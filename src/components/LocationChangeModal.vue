@@ -112,7 +112,7 @@ export default {
     },
   },
   mounted () {
-    this.$root.$on('LocationChangeModal',() => {
+    this.$root.$on('LocationChangeModal',() => { //test
     // setTimeout(this.showModal, 1000);
     this.showLocationModal();   
     console.log("IN MOUNTED");
