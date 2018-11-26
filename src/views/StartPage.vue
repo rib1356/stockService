@@ -14,11 +14,6 @@ export default {
       msg: 'Welcome to Your Vue.js App'
     }
   },
-  method: {
-    // movePage: function(){
-    //   this.$router.push('StockTable');
-    // }
-  },
 }
 </script>
 

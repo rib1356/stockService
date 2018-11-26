@@ -1,5 +1,7 @@
 <template>
   <b-container fluid>
+    <p class="loader" v-if="loading"></p>
+    <p>{{status}}</p>
     <router-link to="/StartPage" tag="button">Home</router-link>
     <!-- User Interface controls -->
     <b-row>
@@ -43,7 +45,7 @@
     <div>
     <b-table show-empty
              stacked="md"
-             :items="items"
+             :items="plantData"
              :fields="fields"
              :filter="filter"
              :sort-by.sync="sortBy"
@@ -51,7 +53,7 @@
              :sort-direction="sortDirection"
              class="table"    
              >
-      <template slot="plantName" slot-scope="row">{{row.value.genera}} {{row.value.species}} {{row.value.variety}}</template>
+      <!-- <template slot="plantName" slot-scope="row">{{row.value.plantName}} </template> -->
       <!-- <template slot="quantity" slot-scope="row">{{row.value === 0, 'No'}}</template> -->
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
@@ -73,41 +75,25 @@
 </template>
 
 <script>
-const items = [
-  { plantName: { genera: 'ACER', species: 'Palmatum', variety: 'Sango-kaku' }, location: 'R2', quantity: 40, formSize: '6-8 C5' },
-  { plantName: { genera: 'ASPLENIUM', species: 'Scolopendium', variety: '' }, location: 'W2', quantity: 33, formSize: '20-30 C2' },
-  { plantName: { genera: 'BERGENIA', species: 'Silver', variety: 'Light' }, location: 'E5', quantity: 8, formSize: '6-8 C5' },
-  { plantName: { genera: 'CHAENOMELES', species: 'Geisha', variety: 'Girl' }, location: 'E6', quantity: 32, formSize: '30-40 C3' },
-  { plantName: { genera: 'CLEMATIS', species: 'Alpina', variety: 'Helsingourg' }, location: 'W10', quantity: 27, formSize: '6-8 C5' },
-  { plantName: { genera: 'CORYLUS', species: 'Cortorta', variety: '' }, location: 'MBS4', quantity: 22, formSize: '6-8 C5' },
-  { plantName: { genera: 'DRYOPERTIS', species: 'Felix-mas', variety: '' }, location: 'MBW7', quantity: 12, formSize: '6-8 C5' },
-  { plantName: { genera: 'HELLEBOROUS', species: 'Orirntalis', variety: 'Mixed' }, location: 'W30', quantity: 23, formSize: '6-8 C5' },
-  { plantName: { genera: 'HEUCHERA', species: 'Petite', variety: 'Pearl Fairy' }, location: 'W33', quantity: 38, formSize: '6-8 C5' },
-  { plantName: { genera: 'LIROPE', species: 'Muscari', variety: 'Big Blue' }, location: 'MBW2', quantity: 6, formSize: '6-8 C5' },
-  { plantName: { genera: 'LAMIUM', species: 'Maculata', variety: 'White Nancy' }, location: 'R4', quantity: 5, formSize: '6-8 C5' },
-  { plantName: { genera: 'MISCANTHUS', species: 'Sinensis', variety: 'Zebius' }, location: 'E23', quantity: 8, formSize: '6-8 C5' },
-  { plantName: { genera: 'LAMIUM', species: 'Maculata', variety: 'White Nancy' }, location: 'R4', quantity: 5, formSize: '6-8 C5' },
-  { plantName: { genera: 'MISCANTHUS', species: '', variety: 'Zebius' }, location: 'E23', quantity: 8, formSize: '6-8 C5' },
-  { plantName: { genera: 'LAMIUM', species: 'Maculata', variety: 'White Nancy' }, location: 'R4', quantity: 5, formSize: '6-8 C5' },
-]
 
 export default {
   name: 'StockTable',
   data () {
     return {
-      items: items,
       fields: [
         { key: 'plantName', label: 'Plant Full Name', sortable: true, sortDirection: 'desc' },
         { key: 'location', label: 'Location', sortable: true, 'class': 'text-center' },
         { key: 'quantity', label: 'Quantity', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
-      totalRows: items.length,
       sortBy: null,
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-      modalInfo: { title: '', content: '' }
+      modalInfo: { title: '', content: '' },
+      status: '',
+      plantData: [],
+      loading: true,
     }
   },
   computed: {
@@ -120,7 +106,8 @@ export default {
   },
   methods: {
     info(item, index, button) {
-      this.modalInfo.title = `Name: ${item.plantName.genera} ${item.plantName.species} ${item.plantName.variety}`
+      this.modalInfo.title = `Name: ${item.plantName}`
+      // this.modalInfo.title = `Name: ${item.plantName.genera} ${item.plantName.species} ${item.plantName.variety}`
       this.modalInfo.content = JSON.stringify(item, null, 2)
       this.$root.$emit('bv::show::modal', 'modalInfo', button)
     },
@@ -128,23 +115,46 @@ export default {
       this.modalInfo.title = ''
       this.modalInfo.content = ''
     },
-    selectBatch(item, index) {
-      var selectedBatch = new this.selectedBatchInformation();
-      selectedBatch.genera = item.plantName.genera;
-      selectedBatch.species = item.plantName.species;
-      selectedBatch.variety = item.plantName.variety;
+    selectBatch(item, index) { //Get the selected row
+      var selectedBatch = new this.selectedBatchInformation(); //Create a new object and assign the row values
+      selectedBatch.plantName = item.plantName;
       selectedBatch.location = item.location;
       selectedBatch.quantity = item.quantity;
       selectedBatch.formSize = item.formSize;
       selectedBatch.batchNo = index;
 
-      console.log("Batch object saved = " + selectedBatch);
-      sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch));
-      this.$router.push('BatchInformation');
+      sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
+      this.$router.push('BatchInformation'); //Move to next page
     },
-    selectedBatchInformation(genera, species, variety, location, quantity, formSize, batchNo){
-      var genera, species, variety, loction, quantity, formSize, batchNo;
-    }, 
+    selectedBatchInformation(plantName, location, quantity, formSize, batchNo){
+      var plantName, loction, quantity, formSize, batchNo;
+    },
+    retrieveData () {
+      this.status = "loading stock information..."
+      this.$http.get('https://ahillsbatchservice.azurewebsites.net/api/Batches')
+        .then((response) => {
+          this.changeData(response.data);
+          this.status = 'Stock Information loaded'
+          this.loading = false; //Hide the spinner once data is loaded
+      })
+        .catch((error) => {
+          this.status = error;
+      });
+    },
+    changeData (response) {
+
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+        this.plantData.push({                  //This is then used to populate the data table
+          "plantName": response[i].Name,
+          "location": response[i].Location,
+          "quantity": response[i].Quantity,
+          "formSize": response[i].FormSize,
+           });
+      }
+    } 
+  },
+  created() {
+    this.retrieveData(); //On webpage load
   }
 }
 </script>
@@ -159,6 +169,25 @@ export default {
 
 /* /thead, tbody { display: block; } */
 
+.loader {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #61dd27; /* Green */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    position: absolute;
+    left: 50%;
+    top: 50%; /* Needs to be changed so that its centered on mobile devices */  
+    right: 50%;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
 tbody {
   height: 100%;
   width: 100%;
@@ -169,6 +198,10 @@ tbody {
 thead {
   width: 100%;
   vertical-align: top;
+}
+
+.b-table[aria-busy="true"] {
+  content: 'nigguh';
 }
 
 /* // th {

@@ -112,7 +112,7 @@ export default {
     },
   },
   mounted () {
-    this.$root.$on('LocationChangeModal',() => { //test
+    this.$root.$on('LocationChangeModal',() => { //test CREATED()
     // setTimeout(this.showModal, 1000);
     this.showLocationModal();   
     console.log("IN MOUNTED");
@@ -120,6 +120,9 @@ export default {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.quantity = selectedBatchInformation.quantity;
     this.oldLocation = selectedBatchInformation.location;
+  },
+  created: function () {
+    
   }
 }
 </script>

@@ -2,7 +2,7 @@
   <div>
       <b-container>
       <h4>Batch Number: {{batchNo}}</h4>
-      <h4>Plant Name: {{genera}} {{species}} {{variety}} </h4>
+      <h4>Plant Name: {{plantName}} </h4>
       <b-row>
         <b-col cols="2"><label for="location">Location: {{location}}</label></b-col>
         <b-col cols="10"><location-change-modal></location-change-modal></b-col>
@@ -71,9 +71,7 @@ export default {
   },
   methods: {
     displayBatchInformation(selectedBatchInformation) {
-      this.genera = selectedBatchInformation.genera;
-      this.species = selectedBatchInformation.species;
-      this.variety = selectedBatchInformation.variety;
+      this.plantName = selectedBatchInformation.plantName;
       this.location = selectedBatchInformation.location;
       this.quantity = selectedBatchInformation.quantity;
       this.formSize = selectedBatchInformation.formSize;

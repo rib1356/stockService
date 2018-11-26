@@ -40,10 +40,11 @@ export default {
 </script>
 
 <style scoped>
-/* .btn {
-  margin-left: 10%;
-  text-align: right;
-} */
+
+.modal-lg { /*Used to overwrite the size of the modal */
+    height: 20vh;
+}
+
 p {
   margin-left: 10px;
   /* vertical-align: middle;
