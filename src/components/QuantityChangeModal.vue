@@ -8,7 +8,7 @@
           <p>Edit Quantity: &nbsp; <input type="number" name="quantity" id="quantity"></p>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Save Changes</b-btn>
       </div>
     <!-- <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-btn>   -->

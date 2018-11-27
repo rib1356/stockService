@@ -37,7 +37,7 @@
       </div>
       <!-- class="modal-footer" Adds a footer but own css could be used? -->
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideLocationModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideLocationModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="showConfirmModal">Continue</b-btn>
       </div>
     </b-modal>
@@ -50,7 +50,7 @@
         <p>New Location: Main-{{selectedMainLocation}} || Sub-{{selectedSubLocation}} </p>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="showLocationModal">Back</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="showLocationModal">Back</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="hideConfirmModal">Save Changes</b-btn>
       </div>
       </b-modal>

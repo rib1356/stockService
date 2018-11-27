@@ -7,7 +7,7 @@
         <b-button class="myBtn">Add/Edit Image: </b-button>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Save Changes</b-btn>
       </div>
     </b-modal>

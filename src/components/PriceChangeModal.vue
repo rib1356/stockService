@@ -11,7 +11,7 @@
         <p>Set new selling price: <input type="text" name="price" id="price"></p>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Save Changes</b-btn>
       </div>
     </b-modal>

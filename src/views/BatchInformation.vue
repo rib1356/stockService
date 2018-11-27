@@ -1,7 +1,7 @@
 <template>
   <div>
       <b-container>
-      <h4>Batch Number: {{batchNo}}</h4>
+      <h4>Batch Number: {{batchId}}</h4>
       <h4>Plant Name: {{plantName}} </h4>
       <b-row>
         <b-col cols="2"><label for="location">Location: {{location}}</label></b-col>
@@ -52,13 +52,11 @@ export default {
   name: 'BatchInformation',
   data () {
     return {
-      genera: '',
-      species: '',
-      variety: '',
+      plantName: '',
       location: '',
       quantity: '',
       formSize: '',
-      batchNo: '',
+      batchId: '',
     }
   },
   components: {
@@ -75,7 +73,7 @@ export default {
       this.location = selectedBatchInformation.location;
       this.quantity = selectedBatchInformation.quantity;
       this.formSize = selectedBatchInformation.formSize;
-      this.batchNo = selectedBatchInformation.batchNo;
+      this.batchId = selectedBatchInformation.batchId;
     },
     saveChanges(){
       this.$router.push('StockTable');

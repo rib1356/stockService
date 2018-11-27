@@ -7,6 +7,7 @@ import Router from 'vue-router'
 import StartPage from '@/views/StartPage'
 import StockTable from '@/views/StockTable'
 import BatchInformation from '@/views/BatchInformation'
+import newBatch from '@/views/newBatch'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -38,6 +39,11 @@ export default new Router({
       path: '/BatchInformation',
       name: 'BatchInformation',
       component: BatchInformation
-    }
+    },
+    {
+      path: '/newBatch',
+      name: 'newBatch',
+      component: newBatch
+    },
   ]
 })

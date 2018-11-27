@@ -2,7 +2,9 @@
   <b-container fluid>
     <p class="loader" v-if="loading"></p>
     <p>{{status}}</p>
-    <router-link to="/StartPage" tag="button">Home</router-link>
+    <router-link to="/StartPage" tag="button" >Home</router-link>
+    <router-link to="/newBatch" tag="button">Add new batch</router-link>
+
     <!-- User Interface controls -->
     <b-row>
       <b-col md="6" class="my-1">
@@ -28,17 +30,6 @@
           </b-input-group>
         </b-form-group>
       </b-col>
-      <!-- <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Sort direction" class="mb-0">
-          <b-input-group>
-            <b-form-select v-model="sortDirection" slot="append">
-              <option value="asc">Asc</option>
-              <option value="desc">Desc</option>
-              <option value="last">Last</option>
-            </b-form-select>
-          </b-input-group>
-        </b-form-group>
-      </b-col> -->
     </b-row>
     
     <!-- Main table element -->
@@ -53,14 +44,12 @@
              :sort-direction="sortDirection"
              class="table"    
              >
-      <!-- <template slot="plantName" slot-scope="row">{{row.value.plantName}} </template> -->
-      <!-- <template slot="quantity" slot-scope="row">{{row.value === 0, 'No'}}</template> -->
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-        <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
+        <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
           Info modal
         </b-button>
-        <b-button size="sm" @click.stop="selectBatch(row.item, row.index)">
+        <b-button size="sm" variant="outline-primary" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
       </template>
@@ -82,12 +71,13 @@ export default {
     return {
       fields: [
         { key: 'plantName', label: 'Plant Full Name', sortable: true, sortDirection: 'desc' },
-        { key: 'location', label: 'Location', sortable: true, 'class': 'text-center' },
+        { key: 'location', label: 'Location', sortable: true, 'class': 'text-center', searchable: true },
         { key: 'quantity', label: 'Quantity', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
       sortBy: null,
       sortDesc: false,
+      sortSearch: false,
       sortDirection: 'asc',
       filter: null,
       modalInfo: { title: '', content: '' },
@@ -105,7 +95,7 @@ export default {
     }
   },
   methods: {
-    info(item, index, button) {
+    info(item, button) {
       this.modalInfo.title = `Name: ${item.plantName}`
       // this.modalInfo.title = `Name: ${item.plantName.genera} ${item.plantName.species} ${item.plantName.variety}`
       this.modalInfo.content = JSON.stringify(item, null, 2)
@@ -121,17 +111,17 @@ export default {
       selectedBatch.location = item.location;
       selectedBatch.quantity = item.quantity;
       selectedBatch.formSize = item.formSize;
-      selectedBatch.batchNo = index;
+      selectedBatch.batchId = item.batchId;
 
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
       this.$router.push('BatchInformation'); //Move to next page
     },
-    selectedBatchInformation(plantName, location, quantity, formSize, batchNo){
-      var plantName, loction, quantity, formSize, batchNo;
+    selectedBatchInformation(plantName, location, quantity, formSize, batchId){
+      var plantName, loction, quantity, formSize, batchId;
     },
     retrieveData () {
       this.status = "loading stock information..."
-      this.$http.get('https://ahillsbatchservice.azurewebsites.net/api/Batches')
+      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches')
         .then((response) => {
           this.changeData(response.data);
           this.status = 'Stock Information loaded'
@@ -142,9 +132,9 @@ export default {
       });
     },
     changeData (response) {
-
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
         this.plantData.push({                  //This is then used to populate the data table
+          "batchId": response[i].Id,
           "plantName": response[i].Name,
           "location": response[i].Location,
           "quantity": response[i].Quantity,
@@ -187,6 +177,10 @@ export default {
     100% { transform: rotate(360deg); }
 }
 
+
+.myBtn {
+  margin-top: 1px;
+}
 
 tbody {
   height: 100%;

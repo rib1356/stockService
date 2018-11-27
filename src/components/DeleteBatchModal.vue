@@ -11,7 +11,7 @@
         <p>Quantity: <input type="number" v-model="quantity" :max="quantity"></p>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="testMethod">Save Changes</b-btn>
       </div>
     </b-modal>

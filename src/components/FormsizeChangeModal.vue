@@ -36,7 +36,7 @@
         </b-container>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Cancel</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
       </div>
     </b-modal>
@@ -48,7 +48,7 @@
         <p>New form size: {{selectedFormSize}}</p>
       </div>
       <div>
-        <b-btn class="mt-3" variant="outline-primary" @click="showModal">Back</b-btn>
+        <b-btn class="mt-3" variant="outline-danger" @click="showModal">Back</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="hideConfirmModal">Save Changes</b-btn>
       </div>
       </b-modal>
