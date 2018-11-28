@@ -9,25 +9,31 @@
 				  label="Name:"
 				  label-class="text-sm-right"
 				  label-for="nestedName">
-	  <b-form-input id="nestedName"></b-form-input>
+	  <b-form-input id="nestedName" v-model="Name"></b-form-input>
 	</b-form-group>
 	<b-form-group horizontal
 				  label="Size:"
 				  label-class="text-sm-right"
 				  label-for="nestedSize">
-	  <b-form-input id="nestedSize"></b-form-input>
+	  <b-form-input id="nestedSize" v-model="FormSize"></b-form-input>
+	</b-form-group>
+	<b-form-group horizontal
+				  label="Location:"
+				  label-class="text-sm-right"
+				  label-for="nestedLocation">
+	  <b-form-input id="nestedLocation" v-model="Location"></b-form-input>
 	</b-form-group>
 	<b-form-group horizontal
 				  label="Quantity:"
 				  label-class="text-sm-right"
 				  label-for="nestedQuantity">
-	  <b-form-input id="nestedQuantity"></b-form-input>
+	  <b-form-input id="nestedQuantity" v-model="Quantity"></b-form-input>
 	</b-form-group>
 	<b-form-group horizontal
 				  label="Price:"
 				  label-class="text-sm-right"
 				  label-for="nestedPrice">
-	  <b-form-input id="nestedPrice"></b-form-input>
+	  <b-form-input id="nestedPrice" v-model="WholesalePrice"></b-form-input>
 	  </b-form-group>
 	<b-form-group horizontal
 				  label="Image:"
@@ -46,7 +52,18 @@
 export default {
   data () {
 		return {
-	  	name: ''
+			 //Make this batch object to be the same as the table
+				//Hopefully the ID will auto inc
+				// Id: '300',
+				Sku: 'Test',
+				Name: '',
+				FormSize: '',
+				Location: '',
+				Quantity: '',
+				WholesalePrice: '',
+				Image: null,
+				Active: 1,
+			
 		}		
   },
   methods: {
@@ -54,8 +71,24 @@ export default {
 	  	this.$router.push('StockTable');
 	},
 		saveBatch() {
-	  	alert("Batch Saved");
-	  	this.$router.push('StockTable');  
+			this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
+				"Sku": this.Sku,
+				"Name": this.Name,
+				"FormSize": this.FormSize,
+				"Location": this.Location,
+				"Quantity": this.Quantity,
+				"WholesalePrice": this.WholesalePrice,
+				"Image": this.Image,
+				"Active": this.Active,
+			})
+			.then((response) => {
+				console.log(response);
+				alert("Batch created");
+				this.$router.push('StockTable');
+			})
+			.catch((error) => {
+				console.log(error);
+			});
 	}
   }
 }
