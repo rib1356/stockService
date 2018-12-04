@@ -112,6 +112,7 @@ export default {
       selectedBatch.quantity = item.quantity;
       selectedBatch.formSize = item.formSize;
       selectedBatch.batchId = item.batchId;
+      selectedBatch.active = item.active;
 
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
       this.$router.push('BatchInformation'); //Move to next page
@@ -133,13 +134,14 @@ export default {
     },
     changeData (response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-      if(response[i].Active == 1) {            //Only get the batches that are active to not show deleted batches  
+      if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
         this.plantData.push({                 //This is then pushed into an array and used to populate the data table
           "batchId": response[i].Id,
           "plantName": response[i].Name,
           "location": response[i].Location,
           "quantity": response[i].Quantity,
           "formSize": response[i].FormSize,
+          "active": response[i].Active,
            });
       }     
       }

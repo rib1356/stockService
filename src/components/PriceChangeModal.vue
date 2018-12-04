@@ -38,6 +38,13 @@ export default {
 </script>
 
 <style scoped>
+.modal {
+    display: none;
+    position: fixed;
+}
+.modal.open {
+   display: block;
+}
 /* .btn {
   margin-left: 10%;
   text-align: right;

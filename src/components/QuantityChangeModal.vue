@@ -41,6 +41,14 @@ export default {
 
 <style scoped>
 
+.modal {
+    display: none;
+    position: fixed;
+}
+.modal.open {
+   display: block;
+}
+
 .modal-lg { /*Used to overwrite the size of the modal */
     height: 20vh;
 }

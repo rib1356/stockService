@@ -3,16 +3,16 @@
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Delete Batch</b-button>
     <b-modal ref="DeleteModal" title="Delete Batch" size="lg" centered hide-footer>
-      <div class="modal-lg">
+      <div class="modal__content">
         <p>Are you sure you want to delete this batch?</p>
-        <p>Name: {{genera}} {{species}} {{variety}}</p>
+        <p>Name: {{plantName}}</p>
         <p>Location: {{location}}</p>
         <p>Reason?: <input type="text" name="reason" id="reason"></p>
-        <p>Quantity: <input type="number" v-model="quantity" :max="quantity"></p>
+        <!-- <p>Quantity: <input type="number" v-model="quantity" :max="quantity"></p> -->
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="testMethod">Save Changes</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="deleteBatch">Save Changes</b-btn>
       </div>
     </b-modal>
   </div>
@@ -23,11 +23,11 @@ export default {
   name: 'DeleteBatchModal',
   data () {
     return {
-      genera: '',
-      species: '',
-      variety: '',
+      plantName: '',
       location: '',
       quantity: '',
+      batchId: '',
+      active: '',
      }
   },
   methods: {
@@ -38,9 +38,25 @@ export default {
       this.$refs.DeleteModal.hide();
       this.quantity = '';
     },
-    testMethod (){
+    deleteBatch (){
       console.log("Save and close");
-      this.$refs.DeleteModal.hide();
+
+      var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
+      this.active = false;
+      let data = { "Id": this.batchId, "Active": this.active} ;
+      this.axios.put(url, data, {
+        headers: { 
+          'Content-Type': 'application/json',
+        }
+      })
+			.then((response) => {
+				console.log(response);
+				confirm("Batch deleted");
+				this.$router.push('StockTable');
+			})
+			.catch((error) => {
+				console.log(error);
+			});
     }
   },
   mounted() {
@@ -48,16 +64,23 @@ export default {
       this.showModal();      
     });
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
-    this.genera = selectedBatchInformation.genera;
-    this.species = selectedBatchInformation.species;
-    this.variety = selectedBatchInformation.variety;
+    this.plantName = selectedBatchInformation.plantName; 
     this.location = selectedBatchInformation.location;
     this.quantity = selectedBatchInformation.quantity;
+    this.batchId = selectedBatchInformation.batchId;
+    this.active = selectedBatchInformation.active;
   }
 }
 </script>
 
 <style scoped>
+.modal {
+    display: none;
+    position: fixed;
+}
+.modal.open {
+   display: block;
+}
 /* .btn {
   margin-left: 10%;
   text-align: right;

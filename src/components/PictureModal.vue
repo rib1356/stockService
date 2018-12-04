@@ -3,7 +3,7 @@
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Picture</b-button>
     <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer>
-      <div class="modal-lg">
+      <div class="modal__content">
         <b-button class="myBtn">Add/Edit Image: </b-button>
       </div>
       <div>
@@ -38,7 +38,13 @@ export default {
   margin-left: 10%;
   text-align: right;
 } */
-
+.modal {
+    display: none;
+    position: fixed;
+}
+.modal.open {
+   display: block;
+}
 .myBtn {
   margin-left: 0px;
 }

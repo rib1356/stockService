@@ -62,8 +62,7 @@ export default {
 				Quantity: '',
 				WholesalePrice: '',
 				Image: null,
-				Active: 1,
-			
+				Active: true,
 		}		
   },
   methods: {

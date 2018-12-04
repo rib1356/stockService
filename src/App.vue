@@ -20,7 +20,7 @@ export default {
   margin-top: 10px;
 }
 
-.modal-lg {
+.modal__content {
     height: 45vh;
 }
 

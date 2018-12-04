@@ -4,8 +4,10 @@
               Change Form Size</b-button>
     <b-modal ref="formSizeModal" title="Change Batch Form Size" size="lg" centered hide-footer>
       <!-- Div for the modal body -->
-      <div class="modal-lg my-modal"> 
+      <div>
         <p>Quantity: <input type="text"  v-model="quantity"></p>
+      </div>
+      <div class="modal__content">   
         <b-container>
           <b-row>
             <b-col> 
@@ -35,14 +37,14 @@
           </b-row>
         </b-container>
       </div>
-      <div>
+      <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
         <b-btn class="mt-3" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
       </div>
     </b-modal>
     <div>
       <b-modal ref="formSizeConfirmModal" title="Confirm Form Size Change" size="lg" centered hide-footer>
-        <div class="modal-lg">
+        <div class="modal__content">
         <p>Are the changes to form size Correct?</p>
         <p>Old form size: {{oldFormSize}} </p>
         <p>New form size: {{selectedFormSize}}</p>
@@ -77,6 +79,9 @@ export default {
         { text: 'C2 40-60', value: 'C2-40' },
         { text: 'C3 20-30', value: 'C3-20' },
         { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
       ],
     }
   },
@@ -108,7 +113,18 @@ export default {
 }
 </script>
 
-<style >
+<style>
+
+.modal {
+    display: none;
+    position: fixed;
+}
+.modal.open {
+   display: block;
+}
+.modal__content {
+    overflow-y: auto;
+}
 
 /* .btn {
   margin-left: 10%;
