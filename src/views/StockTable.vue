@@ -154,7 +154,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 .scrollable {
   vertical-align: top;
@@ -182,6 +182,13 @@ export default {
     100% { transform: rotate(360deg); }
 }
 
+@media only screen and (max-width : 768px) {
+.loader {
+    left: 45%;  
+    top: 50%;
+    right: 55%;
+}
+}
 
 .myBtn {
   margin-top: 1px;
@@ -202,15 +209,5 @@ thead {
 .b-table[aria-busy="true"] {
   content: 'nigguh';
 }
-
-/* // th {
-//   position: fixed;
-// } */
-
-/* body {
-  padding-top: 50px;
-  position: fixed;
-  top: 0; bottom: 0; left: 0; right: 0;
-} */
 
 </style>

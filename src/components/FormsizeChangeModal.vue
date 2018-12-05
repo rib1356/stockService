@@ -7,11 +7,12 @@
       <div>
         <p>Quantity: <input type="text"  v-model="quantity"></p>
       </div>
-      <div class="modal__content">   
+      <div>   
         <b-container>
           <b-row>
-            <b-col> 
-              <b-form-group label="Form Size Group">
+            <b-col>
+              <p>Form Size Group</p> 
+              <b-form-group class="modal__content">
                 <b-form-radio-group id="groupFormSizeButtons"
                                     v-model="selected"
                                     buttons
@@ -23,7 +24,8 @@
               </b-form-group>
             </b-col>
             <b-col>
-              <b-form-group label="New Form Size">
+              <p>New Form Size</p>
+              <b-form-group class="modal__content">
                 <b-form-radio-group id="newFormSizeButtons"
                                     v-model="selectedFormSize"
                                     buttons
@@ -82,6 +84,11 @@ export default {
         { text: 'C3 40-60', value: 'C3-40' },
         { text: 'C3 40-60', value: 'C3-40' },
         { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C3 40-60', value: 'C3-40' },
       ],
     }
   },
@@ -113,7 +120,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 .modal {
     display: none;
@@ -122,18 +129,41 @@ export default {
 .modal.open {
    display: block;
 }
+
 .modal__content {
     overflow-y: auto;
+    border-bottom: 1px solid #e9ecef !important;
+    border-top: 1px solid #e9ecef;
+    margin-bottom: 5px;
+}
+ /* make scrollbar transparent */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
 }
 
-/* .btn {
-  margin-left: 10%;
-  text-align: right;
-} */
+/* Stop background moving when modal is open */
+body.modal-open {
+    overflow: hidden;
+    /* position: fixed; */
+}
 
-/* .my-modal .modal-body {
-  max-height: 60vh;
-  overflow-y: auto;
-} */
+body{
+  overflow: hidden !important;
+  position: fixed;
+}
+
+/* For mobile screens potential for more css in here? */
+@media only screen and (max-width : 768px) {
+ .modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  }
+}
 
 </style>
