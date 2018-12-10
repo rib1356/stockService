@@ -32,7 +32,7 @@
         <b-col cols="2"></b-col>
         <b-col cols="10"><b-button @click="saveChanges" style="position: absolute;" 
                                    variant="outline-primary">
-                                   Save Changes</b-button>
+                                   Finished Editing</b-button>
         </b-col>
       </b-row>
     </b-container> 
@@ -57,6 +57,7 @@ export default {
       quantity: '',
       formSize: '',
       batchId: '',
+      newLocation: ''
     }
   },
   components: {
@@ -76,12 +77,31 @@ export default {
       this.batchId = selectedBatchInformation.batchId;
     },
     saveChanges(){
+      sessionStorage.removeItem('newLocation');
       this.$router.push('StockTable');
+    },
+    loadNewLocation(value) {
+      console.log(value);
     }
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.displayBatchInformation(selectedBatchInformation);
+
+    //This should be changed so that when coming back from modal page recalls the data from Service
+    if(sessionStorage.hasOwnProperty('newLocation')) { //If new location exists show this value after page reload
+      var newLocation = sessionStorage.getItem('newLocation');
+      this.location = newLocation;
+    }
+   
+    
+    
+  },
+  computed: {
+      refresh() {
+        this.newLocation = this.$props.newLocation
+        console.log(this.newLocation);
+      }
   }
 }
 </script>

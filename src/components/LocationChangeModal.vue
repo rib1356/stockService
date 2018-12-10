@@ -21,7 +21,7 @@
                                     stacked
                                     name="radioMainLoc"
                                     @input="getSelectedSubLocations"
-                                    >
+                                    > <p>{{status}}</p>
                 </b-form-radio-group>
               </b-form-group>
             </b-col>
@@ -46,7 +46,7 @@
       <!-- class="modal-footer" Adds a footer but own css could be used? -->
       <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="hideLocationModal">Cancel</b-btn>
-        <b-btn class="mt-3" :disabled="false" variant="outline-primary" @click="showConfirmModal">Continue</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="showConfirmModal">Continue</b-btn>
       </div>
     </b-modal>
     <!-- A new modal is created to allow the user to confirm their changes -->
@@ -55,11 +55,11 @@
         <div class="modal-lg">
         <p>Are the changes to location Correct?</p>
         <p>Old Location: {{oldLocation}}</p>
-        <p>New Location: Main-{{selectedMainLocation}} || Sub-{{selectedSubLocation}} </p>
+        <p>New Location: {{selectedMainLocation}}{{selectedSubLocation}} </p>
       </div>
       <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="showLocationModal">Back</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideConfirmModal">Save Changes</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="SaveLocation">Save Changes</b-btn>
       </div>
       </b-modal>
     </div>
@@ -80,7 +80,8 @@ export default {
       oldLocation: '',
       mainLocations: [],
       subLocations: [],
-      disabled: '',
+      disabled: 1,
+      status: '',
     }
   },
   components: {
@@ -93,17 +94,21 @@ export default {
     },
     hideLocationModal () {
       this.$refs.locationModal.hide();
-      this.mainLocations = [];
+      this.mainLocations = []; //Reset main location array so it doesnt become repopulated
     },
     showConfirmModal () {
       this.$refs.locationConfirmModal.show();
     },
-    hideConfirmModal () {
+    SaveLocation () {
+      var newLocation = this.selectedMainLocation + this.selectedSubLocation;
+      sessionStorage.setItem("newLocation", newLocation);
+      this.$router.go();
       this.$refs.locationConfirmModal.hide();
     },
     retrieveMainLocationData () { //Get all main locations within the database
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations/main')
         .then((response) => {
+          this.status = "Retrieving main locations";
           this.transformMainLocationData(response.data);
       })
         .catch((error) => {
@@ -111,6 +116,7 @@ export default {
       });
     },
     transformMainLocationData(data) { //Transform the incoming data so it can be displayed as radio buttons
+      this.status = '';
       if(this.mainLocations.length <= 0) //If array doesnt already have data format data show on radio buttons
       {
         for(var i = 0; i < data.length; i++){
@@ -124,6 +130,9 @@ export default {
       }
     },
     getSelectedSubLocations() { //When a main location is pressed query the server for the sub locations under that main location
+      this.disabled = 1; //Disable to continue button so a false location cant be selected
+      console.log("Main location pressed: disabled=" + this.disabled);
+      this.selectedSubLocation = ''; //Reset the selected sub location so it can be chosen again
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations?main=' + this.selectedMainLocation)
         .then((response) => {
           this.transformSubLocationData(response.data);
@@ -143,7 +152,9 @@ export default {
         }
     },
     subSelected() {
-      this.disabled = true;
+      if(this.selectedSubLocation != ''){ //Disable button until sublocation is selected
+        this.disabled = 0;
+      }
     }
   },
   mounted () {
