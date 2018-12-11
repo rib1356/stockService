@@ -82,6 +82,7 @@ export default {
       subLocations: [],
       disabled: 1,
       status: '',
+      batchId: '',
     }
   },
   components: {
@@ -101,14 +102,15 @@ export default {
     },
     SaveLocation () {
       var newLocation = this.selectedMainLocation + this.selectedSubLocation;
-      sessionStorage.setItem("newLocation", newLocation);
-      this.$router.go();
+      this.saveDbLocation(newLocation);
+      sessionStorage.setItem("newLocation", newLocation); //Save the new location to session storage
+      this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
       this.$refs.locationConfirmModal.hide();
     },
     retrieveMainLocationData () { //Get all main locations within the database
+      this.status = "Retrieving main locations";
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations/main')
         .then((response) => {
-          this.status = "Retrieving main locations";
           this.transformMainLocationData(response.data);
       })
         .catch((error) => {
@@ -130,8 +132,7 @@ export default {
       }
     },
     getSelectedSubLocations() { //When a main location is pressed query the server for the sub locations under that main location
-      this.disabled = 1; //Disable to continue button so a false location cant be selected
-      console.log("Main location pressed: disabled=" + this.disabled);
+      this.disabled = 1; //Disable continue button so a false location cant be selected
       this.selectedSubLocation = ''; //Reset the selected sub location so it can be chosen again
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations?main=' + this.selectedMainLocation)
         .then((response) => {
@@ -155,12 +156,24 @@ export default {
       if(this.selectedSubLocation != ''){ //Disable button until sublocation is selected
         this.disabled = 0;
       }
+    },
+    saveDbLocation(newLocation) { //Save the new location of the batch in the database
+      var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
+      let data = { "Id": this.batchId, "Location": newLocation};
+      this.axios.put(url, data)
+			  .then((response) => {
+          console.log(response);
+			  })
+			.catch((error) => {
+				alert(error);
+			});
     }
   },
   mounted () {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.quantity = selectedBatchInformation.quantity;
     this.oldLocation = selectedBatchInformation.location;
+    this.batchId = selectedBatchInformation.batchId;
   },
   beforeCreate () {
     this.$root.$on('LocationChangeModal',() => { //test CREATED()

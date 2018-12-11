@@ -11,19 +11,6 @@
         <b-container>
           <b-row>
             <b-col>
-              <p>Form Size Group</p> 
-              <b-form-group class="modal__content">
-                <b-form-radio-group id="groupFormSizeButtons"
-                                    v-model="selected"
-                                    buttons
-                                    button-variant="outline-primary"
-                                    :options="formSizeGroups"
-                                    stacked
-                                    name="radioFormSizeGroup">
-                </b-form-radio-group>
-              </b-form-group>
-            </b-col>
-            <b-col>
               <p>New Form Size</p>
               <b-form-group class="modal__content">
                 <b-form-radio-group id="newFormSizeButtons"
@@ -70,25 +57,18 @@ export default {
       selectedFormSize: '',
       quantity: '',
       originalQuantity: '',
-      formSizeGroups: [
-        { text: 'Group1', value: 'Group1' },
-        { text: 'Group2', value: 'Group2' },
-        { text: 'Group3', value: 'Group3' },
-      ],
       newFormSize: [
         { text: 'C2 20-30', value: 'C2-20' },
         { text: 'C2 30-40', value: 'C2-30' },
         { text: 'C2 40-60', value: 'C2-40' },
         { text: 'C3 20-30', value: 'C3-20' },
         { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C3 40-60', value: 'C3-40' },
+        { text: 'C5 20-30', value: 'C5-20' },
+        { text: 'C5 30-40', value: 'C5-30' },
+        { text: 'C5 40-60', value: 'C5-40' },
+        { text: 'C10 60-80', value: 'C10-60' },
+        { text: 'C10 80-100', value: 'C10-80' },
+        { text: 'C10 100-120', value: 'C10-100' },
       ],
     }
   },

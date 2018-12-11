@@ -57,7 +57,6 @@ export default {
       quantity: '',
       formSize: '',
       batchId: '',
-      newLocation: ''
     }
   },
   components: {
@@ -80,29 +79,21 @@ export default {
       sessionStorage.removeItem('newLocation');
       this.$router.push('StockTable');
     },
-    loadNewLocation(value) {
-      console.log(value);
-    }
+    updateLocation() { //This will change the current displayed location
+      if(sessionStorage.hasOwnProperty('newLocation')) { //If new location exists show this value after called
+        var newLocation = sessionStorage.getItem('newLocation');
+        this.location = newLocation;
+      }  
+    },
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.displayBatchInformation(selectedBatchInformation);
-
-    //This should be changed so that when coming back from modal page recalls the data from Service
-    if(sessionStorage.hasOwnProperty('newLocation')) { //If new location exists show this value after page reload
-      var newLocation = sessionStorage.getItem('newLocation');
-      this.location = newLocation;
-    }
-   
-    
-    
+ 
+    this.$root.$on('BatchInformation', () => { //Method is called when the location is changed
+        this.updateLocation();
+    });
   },
-  computed: {
-      refresh() {
-        this.newLocation = this.$props.newLocation
-        console.log(this.newLocation);
-      }
-  }
 }
 </script>
 

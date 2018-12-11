@@ -39,23 +39,17 @@ export default {
       this.quantity = '';
     },
     deleteBatch (){
-      console.log("Save and close");
-
       var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
       this.active = false;
       let data = { "Id": this.batchId, "Active": this.active} ;
-      this.axios.put(url, data, {
-        headers: { 
-          'Content-Type': 'application/json',
-        }
-      })
-			.then((response) => {
-				console.log(response);
-				confirm("Batch deleted");
-				this.$router.push('StockTable');
-			})
+      this.axios.put(url, data)
+			  .then((response) => {
+          console.log(response);
+				  confirm("Batch deleted"); //This needed?
+				  this.$router.push('StockTable');
+			  })
 			.catch((error) => {
-				console.log(error);
+				alert(error);
 			});
     }
   },
