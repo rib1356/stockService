@@ -111,10 +111,11 @@ export default {
 }
 
 .modal__content {
-    overflow-y: auto;
+    overflow-y: scroll;
     border-bottom: 1px solid #e9ecef !important;
     border-top: 1px solid #e9ecef;
     margin-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
 }
  /* make scrollbar transparent */
 ::-webkit-scrollbar {

@@ -23,5 +23,4 @@ export default {
 .modal__content {
     height: 45vh;
 }
-
 </style>

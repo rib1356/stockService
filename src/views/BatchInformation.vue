@@ -104,6 +104,7 @@ h4 {
   font-weight: normal;
   text-align: left;
 }
+
 p {
   font-family: Georgia, "Times New Roman", Times, serif;
   text-align: left;
@@ -112,6 +113,7 @@ p {
   height: 40px;
   margin-right: 55%;
 }
+
 label {
     font-family: Georgia, "Times New Roman", Times, serif;
     font-size: 18px;

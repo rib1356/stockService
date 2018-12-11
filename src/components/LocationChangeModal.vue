@@ -14,6 +14,7 @@
               <p>Main Location</p>
               <b-form-group class="modal__content">
                 <b-form-radio-group id="mainLocationButtons"
+                                    class="myRadioButton"
                                     v-model="selectedMainLocation"
                                     buttons
                                     button-variant="outline-primary"
@@ -30,6 +31,7 @@
               <b-form-group class="modal__content">
                 <b-form-radio-group id="subLocationButtons"
                                     v-model="selectedSubLocation"
+                                    class="myRadioButton"
                                     buttons
                                     button-variant="outline-primary"
                                     :options="subLocations"
@@ -194,10 +196,11 @@ export default {
 }
 
 .modal__content {
-    overflow-y: auto;
+    overflow-y: scroll;
     border-bottom: 1px solid #e9ecef;
     border-top: 1px solid #e9ecef;
     margin-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
 }
  /* make scrollbar transparent */
 ::-webkit-scrollbar {
@@ -205,30 +208,50 @@ export default {
     background: transparent;
 }
 
+.modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
 /* Stop background moving when modal is open */
-body.modal-open {
+/* body.modal-open {
     overflow: hidden !important;
     position: fixed;
     width: 100%;
 }
 
-body{
-  overflow: hidden !important;
-}
+html,
+body {
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+} */
 
 /* For mobile screens potential for more css in here? */
 @media only screen and (max-width : 425px) {
- .modal {
-  position: fixed;
-  overflow: hidden;
-  display: block;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
+ /* .modal__content {
+    /* overflow: hidden !important; */
+    /* position: fixed; */
+    /* width: 100%; */
+    /* height: 100%; */
+    /* height: 60vh;
+    } */
+  /* .modal__content {
+    height: 55vh;
+     max-height: calc(100vh - 200px);
+    overflow-y: auto;
   }
+
+  .modal {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}  */
+
+
+}
+
+.myRadioButton {
+   width: 100px;
 }
 
 </style>
