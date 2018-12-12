@@ -85,6 +85,12 @@ export default {
         this.location = newLocation;
       }  
     },
+    updateQuantity() { //This will change the current displayed location
+      if(sessionStorage.hasOwnProperty('newQuantity')) { //If new location exists show this value after called
+        var newQuantity = sessionStorage.getItem('newQuantity');
+        this.quantity = newQuantity;
+      }  
+    },
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
@@ -92,6 +98,7 @@ export default {
  
     this.$root.$on('BatchInformation', () => { //Method is called when the location is changed
         this.updateLocation();
+        this.updateQuantity();
     });
   },
 }
