@@ -4,12 +4,15 @@
         Change Quantity</b-button>
     <b-modal ref="quantityModal" title="Change Batch Quantity" size="lg" centered hide-footer>
       <div class="modal-lg">
-          <p>Quantity: {{originalQuantity}}</p>
-          <p>Edit Quantity: &nbsp; <input type="number" name="quantity" id="quantity" v-model="quantity" min="1"></p>
+          <div class="form-group" :class="{'has-error': errors.has('quantity') }" >
+            <label class="control-label" for="quantity">Quantity: {{originalQuantity}}</label>
+            <input v-validate="'numeric|min_value:1|required'" name="quantity" id="quantity" v-model="quantity" class="form-control" placeholder="Edit Quantity">
+            <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+          </div>
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="saveChanges">Save Changes</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="validateBeforeSubmit">Save Changes</b-btn>
       </div>
     <!-- <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-btn>   -->
     </b-modal>
@@ -33,21 +36,24 @@ export default {
     hideModal () {
       this.$refs.quantityModal.hide();
     },
-    saveChanges () { 
+    validateBeforeSubmit(e) { //Check that all validation passes before saving
+      this.$validator.validateAll();
+        if (!this.errors.any()) {
+            this.saveChanges();
+        }
+    },
+    saveChanges () { //When button pressed show location change and change db
       this.updateBatchQuantity();
       this.saveDbQuantity()
       this.$refs.quantityModal.hide()
-     
     },
     updateBatchQuantity() {
       sessionStorage.setItem("newQuantity", this.quantity); //Save the new location to session storage
       this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
     },
     saveDbQuantity() {
-      
       var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
       let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity)};
-      console.log(data);
       this.axios.put(url, data)
 			  .then((response) => {
           console.log(response);

@@ -3,9 +3,10 @@
     <b-button @click="showLocationModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Location</b-button>
     <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer>
+      <b-alert :show="createNewBatch" >Quantity changed, this will create a new batch at chosen location</b-alert>
       <!-- Div for the modal body -->
       <div>
-        <p>Quantity: <input type="text" v-model="quantity"></p>
+        <p>Quantity: <input type="text" v-model="quantity" @keyup="quantityCheck"></p>
       </div>
       <div > 
         <b-container>
@@ -55,9 +56,11 @@
     <div>
       <b-modal ref="locationConfirmModal" title="Confirm Location Change" size="lg" centered hide-footer>
         <div class="modal-lg">
-        <p>Are the changes to location Correct?</p>
+        <p >Are the changes to location Correct?</p>
         <p>Old Location: {{oldLocation}}</p>
-        <p>New Location: {{selectedMainLocation}}{{selectedSubLocation}} </p>
+        <p v-if="createNewBatch">Creating a new batch at {{selectedMainLocation}}{{selectedSubLocation}}
+           where Quantity = {{quantity}}</p>
+        <p v-else>New Location: {{selectedMainLocation}}{{selectedSubLocation}} </p>
       </div>
       <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="showLocationModal">Back</b-btn>
@@ -78,6 +81,7 @@ export default {
     return {
       selectedMainLocation: '',
       selectedSubLocation: '',
+      originalQuantity: '',
       quantity: '',
       oldLocation: '',
       mainLocations: [],
@@ -85,6 +89,7 @@ export default {
       disabled: 1,
       status: '',
       batchId: '',
+      createNewBatch: false,
     }
   },
   components: {
@@ -104,9 +109,15 @@ export default {
     },
     SaveLocation () {
       var newLocation = this.selectedMainLocation + this.selectedSubLocation;
-      this.saveDbLocation(newLocation);
-      sessionStorage.setItem("newLocation", newLocation); //Save the new location to session storage
-      this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
+      if(this.createNewBatch){ //If a new batch needs to be created because the quantities are different
+        console.log("create new batch") //add the code to call a new batch create here
+        //worth routing back to the main table
+      } else { //Change the location of the batch
+        this.saveDbLocation(newLocation);
+        sessionStorage.setItem("newLocation", newLocation); //Save the new location to session storage
+        this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
+      }
+      
       this.$refs.locationConfirmModal.hide();
     },
     retrieveMainLocationData () { //Get all main locations within the database
@@ -169,10 +180,18 @@ export default {
 			.catch((error) => {
 				alert(error);
 			});
+    },
+    quantityCheck() {
+      if(this.quantity != this.originalQuantity) {
+        this.createNewBatch = true;
+      } else {
+        this.createNewBatch = false;
+      }
     }
   },
   mounted () {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
+    this.originalQuantity = selectedBatchInformation.quantity;
     this.quantity = selectedBatchInformation.quantity;
     this.oldLocation = selectedBatchInformation.location;
     this.batchId = selectedBatchInformation.batchId;
