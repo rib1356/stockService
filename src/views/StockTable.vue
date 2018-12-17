@@ -107,6 +107,7 @@ export default {
     },
     selectBatch(item, index) { //Get the selected row
       var selectedBatch = new this.selectedBatchInformation(); //Create a new object and assign the row values
+      selectedBatch.Sku = item.Sku;
       selectedBatch.plantName = item.plantName;
       selectedBatch.location = item.location;
       selectedBatch.quantity = item.quantity;
@@ -137,6 +138,7 @@ export default {
       if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
         this.plantData.push({                 //This is then pushed into an array and used to populate the data table
           "batchId": response[i].Id,
+          "Sku": response[i].Sku,
           "plantName": response[i].Name,
           "location": response[i].Location,
           "quantity": response[i].Quantity,

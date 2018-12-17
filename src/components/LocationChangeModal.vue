@@ -2,11 +2,24 @@
   <div>
     <b-button @click="showLocationModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Location</b-button>
+              
     <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer>
-      <b-alert :show="createNewBatch" >Quantity changed, this will create a new batch at chosen location</b-alert>
+            <label class="control-label" for="quantity">Quantity: {{originalQuantity}}</label>
+      <b-alert :show="newBatchNeeded" >Quantity changed, this will create a new batch at chosen location</b-alert>
       <!-- Div for the modal body -->
       <div>
-        <p>Quantity: <input type="text" v-model="quantity" @keyup="quantityCheck"></p>
+        <!-- Form validation -->
+        <input  v-validate="'required|numeric|min_value:1'" 
+                name="quantity"
+                id="quantity" 
+                v-model="quantity" 
+                class="form-control" 
+                placeholder="Edit Quantity"
+                type="number"
+                pattern="[0-9]*"
+                inputmode="numeric"
+                @keyup="validationCheck">
+        <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
       </div>
       <div > 
         <b-container>
@@ -38,7 +51,7 @@
                                     :options="subLocations"
                                     stacked
                                     name="radioSubLoc"
-                                    @input="subSelected"
+                                    @input="validationCheck"
                                     >
                 </b-form-radio-group>
               </b-form-group>  
@@ -58,7 +71,7 @@
         <div class="modal-lg">
         <p >Are the changes to location Correct?</p>
         <p>Old Location: {{oldLocation}}</p>
-        <p v-if="createNewBatch">Creating a new batch at {{selectedMainLocation}}{{selectedSubLocation}}
+        <p v-if="newBatchNeeded">Creating a new batch at {{selectedMainLocation}}{{selectedSubLocation}}
            where Quantity = {{quantity}}</p>
         <p v-else>New Location: {{selectedMainLocation}}{{selectedSubLocation}} </p>
       </div>
@@ -86,10 +99,13 @@ export default {
       oldLocation: '',
       mainLocations: [],
       subLocations: [],
+      batchId: '',
+      Sku: '',
+      name: '',
+      formSize: '',
       disabled: 1,
       status: '',
-      batchId: '',
-      createNewBatch: false,
+      newBatchNeeded: false,
     }
   },
   components: {
@@ -109,15 +125,15 @@ export default {
     },
     SaveLocation () {
       var newLocation = this.selectedMainLocation + this.selectedSubLocation;
-      if(this.createNewBatch){ //If a new batch needs to be created because the quantities are different
-        console.log("create new batch") //add the code to call a new batch create here
-        //worth routing back to the main table
+      var newQuantity = this.originalQuantity - this.quantity;
+      if(this.newBatchNeeded){ //If a new batch needs to be created because the quantities are different
+        this.createNewBatch(newLocation); //Create a duplicate batch with a new quantity 
+        this.editCurrentBatchQuantity(newQuantity); //Update the quantity of the original batch
       } else { //Change the location of the batch
         this.saveDbLocation(newLocation);
         sessionStorage.setItem("newLocation", newLocation); //Save the new location to session storage
         this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
       }
-      
       this.$refs.locationConfirmModal.hide();
     },
     retrieveMainLocationData () { //Get all main locations within the database
@@ -136,7 +152,7 @@ export default {
       {
         for(var i = 0; i < data.length; i++){
           this.mainLocations.push({ //Create an array of objects
-            "text": data[i],
+            "text": data[i], //Data coming in is string so just assign values in object
             "value": data[i]
           });
         }
@@ -165,11 +181,6 @@ export default {
           });
         }
     },
-    subSelected() {
-      if(this.selectedSubLocation != ''){ //Disable button until sublocation is selected
-        this.disabled = 0;
-      }
-    },
     saveDbLocation(newLocation) { //Save the new location of the batch in the database
       var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
       let data = { "Id": this.batchId, "Location": newLocation};
@@ -181,11 +192,50 @@ export default {
 				alert(error);
 			});
     },
-    quantityCheck() {
+    createNewBatch(newLocation) { //Create a new batch with the new location and quantity
+      this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
+        "Sku": this.Sku,
+				"Name": this.name,
+				"FormSize": this.formSize,
+				"Location": newLocation,
+				"Quantity": this.quantity,
+				"WholesalePrice": '',
+				"Image": null,
+				"Active": true,
+			})
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+      });
+    },
+    editCurrentBatchQuantity(newQuantity) {
+      this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, {
+        "Id": this.batchId,
+        "Quantity": parseInt(newQuantity),
+      })
+			.then((response) => {
+        console.log(response);
+        this.$router.push('StockTable')
+			})
+			.catch((error) => {
+				alert(error);
+			});
+    },
+    validationCheck() { 
+      //If quantities are different display alert
       if(this.quantity != this.originalQuantity) {
-        this.createNewBatch = true;
+        this.newBatchNeeded = true;
       } else {
-        this.createNewBatch = false;
+        this.newBatchNeeded = false;
+      }
+      this.$validator.validateAll();
+      //If no validation errors and a sub location is selected enable button
+      if (!this.errors.any() && this.selectedSubLocation != '') {
+        this.disabled = 0;
+      } else {
+        this.disabled = 1;
       }
     }
   },
@@ -195,6 +245,9 @@ export default {
     this.quantity = selectedBatchInformation.quantity;
     this.oldLocation = selectedBatchInformation.location;
     this.batchId = selectedBatchInformation.batchId;
+    this.Sku = selectedBatchInformation.Sku;
+    this.name = selectedBatchInformation.plantName;
+    this.formSize = selectedBatchInformation.formSize;
   },
   beforeCreate () {
     this.$root.$on('LocationChangeModal',() => { //test CREATED()

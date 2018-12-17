@@ -4,17 +4,27 @@
         Change Quantity</b-button>
     <b-modal ref="quantityModal" title="Change Batch Quantity" size="lg" centered hide-footer>
       <div class="modal-lg">
-          <div class="form-group" :class="{'has-error': errors.has('quantity') }" >
+          <div>
+            <!-- Form Validation -->
             <label class="control-label" for="quantity">Quantity: {{originalQuantity}}</label>
-            <input v-validate="'numeric|min_value:1|required'" name="quantity" id="quantity" v-model="quantity" class="form-control" placeholder="Edit Quantity">
+            <input  v-validate="'required|numeric|min_value:1'" 
+                    name="quantity"
+                    id="quantity" 
+                    v-model="quantity" 
+                    class="form-control" 
+                    placeholder="Edit Quantity"
+                    type="number"
+                    pattern="[0-9]*"
+                    inputmode="numeric"
+                    @keyup="validationCheck">
             <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
           </div>
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="validateBeforeSubmit">Save Changes</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false"
+               variant="outline-primary" @click="validateBeforeSubmit">Save Changes</b-btn>
       </div>
-    <!-- <b-btn class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-btn>   -->
     </b-modal>
   </div>
 </template>
@@ -27,6 +37,7 @@ export default {
       originalQuantity: '',
       quantity: '',
       batchId: '',
+      disabled: 1,
     }
   },
   methods: {
@@ -40,6 +51,14 @@ export default {
       this.$validator.validateAll();
         if (!this.errors.any()) {
             this.saveChanges();
+        }
+    },
+    validationCheck() {
+      this.$validator.validateAll();
+        if (!this.errors.any()) {
+          this.disabled = 0;
+        } else {
+          this.disabled = 1;
         }
     },
     saveChanges () { //When button pressed show location change and change db
@@ -66,6 +85,7 @@ export default {
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.originalQuantity = selectedBatchInformation.quantity;
+    this.quantity = selectedBatchInformation.quantity;
     this.batchId = selectedBatchInformation.batchId;
   }
 }
@@ -82,7 +102,7 @@ export default {
 }
 
 .modal-lg { /*Used to overwrite the size of the modal */
-    height: 20vh;
+    height: 30vh;
 }
 
 p {

@@ -53,9 +53,7 @@ export default {
   data () {
 		return {
 			 //Make this batch object to be the same as the table
-				//Hopefully the ID will auto inc
-				// Id: '300',
-				Sku: 'Test',
+				Sku: 'Test', //Make sure that the SKU is coming from plant database
 				Name: '',
 				FormSize: '',
 				Location: '',
