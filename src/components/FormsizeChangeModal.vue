@@ -17,9 +17,10 @@
                                     v-model="selectedFormSize"
                                     buttons
                                     button-variant="outline-primary"
-                                    :options="newFormSize"
+                                    :options="formSizes"
                                     stacked
                                     name="radioNewFormSize">
+                                    <p>{{status}}</p>
                 </b-form-radio-group>
               </b-form-group>  
             </b-col>   
@@ -56,7 +57,10 @@ export default {
       oldFormSize: '',
       selectedFormSize: '',
       quantity: '',
+      Sku: '',
+      status: '',
       originalQuantity: '',
+      formSizes: [],
       newFormSize: [
         { text: 'C2 20-30', value: 'C2-20' },
         { text: 'C2 30-40', value: 'C2-30' },
@@ -73,21 +77,63 @@ export default {
     }
   },
   methods: {
-    showModal () {
+    showModal() {
       this.$refs.formSizeModal.show();
+      this.getFormSizes();
     },
-    hideModal () {
+    hideModal() {
       this.$refs.formSizeModal.hide();
     },
-    hideConfirmModal () {
+    hideConfirmModal() {
       this.$refs.formSizeConfirmModal.hide();
     },
-    continueOrSave () {
+    continueOrSave() {
       if(this.quantity == this.originalQuantity){ 
         this.$refs.formSizeConfirmModal.show(); //If the quantity hasnt changed confirm the form size change
       } else {
         console.log("Trying to open modal");
         this.$root.$emit('LocationChangeModal'); //Else the changed quantity need to be a new batch, therefore set to a new location
+      }
+    },
+    getFormSizes() {
+      this.status = "Retrieving main locations";
+      this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.Sku)
+        .then((response) => {
+          this.transformData(response.data);
+          this.status = '';
+      })
+        .catch((error) => {
+          alert(error);
+      });
+    },
+    transformData(data) {
+      for(var i = 0; i < data.length; i++){
+
+        var potSize;
+        var RootType;
+        //String modifying so that it reads more like "FormSizes"
+        if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
+          potSize = "";
+          RootType = data[i].RootType;
+        } else if (data[i].RootType == "CG") {
+          potSize = "C" + data[i].PotSize;
+          RootType = "";
+        } else {
+          potSize = "AP" + data[i].PotSize;
+          RootType = ""
+        }
+        console.log(data[i].GroupId);
+        var formSize = potSize
+                       + " " + data[i].HeightSpread
+                       + " " + data[i].Girth
+                       + " " + data[i].Age 
+                       + " " + RootType
+                       + " " + data[i].Description
+          this.formSizes.push({
+             "text": formSize,
+             "value": formSize,
+          });
+          
       }
     },
   },
@@ -96,6 +142,7 @@ export default {
     this.quantity = selectedBatchInformation.quantity;
     this.originalQuantity = selectedBatchInformation.quantity;
     this.oldFormSize = selectedBatchInformation.formSize;
+    this.Sku = selectedBatchInformation.Sku;
   }
 }
 </script>

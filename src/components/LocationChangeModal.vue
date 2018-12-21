@@ -141,6 +141,7 @@ export default {
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations/main')
         .then((response) => {
           this.transformMainLocationData(response.data);
+          console.log(this.mainLocations);
       })
         .catch((error) => {
           alert(error);
