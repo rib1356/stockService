@@ -23,7 +23,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: 'StartPage' 
+      redirect: 'StockTable' 
     },
     {
       path: '/StartPage',

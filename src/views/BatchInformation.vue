@@ -91,6 +91,12 @@ export default {
         this.quantity = newQuantity;
       }  
     },
+    updateFormSize() { //This will change the current displayed location
+      if(sessionStorage.hasOwnProperty('newFormSize')) { //If new location exists show this value after called
+        var newFormSize = sessionStorage.getItem('newFormSize');
+        this.formSize = newFormSize;
+      }  
+    },
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
@@ -99,6 +105,7 @@ export default {
     this.$root.$on('BatchInformation', () => { //Method is called when the location is changed
         this.updateLocation();
         this.updateQuantity();
+        this.updateFormSize();
     });
   },
 }

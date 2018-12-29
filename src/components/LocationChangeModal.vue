@@ -141,7 +141,6 @@ export default {
       this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations/main')
         .then((response) => {
           this.transformMainLocationData(response.data);
-          console.log(this.mainLocations);
       })
         .catch((error) => {
           alert(error);
@@ -183,9 +182,8 @@ export default {
         }
     },
     saveDbLocation(newLocation) { //Save the new location of the batch in the database
-      var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
       let data = { "Id": this.batchId, "Location": newLocation};
-      this.axios.put(url, data)
+      this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
 			  })

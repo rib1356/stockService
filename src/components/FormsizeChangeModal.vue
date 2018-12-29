@@ -41,7 +41,7 @@
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="showModal">Back</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideConfirmModal">Save Changes</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="saveFormSizes">Save Changes</b-btn>
       </div>
       </b-modal>
     </div>
@@ -61,19 +61,7 @@ export default {
       status: '',
       originalQuantity: '',
       formSizes: [],
-      newFormSize: [
-        { text: 'C2 20-30', value: 'C2-20' },
-        { text: 'C2 30-40', value: 'C2-30' },
-        { text: 'C2 40-60', value: 'C2-40' },
-        { text: 'C3 20-30', value: 'C3-20' },
-        { text: 'C3 40-60', value: 'C3-40' },
-        { text: 'C5 20-30', value: 'C5-20' },
-        { text: 'C5 30-40', value: 'C5-30' },
-        { text: 'C5 40-60', value: 'C5-40' },
-        { text: 'C10 60-80', value: 'C10-60' },
-        { text: 'C10 80-100', value: 'C10-80' },
-        { text: 'C10 100-120', value: 'C10-100' },
-      ],
+      batchId: '',
     }
   },
   methods: {
@@ -91,12 +79,11 @@ export default {
       if(this.quantity == this.originalQuantity){ 
         this.$refs.formSizeConfirmModal.show(); //If the quantity hasnt changed confirm the form size change
       } else {
-        console.log("Trying to open modal");
         this.$root.$emit('LocationChangeModal'); //Else the changed quantity need to be a new batch, therefore set to a new location
       }
     },
     getFormSizes() {
-      this.status = "Retrieving main locations";
+      this.status = "Retrieving form sizes";
       this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.Sku)
         .then((response) => {
           this.transformData(response.data);
@@ -108,7 +95,6 @@ export default {
     },
     transformData(data) {
       for(var i = 0; i < data.length; i++){
-
         var potSize;
         var RootType;
         //String modifying so that it reads more like "FormSizes"
@@ -122,7 +108,6 @@ export default {
           potSize = "AP" + data[i].PotSize;
           RootType = ""
         }
-        console.log(data[i].GroupId);
         var formSize = potSize
                        + " " + data[i].HeightSpread
                        + " " + data[i].Girth
@@ -133,12 +118,29 @@ export default {
              "text": formSize,
              "value": formSize,
           });
-          
       }
     },
+    updateFormSize() {
+      sessionStorage.setItem("newFormSize", this.selectedFormSize); //Save the new location to session storage
+      this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
+    },
+    saveFormSizes() {
+      this.updateFormSize();
+      this.hideConfirmModal();
+      let data = { "Id": this.batchId, "FormSize": this.selectedFormSize};
+      this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
+			  .then((response) => {
+          console.log(response);
+          
+			  })
+			.catch((error) => {
+				alert(error);
+			});
+    }
   },
   mounted () {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
+    this.batchId = selectedBatchInformation.batchId;
     this.quantity = selectedBatchInformation.quantity;
     this.originalQuantity = selectedBatchInformation.quantity;
     this.oldFormSize = selectedBatchInformation.formSize;

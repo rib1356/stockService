@@ -71,7 +71,8 @@ export default {
     return {
       fields: [
         { key: 'plantName', label: 'Plant Full Name', sortable: true, sortDirection: 'desc' },
-        { key: 'location', label: 'Location', sortable: true, 'class': 'text-center', searchable: true },
+        { key: 'formSize', label: 'Form Size' },
+        { key: 'location', label: 'Location', sortable: true },
         { key: 'quantity', label: 'Quantity', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
