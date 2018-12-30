@@ -3,9 +3,22 @@
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Form Size</b-button>
     <b-modal ref="formSizeModal" title="Change Batch Form Size" size="lg" centered hide-footer>
+      <b-alert :show="newBatchNeeded" >Quantity changed, this will create a new batch when a location is chosen</b-alert>
       <!-- Div for the modal body -->
-      <div>
-        <p>Quantity: <input type="text"  v-model="quantity"></p>
+      <div class="block">
+        <!-- Form validation -->
+        <label for="quantity">Quantity: </label>
+        <input  v-validate="'required|numeric|min_value:1'" 
+                name="quantity"
+                id="quantity" 
+                v-model="quantity" 
+                class="form-control" 
+                placeholder="Edit Quantity"
+                type="number"
+                pattern="[0-9]*"
+                inputmode="numeric"
+                @keyup="validationCheck">
+        <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
       </div>
       <div>   
         <b-container>
@@ -19,7 +32,8 @@
                                     button-variant="outline-primary"
                                     :options="formSizes"
                                     stacked
-                                    name="radioNewFormSize">
+                                    name="radioNewFormSize"
+                                    @input="validationCheck">
                                     <p>{{status}}</p>
                 </b-form-radio-group>
               </b-form-group>  
@@ -29,7 +43,7 @@
       </div>
       <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
       </div>
     </b-modal>
     <div>
@@ -62,6 +76,7 @@ export default {
       originalQuantity: '',
       formSizes: [],
       batchId: '',
+      newBatchNeeded: false,
     }
   },
   methods: {
@@ -79,6 +94,8 @@ export default {
       if(this.quantity == this.originalQuantity){ 
         this.$refs.formSizeConfirmModal.show(); //If the quantity hasnt changed confirm the form size change
       } else {
+        sessionStorage.setItem("newQuantity", this.quantity);
+        sessionStorage.setItem("newFormSize", this.selectedFormSize);
         this.$root.$emit('LocationChangeModal'); //Else the changed quantity need to be a new batch, therefore set to a new location
       }
     },
@@ -136,7 +153,22 @@ export default {
 			.catch((error) => {
 				alert(error);
 			});
-    }
+    },
+    validationCheck() { 
+      //If quantities are different display alert
+      if(this.quantity != this.originalQuantity) {
+        this.newBatchNeeded = true;
+      } else {
+        this.newBatchNeeded = false;
+      }
+      this.$validator.validateAll();
+      //If no validation errors and a formsize is selected enable button
+      if (!this.errors.any() && this.selectedFormSize != '') {
+        this.disabled = 0;
+      } else {
+        this.disabled = 1;
+      }
+    },
   },
   mounted () {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
@@ -181,6 +213,16 @@ body.modal-open {
 body{
   overflow: hidden !important;
   position: fixed;
+}
+
+.block label { 
+  display: inline-block;  
+  text-align: right; 
+  }
+
+.form-control {
+  width: 50%;
+  display: inline-block;
 }
 
 /* For mobile screens potential for more css in here? */

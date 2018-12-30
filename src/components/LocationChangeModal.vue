@@ -2,13 +2,12 @@
   <div>
     <b-button @click="showLocationModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Location</b-button>
-              
     <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer>
-            <label class="control-label" for="quantity">Quantity: {{originalQuantity}}</label>
       <b-alert :show="newBatchNeeded" >Quantity changed, this will create a new batch at chosen location</b-alert>
       <!-- Div for the modal body -->
-      <div>
+      <div class="block">
         <!-- Form validation -->
+        <label for="quantity">Quantity:</label>
         <input  v-validate="'required|numeric|min_value:1'" 
                 name="quantity"
                 id="quantity" 
@@ -18,6 +17,7 @@
                 type="number"
                 pattern="[0-9]*"
                 inputmode="numeric"
+                :disabled="formSizeChanged == 1 ? true : false"
                 @keyup="validationCheck">
         <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
       </div>
@@ -236,7 +236,7 @@ export default {
       } else {
         this.disabled = 1;
       }
-    }
+    },
   },
   mounted () {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
@@ -250,6 +250,9 @@ export default {
   },
   beforeCreate () {
     this.$root.$on('LocationChangeModal',() => { //test CREATED()
+    this.quantity = sessionStorage.getItem('newQuantity');
+    this.formSize = sessionStorage.getItem('newFormSize');
+    this.formSizeChanged = 1;
     this.showLocationModal();   
     });
   }
@@ -284,6 +287,15 @@ export default {
     overflow-y: auto;
 }
 
+.block label { 
+  display: inline-block;  
+  text-align: right; 
+  }
+
+.form-control {
+  width: 50%;
+  display: inline-block;
+}
 /* Stop background moving when modal is open */
 /* body.modal-open {
     overflow: hidden !important;
