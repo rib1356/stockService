@@ -4,7 +4,8 @@
               Change Picture</b-button>
     <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer>
       <div class="modal__content">
-        <b-button class="myBtn">Add/Edit Image: </b-button>
+        <!-- <b-button class="myBtn" @click="openCamera">Add/Edit Image: </b-button> -->
+        <input type="file" accept="image/*">
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
@@ -23,12 +24,12 @@ export default {
     }
   },
   methods: {
-    showModal () {
+    showModal() {
       this.$refs.PictureModal.show()
     },
-    hideModal () {
+    hideModal() {
       this.$refs.PictureModal.hide()
-    }
+    },
   }
 }
 </script>

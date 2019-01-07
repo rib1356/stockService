@@ -106,6 +106,7 @@ export default {
       disabled: 1,
       status: '',
       newBatchNeeded: false,
+      formSizeChanged: false,
     }
   },
   components: {

@@ -77,6 +77,7 @@ export default {
       formSizes: [],
       batchId: '',
       newBatchNeeded: false,
+      disabled: 1,
     }
   },
   methods: {
