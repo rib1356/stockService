@@ -8,18 +8,22 @@ import StartPage from '@/views/StartPage'
 import StockTable from '@/views/StockTable'
 import BatchInformation from '@/views/BatchInformation'
 import newBatch from '@/views/newBatch'
+import Login from '@/views/Login'
+import SignUp from '@/views/SignUp'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 Vue.use(BootstrapVue);
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -43,7 +47,38 @@ export default new Router({
     {
       path: '/newBatch',
       name: 'newBatch',
-      component: newBatch
+      component: newBatch,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/Login',
+      name: 'Login',
+      component: Login
+    },
+    {
+      path: '/SignUp',
+      name: 'SignUp',
+      component: SignUp
     },
   ]
 })
+
+//This method is checked before each route is made
+router.beforeEach((to, from, next) => {
+
+  let currentUser = firebase.auth().currentUser; //Get the current user from firebase if auth (null if not logged in)
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth); //To check if the route we need to go to requires "requiresAuth"
+
+  if(requiresAuth && !currentUser) { //If the page requires authentication and user isnt logged in redirect
+    alert("Please Sign in to access this page");
+    next('/');
+  } else if(requiresAuth && currentUser){ //If page requires authentication and users logged in continue to that page
+    next();
+  } else { //Otherwise allow for normal navigation
+    next();
+  }
+});
+
+export default router;

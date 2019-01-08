@@ -1,9 +1,12 @@
 <template>
   <b-container fluid>
     <p class="loader" v-if="loading"></p>
-    <p>{{status}}</p>
+    <b-alert :show="ifError" variant="danger">{{status}}</b-alert>
+    <!-- <p>{{status}}</p> -->
+    <p>{{userAuthenticated}}</p>
     <router-link to="/StartPage" tag="button" >Home</router-link>
     <router-link to="/newBatch" tag="button">Add new batch</router-link>
+    <router-link to="/Login" tag="button">Login</router-link>
 
     <!-- User Interface controls -->
     <b-row>
@@ -64,7 +67,7 @@
 </template>
 
 <script>
-
+import firebase from 'firebase/app';
 export default {
   name: 'StockTable',
   data () {
@@ -85,6 +88,8 @@ export default {
       status: '',
       plantData: [],
       loading: true,
+      userAuthenticated: '',
+      ifError: false,
     }
   },
   computed: {
@@ -128,10 +133,12 @@ export default {
         .then((response) => {
           this.changeData(response.data);
           this.status = 'Stock Information loaded'
+          this.ifError = false;
           this.loading = false; //Hide the spinner once data is loaded
       })
         .catch((error) => {
           this.status = error;
+          this.ifError = true;
       });
     },
     changeData (response) {
@@ -148,12 +155,18 @@ export default {
            });
       }     
       }
+    },
+    hasUserAuth() {
+      var user = firebase.auth().currentUser; //Get current user
+      if (user) { //If user is logged in continue to the admin page
+        this.userAuthenticated = "User has logged in";
+      }
     } 
   },
   created() {
     this.retrieveData(); //On webpage load
-  },
-  
+    this.hasUserAuth();
+  },  
 }
 </script>
 
