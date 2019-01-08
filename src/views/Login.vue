@@ -16,8 +16,8 @@
 			<p v-if="errors.has('email')" class="alert-danger">{{ errors.first('email') }} </p>
 			<p v-if="errors.has('password')" class="alert-danger">{{ errors.first('password') }} </p>
 			<p class="alert-danger">{{errorMsg}}</p>
-			<b-button @click="validate" variant="outline-primary">Connect</b-button>
-			<b-button @click="signOut" variant="outline-primary">Sign Out</b-button>
+			<b-button @click="signOut" variant="outline-danger">Sign Out</b-button>
+			<b-button @click="validate" variant="outline-primary">Sign In</b-button>
 			<p>Dont have an account ? <router-link to="/SignUp">Create one</router-link></p>
 			<p><router-link to="/Stocktable">Back to stock table</router-link></p>
   </div>
@@ -33,7 +33,6 @@
 			return {
 				email: '',
 				password: '',
-				userSignedIn: false,
 				errorMsg: '',
 			};
 		},
@@ -48,7 +47,7 @@
 			signIn() {
 				firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(
 					(user) => {
-						this.userSignedIn = true;
+						localStorage.setItem("logged", true);
 						this.$router.replace('StockTable');
 					},
 					(err) => {
@@ -58,7 +57,7 @@
 			},
 			signOut() {
 				firebase.auth().signOut().then(() => {
-          console.log("Signed out");
+          localStorage.removeItem("logged");
           this.$router.replace('StockTable');
 				});
 			}
@@ -93,4 +92,11 @@
 .has-error {
   border-color: red;
 }
+
+@media only screen and (max-width : 768px) {
+	input {
+	 width: 80%;
+  }
+}
+
 </style>

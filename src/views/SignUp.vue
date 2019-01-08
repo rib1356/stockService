@@ -57,4 +57,9 @@
 	 text-decoration: underline;
 	 cursor: pointer;
  }
+ @media only screen and (max-width : 768px) {
+	input {
+	 width: 80%;
+  }
+}
 </style>

@@ -5,7 +5,7 @@
     <!-- <p>{{status}}</p> -->
     <p>{{userAuthenticated}}</p>
     <router-link to="/StartPage" tag="button" >Home</router-link>
-    <router-link to="/newBatch" tag="button">Add new batch</router-link>
+    <router-link to="/newBatch" tag="button" v-if="logged">Add new batch</router-link>
     <router-link to="/Login" tag="button">Login</router-link>
 
     <!-- User Interface controls -->
@@ -52,7 +52,7 @@
         <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
           Info modal
         </b-button>
-        <b-button size="sm" variant="outline-primary" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
+        <b-button size="sm" variant="outline-primary" v-if="logged" id="selectBatchBtn" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
       </template>
@@ -90,6 +90,7 @@ export default {
       loading: true,
       userAuthenticated: '',
       ifError: false,
+      logged: false,
     }
   },
   computed: {
@@ -157,16 +158,20 @@ export default {
       }
     },
     hasUserAuth() {
-      var user = firebase.auth().currentUser; //Get current user
-      if (user) { //If user is logged in continue to the admin page
+      this.logged = localStorage.getItem("logged");
+      if (this.logged) { //If user is logged in show the available buttons
         this.userAuthenticated = "User has logged in";
+      } else { //Hide any buttons
+        this.userAuthenticated = "User logged out";
       }
     } 
   },
   created() {
-    this.retrieveData(); //On webpage load
-    this.hasUserAuth();
+    this.retrieveData(); //On webpage load 
   },  
+  mounted() {
+    this.hasUserAuth();
+  }
 }
 </script>
 
@@ -208,6 +213,7 @@ export default {
 
 .myBtn {
   margin-top: 1px;
+
 }
 
 tbody {
@@ -223,7 +229,7 @@ thead {
 }
 
 .b-table[aria-busy="true"] {
-  content: 'nigguh';
+  content: '';
 }
 
 </style>

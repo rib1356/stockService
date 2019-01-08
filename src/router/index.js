@@ -42,7 +42,10 @@ const router = new Router({
     {
       path: '/BatchInformation',
       name: 'BatchInformation',
-      component: BatchInformation
+      component: BatchInformation,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/newBatch',
