@@ -1,14 +1,29 @@
 <template>
   <b-container fluid>
+    <!-- User Navigation -->
+    <b-navbar toggleable="md" type="light">
+      <b-navbar-brand >
+        <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
+        <strong>A Hills Stock</strong>
+      </b-navbar-brand>
+      <b-collapse is-nav id="nav_collapse">
+      <!-- Right aligned nav items -->
+        <b-navbar-nav class="ml-auto">
+          <b-navbar-nav right>
+            <!-- Button navigation -->
+            <b-button variant="outline-primary" class="navBtn" @click="sendHome">Home</b-button>
+            <b-button variant="outline-primary" class="navBtn" @click="addNewBatch" v-if="logged">Add new batch</b-button>
+            <b-button variant="outline-primary" class="navBtn" @click="signOut" v-if="logged">Signout</b-button>
+            <b-button variant="outline-primary" class="navBtn" @click="login" v-else>Login</b-button>
+            </b-navbar-nav>
+        </b-navbar-nav>
+      </b-collapse>
+    </b-navbar>
+    <!-- Loader and Errors -->
     <p class="loader" v-if="loading"></p>
     <b-alert :show="ifError" variant="danger">{{status}}</b-alert>
-    <!-- <p>{{status}}</p> -->
-    <p>{{userAuthenticated}}</p>
-    <router-link to="/StartPage" tag="button" >Home</router-link>
-    <router-link to="/newBatch" tag="button" v-if="logged">Add new batch</router-link>
-    <router-link to="/Login" tag="button">Login</router-link>
-
-    <!-- User Interface controls -->
+    <p>{{"User logged: " + logged}}</p>
+    <!-- User Interface Controls -->
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group horizontal label="Filter" class="mb-0">
@@ -35,7 +50,7 @@
       </b-col>
     </b-row>
     
-    <!-- Main table element -->
+    <!-- Main Table Element -->
     <div>
     <b-table show-empty
              stacked="md"
@@ -52,13 +67,13 @@
         <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
           Info modal
         </b-button>
-        <b-button size="sm" variant="outline-primary" v-if="logged" id="selectBatchBtn" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
+        <b-button size="sm" variant="outline-primary" v-if="logged" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
       </template>
     </b-table>
 
-      <!-- Info modal -->
+      <!-- Info Modal -->
      <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
         <pre>{{ modalInfo.content }}</pre>
       </b-modal>
@@ -91,6 +106,7 @@ export default {
       userAuthenticated: '',
       ifError: false,
       logged: false,
+      authenticated: false,
     }
   },
   computed: {
@@ -158,13 +174,31 @@ export default {
       }
     },
     hasUserAuth() {
-      this.logged = localStorage.getItem("logged");
-      if (this.logged) { //If user is logged in show the available buttons
+      this.authenticated = localStorage.getItem("logged");
+      
+      var user = firebase.auth().currentUser; 
+      if (this.authenticated || user) { //If user is logged in show the available buttons
         this.userAuthenticated = "User has logged in";
+        this.logged = true;
       } else { //Hide any buttons
         this.userAuthenticated = "User logged out";
       }
-    } 
+    },
+    sendHome() {
+      this.$router.push('StartPage');
+    }, 
+    addNewBatch() {
+      this.$router.push('newBatch');
+    }, 
+    login() {
+      this.$router.push('Login');
+    },
+    signOut() {
+			firebase.auth().signOut().then(() => {
+        localStorage.removeItem("logged");
+        this.logged = false
+		  });
+		} 
   },
   created() {
     this.retrieveData(); //On webpage load 
@@ -213,8 +247,12 @@ export default {
 
 .myBtn {
   margin-top: 1px;
-
 }
+.navBtn {
+  margin-right: 3px;
+  margin-left: 3px;
+}
+
 
 tbody {
   height: 100%;

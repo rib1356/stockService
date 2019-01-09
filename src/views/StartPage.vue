@@ -11,7 +11,7 @@ export default {
   name: 'StartPage',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'This page will do something when needs be'
     }
   },
 }
