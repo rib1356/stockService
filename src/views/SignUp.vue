@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="signUp">
       <h3>Sign Up</h3>
 			<input type="text" placeholder="Email" v-model="email"><br>
 			<input type="password" placeholder="Password" v-model="password"><br>
@@ -38,7 +38,7 @@
 </script>
 
 <style scoped>  
- .login {
+ .signUp {
 	 margin-top: 40px;
  }
  input {

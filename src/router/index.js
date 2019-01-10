@@ -10,6 +10,7 @@ import BatchInformation from '@/views/BatchInformation'
 import newBatch from '@/views/newBatch'
 import Login from '@/views/Login'
 import SignUp from '@/views/SignUp'
+import ResetPassword from '@/views/ResetPassword'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -64,6 +65,11 @@ const router = new Router({
       path: '/SignUp',
       name: 'SignUp',
       component: SignUp
+    },
+    {
+      path: '/ResetPassword',
+      name: 'ResetPassword',
+      component: ResetPassword
     },
   ]
 })
