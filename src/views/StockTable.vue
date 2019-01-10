@@ -1,28 +1,28 @@
 <template>
   <b-container fluid>
     <!-- User Navigation -->
-    <b-navbar toggleable="md" type="light">
+    <b-navbar type="light">
       <b-navbar-brand >
         <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
         <strong>A Hills Stock</strong>
       </b-navbar-brand>
-      <b-collapse is-nav id="nav_collapse">
-      <!-- Right aligned nav items -->
-        <b-navbar-nav class="ml-auto">
-          <b-navbar-nav right>
-            <!-- Button navigation -->
-            <b-button variant="outline-primary" class="navBtn" @click="sendHome">Home</b-button>
-            <b-button variant="outline-primary" class="navBtn" @click="addNewBatch" v-if="logged">Add new batch</b-button>
-            <b-button variant="outline-primary" class="navBtn" @click="signOut" v-if="logged">Signout</b-button>
-            <b-button variant="outline-primary" class="navBtn" @click="login" v-else>Login</b-button>
-            </b-navbar-nav>
-        </b-navbar-nav>
-      </b-collapse>
+      <!-- <p>{{"User logged: " + logged}}</p> -->
+      <!-- Right Aligned Menu Button -->
+      <b-dropdown variant="outline" right class="m-2">
+        <template slot="button-content">
+          <span class="navbar-toggler-icon"></span>
+        </template>
+        <b-dropdown-item @click="sendHome">Home</b-dropdown-item>
+        <b-dropdown-item @click="addNewBatch" v-if="logged">Add new batch</b-dropdown-item>
+        <b-dropdown-item @click="signOut" v-if="logged">Signout</b-dropdown-item>
+        <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
+      </b-dropdown>
     </b-navbar>
+
     <!-- Loader and Errors -->
     <p class="loader" v-if="loading"></p>
     <b-alert :show="ifError" variant="danger">{{status}}</b-alert>
-    <p>{{"User logged: " + logged}}</p>
+
     <!-- User Interface Controls -->
     <b-row>
       <b-col md="6" class="my-1">
@@ -248,11 +248,6 @@ export default {
 .myBtn {
   margin-top: 1px;
 }
-.navBtn {
-  margin-right: 3px;
-  margin-left: 3px;
-}
-
 
 tbody {
   height: 100%;
