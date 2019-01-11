@@ -9,7 +9,8 @@
 				  label="Name:"
 				  label-class="text-sm-right"
 				  label-for="nestedName">
-	  <b-form-input id="nestedName" v-model="Name"></b-form-input>
+	  <!-- <b-form-input id="nestedName" v-model="Name"></b-form-input> -->
+		<b-form-select :options="plantNames" class="mb-3" />
 	</b-form-group>
 	<b-form-group horizontal
 				  label="Size:"
@@ -61,12 +62,13 @@ export default {
 				WholesalePrice: '',
 				Image: null,
 				Active: true,
+				plantNames: [],
 		}		
   },
   methods: {
 		cancel() {
 	  	this.$router.push('StockTable');
-	},
+		},
 		saveBatch() {
 			this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
 				"Sku": this.Sku,
@@ -86,7 +88,27 @@ export default {
 			.catch((error) => {
 				console.log(error);
 			});
+	},
+	getPlantNames() {
+		this.axios.get('http://ahillsplantservice.azurewebsites.net/api/plant')
+      .then((response) => {
+				this.transformdata(response.data);
+      })
+      .catch((error) => {
+          alert(error);
+      });
+	},
+	transformdata(data) {
+		for(var i = 0; i < data.length; i++){
+      this.plantNames.push({ //Create an array of objects
+        "text": data[i], //Data coming in is string so just assign values in object
+        "value": data[i]
+      });
+    }
 	}
-  }
+	},
+	mounted() {
+		this.getPlantNames();
+	}
 }
 </script>
