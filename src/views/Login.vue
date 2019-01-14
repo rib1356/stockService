@@ -19,7 +19,7 @@
 			<p class="alert-danger">{{errorMsg}}</p>
 			<b-button @click="signOut" variant="outline-danger">Sign Out</b-button>
 			<b-button @click="validate" variant="outline-primary" @keyup.enter="validate">Sign In</b-button>
-			<p>Dont have an account ? <router-link to="/SignUp">Create one</router-link></p>
+			<!-- <p>Dont have an account ? <router-link to="/SignUp">Create one</router-link></p> -->
 			<p>Forgot Password ? <router-link to="/ResetPassword">Reset</router-link></p>
 			<p><router-link to="/Stocktable">Back to stock table</router-link></p>
   </div>

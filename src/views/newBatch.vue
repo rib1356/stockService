@@ -90,7 +90,7 @@ export default {
 			});
 	},
 	getPlantNames() {
-		this.axios.get('http://ahillsplantservice.azurewebsites.net/api/plant')
+		this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
       .then((response) => {
 				this.transformdata(response.data);
       })
