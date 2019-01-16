@@ -15,6 +15,15 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import 'firebase/auth';
 
+import * as VueGoogleMaps from "vue2-google-maps";
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: "AIzaSyD0AMlMV4a3uaJ1VZMerOMrHVXSKS-Qzjo",
+    libraries: "places" // necessary for places input
+  }
+});
+
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyDdnzoBXA4ltHDfHrWptPcPVh6_pfOvOwg",

@@ -12,7 +12,7 @@
         <template slot="button-content">
           <span class="navbar-toggler-icon"></span>
         </template>
-        <b-dropdown-item @click="sendHome">Home</b-dropdown-item>
+        <!-- <b-dropdown-item @click="sendHome">Home</b-dropdown-item> -->
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
         <b-dropdown-item @click="addNewBatch" v-if="logged">Add new batch</b-dropdown-item>
         <b-dropdown-item @click="signOut" v-if="logged">Signout</b-dropdown-item>
