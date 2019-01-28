@@ -221,7 +221,6 @@ export default {
   height: -webkit-fill-available;
 }
 
-/* /thead, tbody { display: block; } */
 
 .loader {
     border: 8px solid #f3f3f3; /* Light grey */
@@ -249,6 +248,14 @@ export default {
 }
 }
 
+@media only screen and (max-width : 568px) {
+.loader {
+    left: 45%;  
+    top: 60%;
+    right: 55%;
+}
+}
+
 .myBtn {
   margin-top: 1px;
 }
@@ -260,10 +267,10 @@ tbody {
   overflow-x: hidden;
 }
 
-thead {
+/* thead {
   width: 100%;
   vertical-align: top;
-}
+} */
 
 .b-table[aria-busy="true"] {
   content: '';

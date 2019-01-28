@@ -11,10 +11,6 @@ import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate, { fieldsBagName: 'veeFields' });
 Vue.use(VueAxios, axios)
 
-import firebase from 'firebase/app';
-import 'firebase/database';
-import 'firebase/auth';
-
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.use(VueGoogleMaps, {
@@ -24,16 +20,28 @@ Vue.use(VueGoogleMaps, {
   }
 });
 
+//Firebase
+import firebase from 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
+import 'firebase/firestore';
+import 'firebase/storage';
+
+import VueFire from 'vuefire';
+Vue.use(VueFire);
+
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyDdnzoBXA4ltHDfHrWptPcPVh6_pfOvOwg",
   authDomain: "ahills-stockservice.firebaseapp.com",
   databaseURL: "https://ahills-stockservice.firebaseio.com",
   projectId: "ahills-stockservice",
-  storageBucket: "ahills-stockservice.appspot.com",
+  storageBucket: "gs://ahills-stockservice.appspot.com",
   messagingSenderId: "638712816739"
 };
 firebase.initializeApp(config);
+
+export const db = firebase.firestore();
 
 Vue.config.productionTip = false
 window.event = new Vue();
