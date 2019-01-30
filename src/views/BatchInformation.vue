@@ -40,13 +40,15 @@
 </template>
 
 <script>
-
   import LocationChangeModal from '@/components/LocationChangeModal';
   import FormSizeChangeModal from '@/components/FormSizeChangeModal';
   import QuantityChangeModal from '@/components/QuantityChangeModal';
   import PriceChangeModal from '@/components/PriceChangeModal';
   import PictureModal from '@/components/PictureModal';
   import DeleteBatchModal from '@/components/DeleteBatchModal';
+
+  import {db} from '../main'
+  import firebase from 'firebase/app';
 
 export default {
   name: 'BatchInformation',

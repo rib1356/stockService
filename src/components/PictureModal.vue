@@ -3,27 +3,37 @@
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Picture</b-button>
     <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer>
-      <div class="modal__content">
+      <div class="modal-lg">
         <!-- <b-button class="myBtn" @click="openCamera">Add/Edit Image: </b-button> -->
-        <input type="file" accept="image/*" @change="onFileSelected">
-        <button @click="onUpload">Upload</button>
-        <button @click="test">Test</button><br>
-        <img :src="imageUrl" height="200">
-        <img :src="imageUrl2" height="200">
+        <!-- <input type="file" accept="image/*" @change="onFileSelected">  -->
+        <b-form-file type="file"
+                     accept="image/*" 
+                     @change="onFileSelected" 
+                     v:state="Boolean(file)" 
+                     placeholder="Choose an image..."
+                     ></b-form-file>
+        <p v-if="loaded">Uploading image to database</p>
+        <b-progress v-if="loaded"
+                    :value="counter" 
+                    :max="max" 
+                    show-progress 
+                    animated 
+                    ></b-progress>
+        <b-img :src="imageUrl" height="250" width="300" />
       </div>
-
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Save Changes</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="onSave">Save Image</b-btn>
       </div>
     </b-modal>
   </div>
 </template>
 
 <script>
-import {db} from '../main'
+  import {db} from '../main'
   import firebase from 'firebase/app';
-	import 'firebase/storage';
+  import 'firebase/storage';
+  import 'firebase/database';
 
 export default {
   name: 'PictureChangeModal',
@@ -32,9 +42,12 @@ export default {
       batchId: '',
       plantName: '',
       selectedFile: null,
-      imageUrl : null,
-      imageUrl2 : null,
-      images: [],
+      imageUrl: null,
+      loaded: false,
+      downloadUrl: null,
+      disabled: 1,
+      counter: 0,
+      max: 3,
     }
   },
   methods: {
@@ -56,19 +69,58 @@ export default {
       });
       fileReader.readAsDataURL(files[0]);
       this.selectedFile = files[0];
+      
+      //Uploads the image to Firebase storage with the batchId and name which will be used as identifiers 
+      firebase.storage().ref('batchImages/' + this.batchId + "-" + this.plantName).put(this.selectedFile)
+      .catch((error) => {
+        console.log("STORAGE ERROR: " + error);
+      }).then(
+        this.loaded = true,
+        setTimeout(this.checkDownloadUrlExists, 3000), //Set a timer to give enough time to retrieve downloadUrl 
+        setTimeout(this.progressBar(), 1000),
+        firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
+        this.downloadUrl = url;
+      }).catch((error) => {
+        console.log("DOWNLOAD URL ERROR: " + error);
+      }));
     },
-    onUpload() {
-      //Upload the image to Firebase storage with the batchId and name which will be used as identifiers
-      firebase.storage().ref('batchImages/' + this.batchId + "-" + this.plantName).put(this.selectedFile);
-      console.log("Uploading Image");
+    onSave() {
+      this.$refs.PictureModal.hide()
+      //Save the downloadUrl to the database to be referenced when loading the images
+      firebase.database().ref(this.batchId + "-" + this.plantName).set({
+        downloadUrl: this.downloadUrl
+      }).catch((error) => {
+        console.log("DATABASE: " + error);
+      });
     },
-    test() {
-      let storageRef = firebase.storage().ref() 
-      //Get the download url from Firebase storage relating to the image ID and then display the image
-      storageRef.child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
+    getDownloadURL() {
+      //Get the download url from the image that has just been uploaded
+      firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
+        this.downloadUrl = url; //Set the url so that it can be saved to the database
+      }).catch((error) => {
+        console.log(error);
+      });
+    },
+    checkDownloadUrlExists() {
+      if(this.downloadUrl != null) {
+        console.log("DownloadUrl retrieved, can save to db");
+        this.loaded = false; //Hide the loading text
+        this.disabled = 0 //Enable the button only when the download url is there
+      } else {
+        alert("Something went wrong");
+      }
+    },
+    progressBar() {
+      this.counter++
+      if(this.counter != 3) {
+      setTimeout(this.progressBar, 1000);
+      }
+    },
+    getImage() {
+        firebase.database().ref(this.batchId + "-" + this.plantName).once('value').then((snapshot) => {
+        let url = snapshot.val().downloadUrl;
         document.querySelector('img').scr = url;
-        this.imageUrl2 = url;
-        console.log("Image Loaded");
+        this.imageUrl = url;
       });
     }
   },
@@ -76,6 +128,7 @@ export default {
     let selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.batchId = selectedBatchInformation.batchId;
     this.plantName = selectedBatchInformation.plantName;
+    
   }
 }
 </script>
@@ -96,6 +149,9 @@ export default {
   margin-left: 0px;
 }
 
+.modal-lg { /*Used to overwrite the size of the modal */
+    height: 50vh;
+}
 
 /* .modal-body {
   max-width: 150vh;

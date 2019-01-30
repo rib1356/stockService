@@ -76,7 +76,10 @@
 
       <!-- Info Modal -->
      <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-        <pre>{{ modalInfo.content }}</pre>
+        <h2 v-if="imgError">Error</h2>
+       
+        <img v-if="imageLoaded" :src="imageURL" height="200" width="200">
+        <h2 v-else>Image Loading</h2>
       </b-modal>
     </div>
   </b-container>
@@ -84,6 +87,7 @@
 
 <script>
 import firebase from 'firebase/app';
+import 'firebase/storage';
 export default {
   name: 'StockTable',
   data () {
@@ -100,7 +104,7 @@ export default {
       sortSearch: false,
       sortDirection: 'asc',
       filter: null,
-      modalInfo: { title: '', content: '' },
+      modalInfo: { title: '', content: ''},
       status: '',
       plantData: [],
       loading: true,
@@ -108,6 +112,9 @@ export default {
       ifError: false,
       logged: false,
       authenticated: false,
+      imageURL: null,
+      imgError: false,
+      imageLoaded: false,
     }
   },
   computed: {
@@ -121,13 +128,16 @@ export default {
   methods: {
     info(item, button) {
       this.modalInfo.title = `Name: ${item.plantName}`
-      // this.modalInfo.title = `Name: ${item.plantName.genera} ${item.plantName.species} ${item.plantName.variety}`
-      this.modalInfo.content = JSON.stringify(item, null, 2)
+      // this.modalInfo.content = JSON.stringify(item, null, 2)
+      this.getDownloadURL(item.batchId, item.plantName);
       this.$root.$emit('bv::show::modal', 'modalInfo', button)
     },
     resetModal() {
       this.modalInfo.title = ''
       this.modalInfo.content = ''
+      this.imageURL = null
+      this.imgError = false;
+      this.imageLoaded = false;
     },
     selectBatch(item, index) { //Get the selected row
       var selectedBatch = new this.selectedBatchInformation(); //Create a new object and assign the row values
@@ -153,8 +163,7 @@ export default {
           this.status = 'Stock Information loaded'
           this.ifError = false;
           this.loading = false; //Hide the spinner once data is loaded
-      })
-        .catch((error) => {
+      }).catch((error) => {
           this.status = error;
           this.ifError = true;
       });
@@ -184,6 +193,15 @@ export default {
       } else { //Hide any buttons
         this.userAuthenticated = "User logged out";
       }
+    },
+    getDownloadURL(batchId, plantName) {
+        firebase.storage().ref().child('batchImages/' + batchId + "-" + plantName).getDownloadURL().then( (url) => {
+        document.querySelector('img').scr = url;
+        this.imageURL = url;
+        this.imageLoaded = true;
+      }).catch((error) => {
+        this.imgError = true;
+      });
     },
     sendHome() {
       this.$router.push('StartPage');
