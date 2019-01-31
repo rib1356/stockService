@@ -6,7 +6,6 @@
         <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
         <strong>A Hills Stock</strong>
       </b-navbar-brand>
-      <!-- <p>{{"User logged: " + logged}}</p> -->
       <!-- Right Aligned Menu Button -->
       <b-dropdown variant="outline" right class="m-2">
         <template slot="button-content">
@@ -14,8 +13,9 @@
         </template>
         <!-- <b-dropdown-item @click="sendHome">Home</b-dropdown-item> -->
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
-        <b-dropdown-item @click="addNewBatch" v-if="logged">Add new batch</b-dropdown-item>
-        <b-dropdown-item @click="signOut" v-if="logged">Signout</b-dropdown-item>
+        <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add new batch</b-dropdown-item>
+        <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
+        <b-dropdown-item @click="signOut" v-if="authenticated">Signout</b-dropdown-item>
         <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
       </b-dropdown>
     </b-navbar>
@@ -68,7 +68,7 @@
         <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
           View Image
         </b-button>
-        <b-button size="sm" variant="outline-primary" v-if="logged" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
+        <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
       </template>
@@ -109,7 +109,6 @@ export default {
       loading: true,
       userAuthenticated: '',
       ifError: false,
-      logged: false,
       authenticated: false,
       imageURL: null,
       imgError: false,
@@ -157,14 +156,15 @@ export default {
     retrieveData () {
       this.status = "loading stock information..."
       let batchInMemory = sessionStorage.getItem('batchInMemory');
-      if(batchInMemory) {
+      let auth = localStorage.getItem('logged');
+      if(batchInMemory && auth) { //If user is logged in get the batches from session storage and display on table
         console.log("loading batches from sessionStorage")
         let batchList = sessionStorage.getItem('batchList');
         this.plantData = JSON.parse(batchList);
         this.loading = false;
-      } else {
+      } else { 
       console.log("loading batches from db")  
-      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches')
+      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
         .then((response) => {
           this.changeData(response.data);
           this.status = 'Stock Information loaded'
@@ -190,19 +190,19 @@ export default {
            });
       }     
       }
-      console.log(this.plantData);
+      //If the user is logged in save the data to session storage for easier retrieval
+      if(this.authenticated) {
       sessionStorage.setItem('batchList', JSON.stringify(this.plantData));
       sessionStorage.setItem('batchInMemory', true);
+      }
     },
     hasUserAuth() {
       this.authenticated = localStorage.getItem("logged");
-      
       var user = firebase.auth().currentUser; 
       if (this.authenticated || user) { //If user is logged in show the available buttons
-        this.userAuthenticated = "User has logged in";
-        this.logged = true;
+        this.authenticated = true;
       } else { //Hide any buttons
-        this.userAuthenticated = "User logged out";
+        this.authenticated = false;
       }
     },
     getDownloadURL(batchId, plantName) {
@@ -215,6 +215,11 @@ export default {
         this.imgError = true;
         console.log(error);
       });
+    },
+    reloadBatches() {
+      sessionStorage.removeItem('batchInMemory');
+      sessionStorage.removeItem('batchList');
+      location.reload();
     },
     sendHome() {
       this.$router.push('StartPage');
@@ -231,11 +236,24 @@ export default {
     signOut() {
 			firebase.auth().signOut().then(() => {
         localStorage.removeItem("logged");
-        this.logged = false
+        this.authenticated = false
 		  });
 		} 
   },
-  created() {
+  created() {    
+    //If counter hasnt started and the user is not logged in
+    if(sessionStorage.getItem('timesLoaded') === null) {
+      let counter = 0; 
+      sessionStorage.setItem('timesLoaded', counter); //set a counter and add it to storage
+    } else if (sessionStorage.getItem('timesLoaded') < 4) { 
+      let counter = sessionStorage.getItem('timesLoaded'); //Increase the counter each time the page is reloaded
+      counter++;
+      sessionStorage.setItem('timesLoaded', counter);
+    } else { //Once counter is above 4 remove the saved list so that it reloads the database
+      sessionStorage.removeItem('batchInMemory');
+      sessionStorage.removeItem('batchList');
+      sessionStorage.removeItem('timesLoaded');
+    }
     this.retrieveData(); //On webpage load 
   },  
   mounted() {
