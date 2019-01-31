@@ -19,7 +19,9 @@
                     show-progress 
                     animated 
                     ></b-progress>
+        <div style="display: flex; justify-content: center; margin-top: 5%">
         <b-img :src="imageUrl" height="250" width="300" />
+        </div>
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
@@ -71,42 +73,53 @@ export default {
       this.selectedFile = files[0];
       
       //Uploads the image to Firebase storage with the batchId and name which will be used as identifiers 
-      firebase.storage().ref('batchImages/' + this.batchId + "-" + this.plantName).put(this.selectedFile)
+      firebase.storage().ref('batchImages/' + this.batchId + "-" + this.plantName).put(this.selectedFile) 
       .catch((error) => {
-        console.log("STORAGE ERROR: " + error);
+        console.log("STORAGE ERROR: " + JSON.stringify(error));
+        alert("Storage: " + JSON.stringify(error));
       }).then(
-        this.loaded = true,
-        setTimeout(this.checkDownloadUrlExists, 3000), //Set a timer to give enough time to retrieve downloadUrl 
-        setTimeout(this.progressBar(), 1000),
-        firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
-        this.downloadUrl = url;
-      }).catch((error) => {
-        console.log("DOWNLOAD URL ERROR: " + error);
-      }));
+        this.loaded = true, //Show loading bar
+        // setTimeout(this.getDownloadURL, 3000), //Get the download url given enough time for it to load
+        // setTimeout(this.checkDownloadUrlExists, 3000), //Set a timer to give enough time to retrieve downloadUrl to allow user to continue
+        setTimeout(this.progressFinish, 3000),
+        this.progressBar()//Start counter on loading bar
+        );
+      //           firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => { //Get download url
+      //   this.downloadUrl = url;
+      // }).catch((error) => {
+      //   console.log("DOWNLOAD URL ERROR: " + JSON.stringify(error));
+      //   alert(JSON.stringify(error));
+      // })
     },
     onSave() {
       this.$refs.PictureModal.hide()
       //Save the downloadUrl to the database to be referenced when loading the images
-      firebase.database().ref(this.batchId + "-" + this.plantName).set({
-        downloadUrl: this.downloadUrl
-      }).catch((error) => {
-        console.log("DATABASE: " + error);
-      });
+      //---------- THIS SHOULD PROBABLY DO SOMETHING --------
+      // firebase.database().ref(this.batchId).set({
+      //   downloadUrl: this.downloadUrl
+      // }).catch((error) => {
+      //   console.log("DATABASE: " + JSON.stringify(error));
+      //   alert("Database: " + JSON.stringify(error));
+      // });
     },
     getDownloadURL() {
       //Get the download url from the image that has just been uploaded
       firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
         this.downloadUrl = url; //Set the url so that it can be saved to the database
       }).catch((error) => {
-        console.log(error);
-      });
+        console.log("getDownloadUrl: " + error);
+      }).then( 
+        this.checkDownloadUrlExists()
+      );
     },
     checkDownloadUrlExists() {
       if(this.downloadUrl != null) {
         console.log("DownloadUrl retrieved, can save to db");
         this.loaded = false; //Hide the loading text
-        this.disabled = 0 //Enable the button only when the download url is there
+        this.disabled = 0; //Enable the button only when the download url is there
+        this.counter = 0;
       } else {
+        console.log(this.downloadUrl);
         alert("Something went wrong");
       }
     },
@@ -116,8 +129,13 @@ export default {
       setTimeout(this.progressBar, 1000);
       }
     },
+    progressFinish() {
+      this.loaded = false; //Hide the loading text
+      this.disabled = 0; //Enable the button only when the download url is there
+      this.counter = 0;
+    },
     getImage() {
-        firebase.database().ref(this.batchId + "-" + this.plantName).once('value').then((snapshot) => {
+        firebase.database().ref(this.batchId).once('value').then((snapshot) => {
         let url = snapshot.val().downloadUrl;
         document.querySelector('img').scr = url;
         this.imageUrl = url;
@@ -153,6 +171,9 @@ export default {
     height: 50vh;
 }
 
+.b-img {
+  align-content: center;
+}
 /* .modal-body {
   max-width: 150vh;
 }

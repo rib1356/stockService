@@ -66,7 +66,7 @@
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
-          Info modal
+          View Image
         </b-button>
         <b-button size="sm" variant="outline-primary" v-if="logged" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
@@ -74,12 +74,11 @@
       </template>
     </b-table>
 
-      <!-- Info Modal -->
-     <b-modal id="modalInfo" @hide="resetModal" :title="modalInfo.title" ok-only>
-        <h2 v-if="imgError">Error</h2>
-       
-        <img v-if="imageLoaded" :src="imageURL" height="200" width="200">
+      <!-- Picture Modal -->
+     <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
+        <img v-if="imageLoaded" :src="imageURL" height="400" width="300">
         <h2 v-else>Image Loading</h2>
+        <h2 v-if="imgError">Sorry there was an error</h2>
       </b-modal>
     </div>
   </b-container>
@@ -132,7 +131,7 @@ export default {
       this.getDownloadURL(item.batchId, item.plantName);
       this.$root.$emit('bv::show::modal', 'modalInfo', button)
     },
-    resetModal() {
+    resetModal() { //Reset the items of the modal
       this.modalInfo.title = ''
       this.modalInfo.content = ''
       this.imageURL = null
@@ -152,11 +151,19 @@ export default {
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
       this.$router.push('BatchInformation'); //Move to next page
     },
-    selectedBatchInformation(plantName, location, quantity, formSize, batchId){
-      var plantName, loction, quantity, formSize, batchId;
+    selectedBatchInformation(sku, plantName, location, quantity, formSize, batchId){
+      var sku, plantName, loction, quantity, formSize, batchId;
     },
     retrieveData () {
       this.status = "loading stock information..."
+      let batchInMemory = sessionStorage.getItem('batchInMemory');
+      if(batchInMemory) {
+        console.log("loading batches from sessionStorage")
+        let batchList = sessionStorage.getItem('batchList');
+        this.plantData = JSON.parse(batchList);
+        this.loading = false;
+      } else {
+      console.log("loading batches from db")  
       this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches')
         .then((response) => {
           this.changeData(response.data);
@@ -167,6 +174,7 @@ export default {
           this.status = error;
           this.ifError = true;
       });
+      }
     },
     changeData (response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
@@ -182,6 +190,9 @@ export default {
            });
       }     
       }
+      console.log(this.plantData);
+      sessionStorage.setItem('batchList', JSON.stringify(this.plantData));
+      sessionStorage.setItem('batchInMemory', true);
     },
     hasUserAuth() {
       this.authenticated = localStorage.getItem("logged");
@@ -200,7 +211,9 @@ export default {
         this.imageURL = url;
         this.imageLoaded = true;
       }).catch((error) => {
+        this.imageLoaded = false;
         this.imgError = true;
+        console.log(error);
       });
     },
     sendHome() {
@@ -239,6 +252,13 @@ export default {
   height: -webkit-fill-available;
 }
 
+.modal-lg {
+  height: 50vh !important;
+}
+
+.modal-content {
+  height: 50vh;
+}
 
 .loader {
     border: 8px solid #f3f3f3; /* Light grey */
