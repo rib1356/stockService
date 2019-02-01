@@ -102,7 +102,7 @@ export default {
       sortDesc: false,
       sortSearch: false,
       sortDirection: 'asc',
-      filter: null,
+      filter: '',
       modalInfo: { title: '', content: ''},
       status: '',
       plantData: [],
@@ -148,6 +148,7 @@ export default {
       selectedBatch.active = item.active;
 
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
+      sessionStorage.setItem('filterValue', this.filter);
       this.$router.push('BatchInformation'); //Move to next page
     },
     selectedBatchInformation(sku, plantName, location, quantity, formSize, batchId){
@@ -219,7 +220,27 @@ export default {
     reloadBatches() {
       sessionStorage.removeItem('batchInMemory');
       sessionStorage.removeItem('batchList');
+      sessionStorage.removeItem('filterValue');
       location.reload();
+    },
+    pageLoadCounter() {
+      //If counter hasnt started and the user is not logged in
+      if(sessionStorage.getItem('timesLoaded') === null) {
+        let counter = 0; 
+        sessionStorage.setItem('timesLoaded', counter); //set a counter and add it to storage
+      } else if (sessionStorage.getItem('timesLoaded') < 4) { 
+        let counter = sessionStorage.getItem('timesLoaded'); //Increase the counter each time the page is reloaded
+        counter++;
+        sessionStorage.setItem('timesLoaded', counter);
+      } else { //Once counter is above 4 remove the saved list so that it reloads the database
+        sessionStorage.removeItem('batchInMemory');
+        sessionStorage.removeItem('batchList');
+        sessionStorage.removeItem('timesLoaded');
+      }
+    },
+    setFilter() {
+      this.filter = sessionStorage.getItem('filterValue');
+      sessionStorage.removeItem('filerValue');
     },
     sendHome() {
       this.$router.push('StartPage');
@@ -241,19 +262,8 @@ export default {
 		} 
   },
   created() {    
-    //If counter hasnt started and the user is not logged in
-    if(sessionStorage.getItem('timesLoaded') === null) {
-      let counter = 0; 
-      sessionStorage.setItem('timesLoaded', counter); //set a counter and add it to storage
-    } else if (sessionStorage.getItem('timesLoaded') < 4) { 
-      let counter = sessionStorage.getItem('timesLoaded'); //Increase the counter each time the page is reloaded
-      counter++;
-      sessionStorage.setItem('timesLoaded', counter);
-    } else { //Once counter is above 4 remove the saved list so that it reloads the database
-      sessionStorage.removeItem('batchInMemory');
-      sessionStorage.removeItem('batchList');
-      sessionStorage.removeItem('timesLoaded');
-    }
+    this.pageLoadCounter();
+    this.setFilter();
     this.retrieveData(); //On webpage load 
   },  
   mounted() {
