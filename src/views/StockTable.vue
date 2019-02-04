@@ -148,7 +148,9 @@ export default {
       selectedBatch.active = item.active;
 
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
+      if(this.filter != null) {
       sessionStorage.setItem('filterValue', this.filter);
+      }
       this.$router.push('BatchInformation'); //Move to next page
     },
     selectedBatchInformation(sku, plantName, location, quantity, formSize, batchId){
@@ -340,6 +342,16 @@ tbody {
 
 .b-table[aria-busy="true"] {
   content: '';
+}
+
+body.modal-open {
+    position: fixed;
+    overflow: hidden;
+    left:0;
+    right:0;
+}
+.modal{
+    -webkit-overflow-scrolling: auto;
 }
 
 </style>

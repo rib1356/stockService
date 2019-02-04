@@ -78,6 +78,7 @@ export default {
       this.batchId = selectedBatchInformation.batchId;
     },
     saveChanges(){
+      this.getDownloadUrl();
       sessionStorage.removeItem('newLocation');
       this.$router.push('StockTable');
     },
@@ -98,6 +99,21 @@ export default {
         var newFormSize = sessionStorage.getItem('newFormSize');
         this.formSize = newFormSize;
       }  
+    },
+    getDownloadUrl() {
+      firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
+        this.savetoFirebase(url);
+      }).catch((error) => {
+        console.log("getDownloadUrl: " + error);
+      });
+    },
+    savetoFirebase(url) {
+      console.log("Saving to Firebase");
+      firebase.database().ref(this.batchId).set({
+        downloadUrl: url
+      }).catch((error) => {
+        alert("Database: " + JSON.stringify(error));
+      });
     },
   },
   mounted() {

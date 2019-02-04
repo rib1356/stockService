@@ -25,7 +25,7 @@
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="onSave">Save Image</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="hideModal">Save Image</b-btn>
       </div>
     </b-modal>
   </div>
@@ -60,9 +60,9 @@ export default {
       this.$refs.PictureModal.hide()
     },
     onFileSelected(event) {
-      const files = event.target.files;
-      let fileName = files[0].name;
-      if (fileName.lastIndexOf('.') <= 0 ) {
+      const files = event.target.files; 
+      let fileName = files[0].name; 
+      if (fileName.lastIndexOf('.') <= 0 ) { //Checks that the file is valid
         return alert("Please add valid file");
       }
       const fileReader = new FileReader();
@@ -79,83 +79,32 @@ export default {
         alert("Storage: " + JSON.stringify(error));
       }).then(
         this.loaded = true, //Show loading bar
-        // setTimeout(this.getDownloadURL, 3000), //Get the download url given enough time for it to load
-        // setTimeout(this.checkDownloadUrlExists, 3000), //Set a timer to give enough time to retrieve downloadUrl to allow user to continue
-        setTimeout(this.progressFinish, 3000),
+        setTimeout(this.progressFinish, 3000), //Once the progress bar has finished call this method and enable buttons etc
         this.progressBar()//Start counter on loading bar
-        );
-      //           firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => { //Get download url
-      //   this.downloadUrl = url;
-      // }).catch((error) => {
-      //   console.log("DOWNLOAD URL ERROR: " + JSON.stringify(error));
-      //   alert(JSON.stringify(error));
-      // })
-    },
-    onSave() {
-      this.$refs.PictureModal.hide()
-      //Save the downloadUrl to the database to be referenced when loading the images
-      //---------- THIS SHOULD PROBABLY DO SOMETHING --------
-      // firebase.database().ref(this.batchId).set({
-      //   downloadUrl: this.downloadUrl
-      // }).catch((error) => {
-      //   console.log("DATABASE: " + JSON.stringify(error));
-      //   alert("Database: " + JSON.stringify(error));
-      // });
-    },
-    getDownloadURL() {
-      //Get the download url from the image that has just been uploaded
-      firebase.storage().ref().child('batchImages/' + this.batchId + "-" + this.plantName).getDownloadURL().then( (url) => {
-        this.downloadUrl = url; //Set the url so that it can be saved to the database
-      }).catch((error) => {
-        console.log("getDownloadUrl: " + error);
-      }).then( 
-        this.checkDownloadUrlExists()
       );
-    },
-    checkDownloadUrlExists() {
-      if(this.downloadUrl != null) {
-        console.log("DownloadUrl retrieved, can save to db");
-        this.loaded = false; //Hide the loading text
-        this.disabled = 0; //Enable the button only when the download url is there
-        this.counter = 0;
-      } else {
-        console.log(this.downloadUrl);
-        alert("Something went wrong");
-      }
     },
     progressBar() {
       this.counter++
-      if(this.counter != 3) {
+      if(this.counter != 3) { //Increase the counter every second for 3 seconds
       setTimeout(this.progressBar, 1000);
       }
     },
     progressFinish() {
       this.loaded = false; //Hide the loading text
-      this.disabled = 0; //Enable the button only when the download url is there
+      this.disabled = 0;  //Enable the button only when the download url is there
       this.counter = 0;
     },
-    getImage() {
-        firebase.database().ref(this.batchId).once('value').then((snapshot) => {
-        let url = snapshot.val().downloadUrl;
-        document.querySelector('img').scr = url;
-        this.imageUrl = url;
-      });
-    }
   },
   mounted() {
     let selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.batchId = selectedBatchInformation.batchId;
     this.plantName = selectedBatchInformation.plantName;
-    
   }
 }
 </script>
 
 <style scoped>
-/* .btn {
-  margin-left: 10%;
-  text-align: right;
-} */
+
 .modal {
     display: none;
     position: fixed;
