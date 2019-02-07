@@ -112,30 +112,35 @@ export default {
       });
     },
     transformData(data) {
-      for(var i = 0; i < data.length; i++){
-        var potSize;
-        var RootType;
-        //String modifying so that it reads more like "FormSizes"
-        if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
-          potSize = "";
-          RootType = data[i].RootType;
-        } else if (data[i].RootType == "CG") {
-          potSize = "C" + data[i].PotSize;
-          RootType = "";
-        } else {
-          potSize = "AP" + data[i].PotSize;
-          RootType = ""
+      if(this.formSizes.length <= 0) //If array doesnt already have data put in the plant formsize
+      {
+        for(var i = 0; i < data.length; i++){
+          var potSize;
+          var RootType;
+          //String modifying so that it reads more like "FormSizes"
+          if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
+            potSize = "";
+            RootType = data[i].RootType;
+          } else if (data[i].RootType == "CG") {
+            potSize = "C" + data[i].PotSize;
+            RootType = "";
+          } else {
+            potSize = "AP" + data[i].PotSize;
+            RootType = ""
+          }
+          var formSize = potSize
+                        + " " + data[i].HeightSpread
+                        + " " + data[i].Girth
+                        + " " + data[i].Age 
+                        + " " + RootType
+                        + " " + data[i].Description
+            this.formSizes.push({
+              "text": formSize,
+              "value": formSize,
+            });
         }
-        var formSize = potSize
-                       + " " + data[i].HeightSpread
-                       + " " + data[i].Girth
-                       + " " + data[i].Age 
-                       + " " + RootType
-                       + " " + data[i].Description
-          this.formSizes.push({
-             "text": formSize,
-             "value": formSize,
-          });
+      } else {
+        //Do nothing
       }
     },
     updateFormSize() {
@@ -148,8 +153,7 @@ export default {
       let data = { "Id": this.batchId, "FormSize": this.selectedFormSize};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
-          console.log(response);
-          
+          console.log(response);    
 			  })
 			.catch((error) => {
 				alert(error);

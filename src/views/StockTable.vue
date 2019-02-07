@@ -259,6 +259,7 @@ export default {
     signOut() {
 			firebase.auth().signOut().then(() => {
         localStorage.removeItem("logged");
+        sessionStorage.removeItem('mainLocations');
         this.authenticated = false
 		  });
 		} 

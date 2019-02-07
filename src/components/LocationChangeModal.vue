@@ -149,7 +149,13 @@ export default {
     },
     transformMainLocationData(data) { //Transform the incoming data so it can be displayed as radio buttons
       this.status = '';
-      if(this.mainLocations.length <= 0) //If array doesnt already have data format data show on radio buttons
+      //If main locations arent null it means that they exist
+      //load values from session storage and populate array, this means that the locations wont be called
+      if(sessionStorage.getItem('mainLocations') != null) {
+        console.log("Mainlocations exist");
+        this.mainLocations = JSON.parse(sessionStorage.getItem('mainLocations'));
+      }
+      else if(this.mainLocations.length <= 0) //If array doesnt already have data format data show on radio buttons
       {
         for(var i = 0; i < data.length; i++){
           this.mainLocations.push({ //Create an array of objects
@@ -157,6 +163,8 @@ export default {
             "value": data[i]
           });
         }
+        sessionStorage.setItem('mainLocations', JSON.stringify(this.mainLocations));
+        console.log("locations loaded from db and saved to session")
       } else {
         //Do nothing
       }
