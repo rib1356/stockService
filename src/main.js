@@ -11,6 +11,9 @@ import VeeValidate from 'vee-validate';
 Vue.use(VeeValidate, { fieldsBagName: 'veeFields' });
 Vue.use(VueAxios, axios)
 
+import Multiselect from 'vue-multiselect'
+Vue.component('multiselect', Multiselect)
+
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.use(VueGoogleMaps, {
