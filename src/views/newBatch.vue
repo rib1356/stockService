@@ -7,19 +7,33 @@
 							 label="name" 
 							 track-by="name"
 							 :loading="isLoading"
-							 :hide-selected="true"
+							 :show-labels="false"
 							 @input="getPlantFormSizes"
 							 @close="plantSelected"
-							 @open="clearFormSizes"></multiselect>
+							 @open="clearFormSizes"></multiselect>			 
 	<br>
 	<br>
 	<multiselect v-model="selectedFormSize" 
 							 :options="formSizes"  
 							 placeholder="Select a form size" 
-							 label="formSize" 
-							 :hide-selected="true"></multiselect>
-	<p>{{formSize}}</p>
-	<div>
+							 label="formSize"
+							 :loading="isLoading2"
+							 :searchable="false" 
+							 :show-labels="false"></multiselect>
+	<br>
+	<br>
+	<multiselect v-model="selectedLocation" 
+							 :options="locations"  
+							 placeholder="Select a location" 
+							 label="location" 
+							 track-by="location"
+							 :show-labels="false"></multiselect>		
+	<br>
+	<br>
+	<b-form-input v-model="quantity"
+                  type="text"
+                  placeholder="Enter a quantity"></b-form-input>						 					 	 
+	<div style="margin-top: 15px;">
 		<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
 		<b-button @click="saveBatch" variant="outline-primary">Submit</b-button>
 	</div>
@@ -79,18 +93,17 @@
 export default {
   data () {
 		return {
-			sku: '', 
-			name: '',
-			formSize: '',
-			location: '',
-			quantity: '',
-			wholesalePrice: '',
-			image: null,
 			plantNames: [],
 			formSizes: [],
+			locations: [],
 			selectedPlantName: '',
 			selectedFormSize: '',
+			selectedLocation: '',
+			quantity: '',
+			wholesalePrice: '',
 			isLoading: false,
+			isLoading2: false,
+
 		}		
   },
   methods: {
@@ -98,14 +111,16 @@ export default {
 	  	this.$router.push('StockTable');
 	},
 	saveBatch() {
+		// console.log("Sku: " + this.selectedPlantName.sku + " Name: " + this.selectedPlantName.name + " FormSize: " + this.selectedFormSize.formSize
+		// + " Location: " + this.selectedLocation.location + " Quantity: " + this.quantity)
 		this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
-			"Sku": this.sku,
-			// "Name": this.name,
-			// "FormSize": this.formSize,
-			"Location": this.location,
+			"Sku": this.selectedPlantName.sku,
+			"Name": this.selectedPlantName.name,
+			"FormSize": this.selectedFormSize.formSize,
+			"Location":  this.selectedLocation.location,
 			"Quantity": this.quantity,
-			"WholesalePrice": this.wholesalePrice,
-			"Image": this.image,
+			"WholesalePrice": null,
+			"Image": null,
 			"Active": true,
 		})
 		.then((response) => {
@@ -114,6 +129,7 @@ export default {
 			this.$router.push('StockTable');
 		})
 		.catch((error) => {
+			alert("Please check values before submitting")
 			console.log(error);
 		});
 	},
@@ -147,6 +163,7 @@ export default {
 	},
 	transformFormSizes(data) {
 		this.formSizes = [];
+		this.isLoading2 = false;
     for(var i = 0; i < data.length; i++){
   	  var potSize;
       var RootType;
@@ -172,8 +189,24 @@ export default {
       });
 		}
 	},
+	getLocations() {
+		this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations')
+      .then((response) => {
+				this.transformLocations(response.data);
+      })
+      .catch((error) => {
+        alert(error);
+      });
+	},
+	transformLocations(data) {
+		for(var i = 0; i < data.length; i++){
+      this.locations.push({ //Create an array of objects
+				"location": data[i].MainLocation + data[i].SubLocation
+    });
+    }
+	},
 	plantSelected() {
-		// console.log("hello")
+		this.isLoading2 = true;
 	},
 	clearFormSizes() {
 		this.selectedFormSize = '';
@@ -181,6 +214,7 @@ export default {
 	},
 	mounted() {
 		this.getPlantNames();
+		this.getLocations();
 	}
 }
 </script>
@@ -190,11 +224,31 @@ export default {
 <style scoped>
 	.center-div
 	{
-     margin: 0 auto;
-     width: 500px;
-		 height: 300px; 
-		 margin-top: 5px;
+    margin: 0 auto;
+    width: 500px;
+		height: 300px; 
+		margin-top: 5px;
 	}
+
+	.middle-div
+	{
+    position: absolute;
+    margin: auto;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 500px;
+    height: 300px;
+	}
+
+	@media only screen and (max-width : 768px) {
+	.center-div
+	{
+    width: 400px;
+	}
+
+}
 
 	/* Make the height fit on mobile, just make sure that it fits on any screen smaller than 768 */
 </style>
