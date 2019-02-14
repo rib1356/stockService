@@ -80,6 +80,9 @@ export default {
     saveChanges(){
       this.getDownloadUrl();
       sessionStorage.removeItem('newLocation');
+      sessionStorage.removeItem('newQuantity');
+      sessionStorage.removeItem('newFormSize'); ///----------------------------------------------------THESE WERE CHANGED-------------------------------------------------
+      sessionStorage.removeItem('selectedBatchInformation');
       this.$router.push('StockTable');
     },
     updateLocation() { //This will change the current displayed location

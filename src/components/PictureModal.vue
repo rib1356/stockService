@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
+    <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary" v-if="visible">
               Change Picture</b-button>
     <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer>
       <div class="modal-lg">
@@ -38,7 +38,7 @@
   import 'firebase/database';
 
 export default {
-  name: 'PictureChangeModal',
+  name: 'PictureModal',
   data () {
     return {
       batchId: '',
@@ -50,6 +50,8 @@ export default {
       disabled: 1,
       counter: 0,
       max: 3,
+      visible: true,
+      loadFromSelected: true,
     }
   },
   methods: {
@@ -57,7 +59,11 @@ export default {
       this.$refs.PictureModal.show()
     },
     hideModal() {
-      this.$refs.PictureModal.hide()
+      if(this.loadFromSelected) {
+        this.$refs.PictureModal.hide() //If the user has added an image to a previous batch go back to the batchInformation
+      } else {
+        this.$router.push('StockTable'); //Else they have added it from a new batch so go straight to the stockTable
+      }
     },
     onFileSelected(event) {
       const files = event.target.files; 
@@ -71,7 +77,7 @@ export default {
       });
       fileReader.readAsDataURL(files[0]);
       this.selectedFile = files[0];
-      
+      this.getBatchInformation();
       //Uploads the image to Firebase storage with the batchId and name which will be used as identifiers 
       firebase.storage().ref('batchImages/' + this.batchId + "-" + this.plantName).put(this.selectedFile) 
       .catch((error) => {
@@ -94,11 +100,37 @@ export default {
       this.disabled = 0;  //Enable the button only when the download url is there
       this.counter = 0;
     },
+    getBatchInformation() {
+      //Check where to load the batchId and PlantName based upon where the user is adding an image
+      if(sessionStorage.getItem('selectedBatchInformation') != null)
+      {
+        console.log("Information loaded from selected batch")
+        let selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
+        this.batchId = selectedBatchInformation.batchId;
+        this.plantName = selectedBatchInformation.plantName;
+      } else if (sessionStorage.getItem('newBatchInformation') != null) {
+        console.log("Information loaded from a new batch")
+        this.loadFromSelected = false;
+        let newBatchInformation = JSON.parse(sessionStorage.getItem('newBatchInformation'));
+        this.batchId = newBatchInformation.Id;
+        this.plantName = newBatchInformation.Name;
+      } else {
+        //do nothing
+      }
+    },
+    checkButton() { //Hide or show the button
+      if(sessionStorage.getItem('selectedBatchInformation') == null) {
+        this.visible = false;
+      }
+    }
   },
   mounted() {
-    let selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
-    this.batchId = selectedBatchInformation.batchId;
-    this.plantName = selectedBatchInformation.plantName;
+    this.checkButton();
+  },
+  beforeCreate() {
+    this.$root.$on('PictureModal', () => {
+      this.showModal();   
+    });
   }
 }
 </script>

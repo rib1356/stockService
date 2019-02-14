@@ -15,6 +15,7 @@
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
         <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add new batch</b-dropdown-item>
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
+        <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item>
         <b-dropdown-item @click="signOut" v-if="authenticated">Signout</b-dropdown-item>
         <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
       </b-dropdown>
@@ -255,6 +256,9 @@ export default {
     },
     contactPage() {
       this.$router.push('ContactPage');
+    },
+    quote() {
+      this.$router.push('QuoteExample');
     },
     signOut() {
 			firebase.auth().signOut().then(() => {

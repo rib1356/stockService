@@ -12,6 +12,7 @@ import Login from '@/views/Login'
 import SignUp from '@/views/SignUp'
 import ResetPassword from '@/views/ResetPassword'
 import ContactPage from '@/views/ContactPage'
+import QuoteExample from '@/views/QuoteExample'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -76,6 +77,11 @@ const router = new Router({
       path: '/ContactPage',
       name: 'ContactPage',
       component: ContactPage
+    },
+    {
+      path: '/QuoteExample',
+      name: 'QuoteExample',
+      component: QuoteExample
     },
   ]
 })
