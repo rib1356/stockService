@@ -1,12 +1,12 @@
 <template>
-<div class="container">
+<section>
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
-		<form @submit.prevent="addPlant">
+		<!-- <form @submit.prevent="addPlant">
 			<input type="text" placeholder="Enter a plant name" v-model="plantName">
 			<button>Add to list</button>
-		</form>
-		<!-- <multiselect v-model="selectedPlantName" 
+		</form> -->
+		<multiselect v-model="selectedPlantName" 
 								:options="plantNames"  
 								placeholder="Select a plant" 
 								label="name" 
@@ -24,30 +24,24 @@
 								:loading="isLoading2"
 								:searchable="false" 
 								:show-labels="false"></multiselect>
-		<multiselect v-model="selectedLocation" 
-								:options="locations"  
-								placeholder="Select a location" 
-								label="location" 
-								track-by="location"
-								:show-labels="false"></multiselect>		
 		<b-form-input v-model="quantity"
 										type="text"
-										placeholder="Enter a quantity"></b-form-input>						 					 	  -->
+										placeholder="Enter a quantity"></b-form-input>	
 		<div style="margin-top: 15px;">
 			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
-			<!-- <b-button @click="saveBatch" variant="outline-primary">Submit</b-button> -->
+			<b-button @click="addToList" variant="outline-primary">Add to list</b-button>
 		</div>
 	</div>
 	<div class="right-div">
 		<p>Quote List</p>
       <ul>
           <li v-for="(data, index) in plants" :key='index'>
-            {{ data.name }}
-            <i class="fa fa-minus-circle" v-on:click="remove(index)"></i>
+            Name: {{ data.name }} FormSize: {{data.formSize}} Quantity: {{data.quantity}}
+            <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
           </li>
       </ul>
 	</div>
-</div>
+</section>
 </template>
 
 <script>
@@ -56,12 +50,10 @@ export default {
 		return {
 			plantNames: [],
 			formSizes: [],
-			locations: [],
 			plantName: '',
 			plants: [],
 			selectedPlantName: '',
 			selectedFormSize: '',
-			selectedLocation: '',
 			quantity: '',
 			wholesalePrice: '',
 			isLoading: false,
@@ -72,33 +64,18 @@ export default {
 	cancel() {
 	  	this.$router.push('StockTable');
 	},
-	addPlant() {
-		this.plants.push({name: this.plantName})
-		this.plantName = '';
-	},
 	remove(id) {
     this.plants.splice(id,1);
   },
-	saveBatch() {
-		this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
-			"Sku": this.selectedPlantName.sku,
-			"Name": this.selectedPlantName.name,
-			"FormSize": this.selectedFormSize.formSize,
-			"Location":  this.selectedLocation.location,
-			"Quantity": this.quantity,
-			"WholesalePrice": null,
-			"Image": null,
-			"Active": true,
-		})
-		.then((response) => {
-			console.log(response);
-			alert("Batch created");
-			this.$router.push('StockTable');
-		})
-		.catch((error) => {
-			alert("Please check values before submitting")
-			console.log(error);
+	addToList() {
+		this.plants.push({
+			name: this.selectedPlantName.name,
+			formSize: this.selectedFormSize.formSize,
+			quantity: this.quantity,
 		});
+		this.selectedPlantName = ''
+		this.selectedFormSize = ''
+		this.quantity = ''
 	},
 	getPlantNames() {
 		this.isLoading = true;
@@ -156,22 +133,6 @@ export default {
       });
 		}
 	},
-	getLocations() {
-		this.axios.get('https://ahillslocationservice.azurewebsites.net/api/locations')
-      .then((response) => {
-				this.transformLocations(response.data);
-      })
-      .catch((error) => {
-        alert(error);
-      });
-	},
-	transformLocations(data) {
-		for(var i = 0; i < data.length; i++){
-      this.locations.push({ //Create an array of objects
-				"location": data[i].MainLocation + data[i].SubLocation
-    });
-    }
-	},
 	plantSelected() {
 		this.isLoading2 = true;
 	},
@@ -181,7 +142,6 @@ export default {
 	},
 	mounted() {
 		this.getPlantNames();
-		this.getLocations();
 	}
 }
 </script>
@@ -190,25 +150,30 @@ export default {
 
 <style scoped>
 @import "https://cdn.jsdelivr.net/npm/animate.css@3.5.1";
-@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"; 
-	.container {
-		float: left;
-		display: flex;
-		/* margin-top: 25px; */
+/* @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css";  */
+@import "https://use.fontawesome.com/releases/v5.7.2/css/all.css";
+	.section {
+    width: 100%;
+		height: 500px;
+    background: aqua;
+    /* margin:0; */
+    /* padding: 10px; */
 	}
 
 	.left-div
 	{
-		align-items: flex-start;
-    width: 500px;
-		height: 300px; 
+    width: 25%;
+		/* height: 300px;  */
+    /* background: red; */
+		float:left;
+		overflow:hidden;
 		/* background: green; */
 	}
 
 	.right-div {
-		align-items: stretch;
-		flex-grow: 1;
-		/* background: blue */
+		float:left;
+		width:75%;
+		overflow:hidden;
 	}
 	
 	/* starts here */
@@ -228,20 +193,23 @@ export default {
   }
   p {
     text-align:center;
-    color: gray;
   }
   .container {
     box-shadow: 0px 0px 40px lightgray;
   }
   input {
-    width: calc(100% - 40px);
-    border: 0;
-    padding: 5px;
+    /* width: calc(100% - 40px); */
+    border: 1px solid #e8e8e8;
+		font-size: 14px;
+		min-height: 40px;
+    /* padding: 5px; */
     /* font-size: 1.3em; */
-    background-color: #323333;
-    color: #687F7F;
+    /* background-color: #323333; */
+    /* color: #adadad !important; */
+		
   }
 	i {
+	margin-top: 3px;	
   float:right;
   cursor:pointer;
 	}
@@ -252,9 +220,16 @@ export default {
 	}
 
 	@media only screen and (max-width : 768px) {
-	.center-div
-	{
-    width: 100%;
+
+	.left-div {
+		position: relative;
+		width: 100%;
+	}
+
+	.right-div {
+		width: 100%;
+		position: relative;
+		/* visibility: hidden; */
 	}
 
 }
