@@ -14,6 +14,9 @@ Vue.use(VueAxios, axios)
 import Multiselect from 'vue-multiselect'
 Vue.component('multiselect', Multiselect)
 
+import moment from 'moment'
+Vue.use(moment);
+
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.use(VueGoogleMaps, {

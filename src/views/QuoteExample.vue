@@ -2,10 +2,7 @@
 <section>
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
-		<!-- <form @submit.prevent="addPlant">
-			<input type="text" placeholder="Enter a plant name" v-model="plantName">
-			<button>Add to list</button>
-		</form> -->
+		<!-- <button @click="sendEmail">Test</button> -->
 		<multiselect v-model="selectedPlantName" 
 								:options="plantNames"  
 								placeholder="Select a plant" 
@@ -33,10 +30,18 @@
 		</div>
 	</div>
 	<div class="right-div">
+		<div>
+			<p>Customer Name: {{customerInfo.name}}</p>
+			<p>Customer Number: {{customerInfo.number}}</p>
+			<p>Customer Telephone: {{customerInfo.tel}}</p>
+			<p>Customer Address: {{customerInfo.address}}</p>
+			<p>Quote Date: {{currentDate}}</p>
+			<p>Expiry Date: {{expiryDate}}</p>
+		</div>
 		<p>Quote List</p>
       <ul>
           <li v-for="(data, index) in plants" :key='index'>
-            Name: {{ data.name }} FormSize: {{data.formSize}} Quantity: {{data.quantity}}
+            {{ data.name }} {{data.formSize}} x {{data.quantity}}
             <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
           </li>
       </ul>
@@ -45,6 +50,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 export default {
   data () {
 		return {
@@ -58,90 +64,110 @@ export default {
 			wholesalePrice: '',
 			isLoading: false,
 			isLoading2: false,
+			currentDate: null,
+			expiryDate: null,
+			customerInfo: '',
 		}		
-  },
+	},
   methods: {
-	cancel() {
-	  	this.$router.push('StockTable');
-	},
-	remove(id) {
-    this.plants.splice(id,1);
-  },
-	addToList() {
-		this.plants.push({
-			name: this.selectedPlantName.name,
-			formSize: this.selectedFormSize.formSize,
-			quantity: this.quantity,
-		});
-		this.selectedPlantName = ''
-		this.selectedFormSize = ''
-		this.quantity = ''
-	},
-	getPlantNames() {
-		this.isLoading = true;
-		this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
-      .then((response) => {
-				this.transformPlantNames(response.data);
-      })
-      .catch((error) => {
-          alert(error);
-      });
-	},
-	transformPlantNames(data) {
-		for(var i = 0; i < data.length; i++){
-      this.plantNames.push({ //Create an array of objects
-				"name": data[i].plantName,    //Data coming in is string so just assign values in object to be displayed
-				"sku": data[i].Sku
-      });
-			this.isLoading = false;
-    }
-	},
-	getPlantFormSizes() {
-		this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
-      .then((response) => {
-				this.transformFormSizes(response.data);
-      })
-      .catch((error) => {
-        alert(error);
-      });
-	},
-	transformFormSizes(data) {
-		this.formSizes = [];
-		this.isLoading2 = false;
-    for(var i = 0; i < data.length; i++){
-  	  var potSize;
-      var RootType;
-      //String modifying so that it reads more like "FormSizes"
-      if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
-        potSize = "";
-        RootType = data[i].RootType;
-      } else if (data[i].RootType == "CG") {
-        potSize = "C" + data[i].PotSize;
-        RootType = "";
-      } else {
-        potSize = "AP" + data[i].PotSize;
-        RootType = ""
-      }
-    	var formSize = potSize
-        + " " + data[i].HeightSpread
-        + " " + data[i].Girth
-        + " " + data[i].Age 
-        + " " + RootType
-        + " " + data[i].Description
-      this.formSizes.push({
-        "formSize": formSize,
-      });
+		cancel() {
+				this.$router.push('StockTable');
+		},
+		remove(id) {
+			this.plants.splice(id,1);
+		},
+		sendEmail() {
+			var link = "mailto:me@example.com"
+							+ "?cc="
+							+ "&subject=" + escape("Plant enquiry")
+							+ "&body=" + escape("This is the body: " + JSON.stringify(this.plants))
+			;
+
+			window.location.href = link;
+		},
+		addToList() {
+			this.plants.push({
+				name: this.selectedPlantName.name,
+				formSize: this.selectedFormSize.formSize,
+				quantity: this.quantity,
+			});
+			this.selectedPlantName = ''
+			this.selectedFormSize = ''
+			this.quantity = ''
+		},
+		getPlantNames() {
+			this.isLoading = true;
+			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
+				.then((response) => {
+					this.transformPlantNames(response.data);
+				})
+				.catch((error) => {
+						alert(error);
+				});
+		},
+		transformPlantNames(data) {
+			for(var i = 0; i < data.length; i++){
+				this.plantNames.push({ //Create an array of objects
+					"name": data[i].plantName,    //Data coming in is string so just assign values in object to be displayed
+					"sku": data[i].Sku
+				});
+				this.isLoading = false;
+			}
+		},
+		getPlantFormSizes() {
+			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
+				.then((response) => {
+					this.transformFormSizes(response.data);
+				})
+				.catch((error) => {
+					alert(error);
+				});
+		},
+		transformFormSizes(data) {
+			this.formSizes = [];
+			this.isLoading2 = false;
+			for(var i = 0; i < data.length; i++){
+				var potSize;
+				var RootType;
+				//String modifying so that it reads more like "FormSizes"
+				if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
+					potSize = "";
+					RootType = data[i].RootType;
+				} else if (data[i].RootType == "CG") {
+					potSize = "C" + data[i].PotSize;
+					RootType = "";
+				} else {
+					potSize = "AP" + data[i].PotSize;
+					RootType = ""
+				}
+				var formSize = potSize
+					+ " " + data[i].HeightSpread
+					+ " " + data[i].Girth
+					+ " " + data[i].Age 
+					+ " " + RootType
+					+ " " + data[i].Description
+				this.formSizes.push({
+					"formSize": formSize,
+				});
+			}
+		},
+		getQuoteDate() {
+			this.currentDate = moment().format('DD/MM/YYYY');
+			this.expiryDate = moment().add('30', 'days').format('DD/MM/YYYY')
+		},
+		plantSelected() {
+			this.isLoading2 = true;
+		},
+		clearFormSizes() {
+			this.selectedFormSize = '';
 		}
-	},
-	plantSelected() {
-		this.isLoading2 = true;
-	},
-	clearFormSizes() {
-		this.selectedFormSize = '';
-	}
 	},
 	mounted() {
 		this.getPlantNames();
+		this.getQuoteDate();
+	},
+	created() {
+		this.customerInfo = this.$route.params.selectedCustomer;
 	}
 }
 </script>
@@ -163,7 +189,7 @@ export default {
 	.left-div
 	{
     width: 25%;
-		/* height: 300px;  */
+		height: 300px; 
     /* background: red; */
 		float:left;
 		overflow:hidden;

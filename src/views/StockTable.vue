@@ -24,7 +24,6 @@
     <!-- Loader and Errors -->
     <p class="loader" v-if="loading"></p>
     <b-alert :show="ifError" variant="danger">{{status}}</b-alert>
-
     <!-- User Interface Controls -->
     <b-row>
       <b-col md="6" class="my-1">
@@ -62,8 +61,12 @@
              :sort-by.sync="sortBy"
              :sort-desc.sync="sortDesc"
              :sort-direction="sortDirection"
-             class="table"    
+             class="table"  
+             :busy="isBusy"  
              >
+      <div slot="empty">
+        <strong>Loading batches...</strong>
+      </div>       
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
@@ -72,7 +75,7 @@
         <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
-      </template>
+      </template> 
     </b-table>
 
       <!-- Picture Modal -->
@@ -108,6 +111,7 @@ export default {
       status: '',
       plantData: [],
       loading: true,
+      isBusy: true,
       userAuthenticated: '',
       ifError: false,
       authenticated: false,
@@ -166,6 +170,7 @@ export default {
         let batchList = sessionStorage.getItem('batchList');
         this.plantData = JSON.parse(batchList);
         this.loading = false;
+        this.isBusy = false;
       } else { 
       console.log("loading batches from db")  
       this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
@@ -174,6 +179,8 @@ export default {
           this.status = 'Stock Information loaded'
           this.ifError = false;
           this.loading = false; //Hide the spinner once data is loaded
+          this.isBusy = false;
+          this.button 
       }).catch((error) => {
           this.status = error;
           this.ifError = true;
@@ -258,7 +265,7 @@ export default {
       this.$router.push('ContactPage');
     },
     quote() {
-      this.$router.push('QuoteExample');
+      this.$router.push('CustomerInformation');
     },
     signOut() {
 			firebase.auth().signOut().then(() => {

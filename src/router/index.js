@@ -13,6 +13,7 @@ import SignUp from '@/views/SignUp'
 import ResetPassword from '@/views/ResetPassword'
 import ContactPage from '@/views/ContactPage'
 import QuoteExample from '@/views/QuoteExample'
+import CustomerInformation from '@/views/QuotingSystem/CustomerInformation'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -82,6 +83,11 @@ const router = new Router({
       path: '/QuoteExample',
       name: 'QuoteExample',
       component: QuoteExample
+    },
+    {
+      path: '/CustomerInformation',
+      name: 'CustomerInformation',
+      component: CustomerInformation
     },
   ]
 })
