@@ -10,7 +10,7 @@
 		</multiselect>
 		<div style="margin-top: 15px;">
 			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
-			<router-link :to="{name: 'QuoteExample', params: { selectedCustomer: selectedCustomer } }">
+			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer } }">
 				<b-button variant="outline-primary">Go to quote</b-button>
 			</router-link>
 		</div>
@@ -42,7 +42,7 @@ export default {
   methods: {
 		toQuote() {
 			console.log(this.customerName);
-			this.$router.push('QuoteExample');
+			this.$router.push('QuoteCreation');
 		},
 		cancel() {
 			this.$router.push('StockTable');
@@ -71,6 +71,21 @@ export default {
 		width:25%;
 		overflow:hidden;
 	}
+
+	@media only screen and (max-width : 768px) {
+
+	.left-div {
+		position: relative;
+		width: 100%;
+	}
+
+	.right-div {
+		width: 100%;
+		position: relative;
+		/* visibility: hidden; */
+	}
+
+}
 
 
 </style>

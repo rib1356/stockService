@@ -12,8 +12,14 @@ import Login from '@/views/Login'
 import SignUp from '@/views/SignUp'
 import ResetPassword from '@/views/ResetPassword'
 import ContactPage from '@/views/ContactPage'
-import QuoteExample from '@/views/QuoteExample'
+
+//Quote Pages
+import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'
 import CustomerInformation from '@/views/QuotingSystem/CustomerInformation'
+import QuoteNavigation from '@/views/QuotingSystem/QuoteNavigation'
+import ExistingQuotes from '@/views/QuotingSystem/ExistingQuotes'
+import EditQuote from '@/views/QuotingSystem/EditQuote'
+
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -80,14 +86,29 @@ const router = new Router({
       component: ContactPage
     },
     {
-      path: '/QuoteExample',
-      name: 'QuoteExample',
-      component: QuoteExample
+      path: '/QuoteCreation',
+      name: 'QuoteCreation',
+      component: QuoteCreation
     },
     {
       path: '/CustomerInformation',
       name: 'CustomerInformation',
       component: CustomerInformation
+    },
+    {
+      path: '/QuoteNavigation',
+      name: 'QuoteNavigation',
+      component: QuoteNavigation
+    },
+    {
+      path: '/ExistingQuotes',
+      name: 'ExistingQuotes',
+      component: ExistingQuotes
+    },
+    {
+      path: '/EditQuote',
+      name: 'EditQuote',
+      component: EditQuote
     },
   ]
 })

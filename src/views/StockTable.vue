@@ -265,7 +265,7 @@ export default {
       this.$router.push('ContactPage');
     },
     quote() {
-      this.$router.push('CustomerInformation');
+      this.$router.push('QuoteNavigation');
     },
     signOut() {
 			firebase.auth().signOut().then(() => {

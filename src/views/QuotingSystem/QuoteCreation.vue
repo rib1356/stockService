@@ -189,10 +189,10 @@ export default {
 	.left-div
 	{
     width: 25%;
-		height: 300px; 
+		height: 100%; 
     /* background: red; */
 		float:left;
-		overflow:hidden;
+		/* overflow:hidden; */
 		/* background: green; */
 	}
 
