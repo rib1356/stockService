@@ -25,34 +25,35 @@
     <p class="loader" v-if="loading"></p>
     <b-alert :show="ifError" variant="danger">{{status}}</b-alert>
     <!-- User Interface Controls -->
+    <div class="filter-div">
     <b-row>
       <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Filter" class="mb-0">
+        <!-- <b-form-group horizontal label="Filter" class="mb-0"> -->
           <b-input-group>
             <b-form-input v-model="filter" placeholder="Type to Search" />
             <b-input-group-append>
               <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
             </b-input-group-append>
           </b-input-group>
-        </b-form-group>
+        <!-- </b-form-group> -->
       </b-col>
       <b-col md="6" class="my-1">
-        <b-form-group horizontal label="Sort" class="mb-0">
+        <!-- <b-form-group horizontal label="Sort" class="mb-0"> -->
           <b-input-group>
             <b-form-select v-model="sortBy" :options="sortOptions">
-              <option slot="first" :value="null">-- none --</option>
+              <option slot="first" :value="null"> Choose Sort Option</option>
             </b-form-select>
             <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
               <option :value="false">Asc</option>
               <option :value="true">Desc</option>
             </b-form-select>
           </b-input-group>
-        </b-form-group>
+        <!-- </b-form-group> -->
       </b-col>
     </b-row>
-    
+    </div>
     <!-- Main Table Element -->
-    <div>
+    <div class="table-div">
     <b-table show-empty
              stacked="md"
              :items="plantData"
@@ -77,7 +78,8 @@
         </b-button>
       </template> 
     </b-table>
-
+    </div>
+    <div>
       <!-- Picture Modal -->
      <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
         <img v-if="imageLoaded" :src="imageURL" height="400" width="300">
@@ -288,21 +290,21 @@ export default {
 
 <style scoped>
 
-.scrollable {
-  vertical-align: top;
-  width: 100%;
-  height: -webkit-fill-available;
-}
+  .scrollable {
+    vertical-align: top;
+    width: 100%;
+    height: -webkit-fill-available;
+  }
 
-.modal-lg {
-  height: 50vh !important;
-}
+  .modal-lg {
+    height: 50vh !important;
+  }
 
-.modal-content {
-  height: 50vh;
-}
+  .modal-content {
+    height: 50vh;
+  }
 
-.loader {
+  .loader {
     border: 8px solid #f3f3f3; /* Light grey */
     border-top: 8px solid #61dd27; /* Green */
     border-radius: 50%;
@@ -313,7 +315,17 @@ export default {
     left: 50%;
     top: 50%; /* Needs to be changed so that its centered on mobile devices */  
     right: 50%;
-}
+  }
+
+	.table-div {
+		float: left;
+    max-height: 85vh;
+    /* max-width: 95vh; */
+		width: 100%;
+		overflow: auto;
+    /* overflow-y: scroll; */
+    -webkit-overflow-scrolling: touch;
+	}
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -321,11 +333,17 @@ export default {
 }
 
 @media only screen and (max-width : 768px) {
-.loader {
-    left: 45%;  
-    top: 50%;
-    right: 55%;
-}
+  .loader {
+      left: 45%;  
+      top: 50%;
+      right: 55%;
+  }
+
+	.table-div {
+    max-height: 75vh;
+		/* overflow: auto; */
+    -webkit-overflow-scrolling: touch;
+	}
 }
 
 @media only screen and (max-width : 568px) {
@@ -339,13 +357,13 @@ export default {
 .myBtn {
   margin-top: 1px;
 }
-
+/* 
 tbody {
   height: 100%;
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-}
+} */
 
 /* thead {
   width: 100%;

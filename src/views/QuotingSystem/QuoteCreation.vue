@@ -25,16 +25,18 @@
 										type="text"
 										placeholder="Enter a quantity"></b-form-input>	
 		<div style="margin-top: 15px;">
-			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
-			<b-button @click="addToList" variant="outline-primary">Add to list</b-button>
+			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
+			<b-button @click="toCust" variant="outline-primary">Chose another customer</b-button>
+			<b-button @click="addToList" variant="outline-primary">Add plant</b-button>
 		</div>
 	</div>
 	<div class="right-div">
 		<div>
-			<p>Customer Name: {{customerInfo.name}}</p>
-			<p>Customer Number: {{customerInfo.number}}</p>
-			<p>Customer Telephone: {{customerInfo.tel}}</p>
-			<p>Customer Address: {{customerInfo.address}}</p>
+			<p>Customer Name: {{customerInfo.customerName}}</p>
+			<p>Customer Reference: {{customerInfo.customerRef}}</p>
+			<p>Customer Telephone: {{customerInfo.customerTel}}</p>
+			<p>Customer Address: {{customerInfo.customerAddress}}</p>
+			<p>Customer Email: {{customerInfo.customerEmail}}</p>
 			<p>Quote Date: {{currentDate}}</p>
 			<p>Expiry Date: {{expiryDate}}</p>
 		</div>
@@ -72,6 +74,9 @@ export default {
   methods: {
 		cancel() {
 				this.$router.push('StockTable');
+		},
+		toCust() {
+				this.$router.push('CustomerInformation');
 		},
 		remove(id) {
 			this.plants.splice(id,1);
