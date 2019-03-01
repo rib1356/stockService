@@ -8,12 +8,15 @@
    							 label="customerName"
 								 placeholder="Select a customer" >
 		</multiselect>
-		<div style="margin-top: 15px;">
-			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
-			<b-button @click="toQuoteNav" variant="outline-primary">Back to quote navigation</b-button>
-			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer } }">
-				<b-button variant="outline-primary">Go to quote</b-button>
+		<b-form-input v-model="siteRef"
+									type="text"
+									placeholder="Enter a site reference"></b-form-input>	
+			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, siteRef: siteRef } }">
+				<b-button variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
+		<div style="margin-top: 10px;">
+			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
+			<b-button @click="toQuoteNav" variant="outline-danger">Back to quote navigation</b-button>
 		</div>
 	</div>
 	<div class="right-div">
@@ -22,6 +25,7 @@
 			<p>Customer Telephone: {{selectedCustomer.customerTel}}</p>
 			<p>Customer Address: {{selectedCustomer.customerAddress}}</p>
 			<p>Customer Email: {{selectedCustomer.customerEmail}}</p>
+			<p>Site Reference: {{siteRef}}</p>
 	</div>
 	
 		<!-- <button @click="toQuote" >Click me</button> -->
@@ -34,6 +38,7 @@ export default {
   data () {
 		return {
 			selectedCustomer: '',
+			siteRef: '',
 			customers: []
 		}		
   },
@@ -97,6 +102,17 @@ export default {
 		width:25%;
 		overflow:hidden;
 	}
+
+  input {
+    border: 1px solid #e8e8e8;
+		font-size: 14px;
+		min-height: 40px;
+  }
+
+	.multiselect {
+		margin-bottom: 10px;
+	}
+
 
 	@media only screen and (max-width : 768px) {
 

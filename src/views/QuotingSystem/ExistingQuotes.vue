@@ -13,6 +13,7 @@
             </b-input-group-append>
           </b-input-group>
         </b-form-group>
+        <!-- <datepicker placeholder="Select Date"></datepicker> -->
     </div>
     <div class="right-div">
 		<b-table show-empty
@@ -58,20 +59,6 @@ export default {
 			],
 			quotes: [
         {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
       ],
       customers: [],
       filter: '',
@@ -99,7 +86,7 @@ export default {
           "startDate": moment(response[i].Date).format('DD/MM/YYYY'),
           "expiryDate": moment(response[i].ExpiryDate).format('DD/MM/YYYY'),
           "siteRef": response[i].SiteRef,
-        "totalPrice": response[i].TotalPrice / 100,
+          "totalPrice": response[i].TotalPrice / 100,
         });
       }
     },

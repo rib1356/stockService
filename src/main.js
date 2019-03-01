@@ -17,6 +17,9 @@ Vue.component('multiselect', Multiselect)
 import moment from 'moment'
 Vue.use(moment);
 
+import Datepicker from 'vuejs-datepicker';
+Vue.use(Datepicker);
+
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.use(VueGoogleMaps, {

@@ -22,12 +22,14 @@
 								:searchable="false" 
 								:show-labels="false"></multiselect>
 		<b-form-input v-model="quantity"
-										type="text"
-										placeholder="Enter a quantity"></b-form-input>	
-		<div style="margin-top: 15px;">
+									type="text"
+									placeholder="Enter a quantity"></b-form-input>	
+		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
+		<b-button @click="addToList" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
+		<div style="margin-top: 10px;">
 			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
-			<b-button @click="toCust" variant="outline-primary">Chose another customer</b-button>
-			<b-button @click="addToList" variant="outline-primary">Add plant</b-button>
+			<b-button @click="toCust" variant="outline-danger">Chose another customer</b-button>
+			
 		</div>
 	</div>
 	<div class="right-div">
@@ -37,13 +39,14 @@
 			<p>Customer Telephone: {{customerInfo.customerTel}}</p>
 			<p>Customer Address: {{customerInfo.customerAddress}}</p>
 			<p>Customer Email: {{customerInfo.customerEmail}}</p>
-			<p>Quote Date: {{currentDate}}</p>
+			<p>Site reference: {{siteRef}}</p>
+			<p>Quote Date: {{quoteDate}}</p>
 			<p>Expiry Date: {{expiryDate}}</p>
 		</div>
 		<p>Quote List</p>
       <ul>
           <li v-for="(data, index) in plants" :key='index'>
-            {{ data.name }} {{data.formSize}} x {{data.quantity}}
+            {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{data.Price}}
             <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
           </li>
       </ul>
@@ -66,9 +69,11 @@ export default {
 			wholesalePrice: '',
 			isLoading: false,
 			isLoading2: false,
-			currentDate: null,
+			quoteDate: null,
 			expiryDate: null,
+			siteRef: null,
 			customerInfo: '',
+			quoteObject: '',
 		}		
 	},
   methods: {
@@ -90,12 +95,47 @@ export default {
 
 			window.location.href = link;
 		},
+		saveQuote() {
+			console.log(this.plants);
+			this.axios.post('http://ahillsquoteservice.azurewebsites.net/api/quote', {
+        CustomerRef: this.customerInfo.CustomerRef,
+				TotalPrice: 1000,
+				Date: this.quoteDate,
+				ExpiryDate: this.expiryDate,
+				SiteRef: this.siteRef,
+				Active: true,
+				QuoteDetails: [
+					{PlantName: "TestName", FormSize: "TestForm", Comment: "TestComment", Price: 100, Quantity: 5},
+					{PlantName: "TestName2", FormSize: "TestForm2", Comment: "TestComment2", Price: 100, Quantity: 5},
+				]
+			})
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => {
+				alert("Please check values before submitting")
+				console.log(error);
+			});
+			// this.quoteObject.push({
+			// 	CustomerRef: this.customerInfo.CustomerRef,
+			// 	TotalPrice: 1000,
+			// 	Date: this.quoteDate,
+			// 	ExpiryDate: this.expiryDate,
+			// 	SiteRef: this.siteRef,
+			// 	Active: true,
+			// 	QuoteDetails: this.plants,
+			// });
+			// console.log(this.quoteObject);
+		},
 		addToList() {
 			this.plants.push({
-				name: this.selectedPlantName.name,
-				formSize: this.selectedFormSize.formSize,
-				quantity: this.quantity,
+				PlantName: this.selectedPlantName.name,
+				FormSize: this.selectedFormSize.formSize,
+				Quantity: this.quantity,
+				Comment: null,
+				Price: 100 / 100,
 			});
+			console.log(this.plants);
 			this.selectedPlantName = ''
 			this.selectedFormSize = ''
 			this.quantity = ''
@@ -157,7 +197,7 @@ export default {
 			}
 		},
 		getQuoteDate() {
-			this.currentDate = moment().format('DD/MM/YYYY');
+			this.quoteDate = moment().format('DD/MM/YYYY');
 			this.expiryDate = moment().add('30', 'days').format('DD/MM/YYYY')
 		},
 		plantSelected() {
@@ -173,6 +213,7 @@ export default {
 	},
 	created() {
 		this.customerInfo = this.$route.params.selectedCustomer;
+		this.siteRef = this.$route.params.siteRef;
 	}
 }
 </script>
