@@ -6,13 +6,16 @@
 							   :options="customers"
 								 track-by="customerName"
    							 label="customerName"
-								 placeholder="Select a customer" >
+								 placeholder="Select a customer"
+								 :allow-empty="false"
+								 deselect-label="Can't remove this value" 
+								 @close="customerSelected">
 		</multiselect>
 		<b-form-input v-model="siteRef"
 									type="text"
 									placeholder="Enter a site reference"></b-form-input>	
 			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, siteRef: siteRef } }">
-				<b-button variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
+				<b-button :disabled="disabled == 1 ? true : false" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
 		<div style="margin-top: 10px;">
 			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
@@ -39,7 +42,8 @@ export default {
 		return {
 			selectedCustomer: '',
 			siteRef: '',
-			customers: []
+			customers: [],
+			disabled: 1,
 		}		
   },
   methods: {
@@ -50,11 +54,14 @@ export default {
 		cancel() {
 			this.$router.push('StockTable');
 		},
+		customerSelected() {
+			this.disabled = 0;
+		},
 		toQuoteNav() {
 			this.$router.push('QuoteNavigation');
 		},
 		getAllCustomers() {
-			this.axios.get('http://ahillsquoteservice.azurewebsites.net/api/customer/all')
+			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
 				.then((response) => {
 					this.parseCustomers(response.data);
 				})

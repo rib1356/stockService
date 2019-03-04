@@ -6,7 +6,7 @@
     <router-link to="/StockTable" tag="button">Back to stock table</router-link>
     <router-view></router-view>
     <!-- {{testObj}} -->
-    <button @click="sendObj">Click me to send object</button>
+    <!-- <button @click="sendObj">Click me to send object</button> -->
   </div>
 </template>
 
@@ -34,16 +34,16 @@ export default {
   methods: {
     sendObj() {
       console.log(this.testObj);
-      this.axios.post('http://localhost:61993/api/quote', 
-        this.testObj
-			)
-			.then((response) => {
-				console.log(response);
-			})
-			.catch((error) => {
-				alert("Please check values before submitting")
-				console.log(error);
-			});
+      // this.axios.post('http://localhost:61993/api/quote', 
+      //   this.testObj
+			// )
+			// .then((response) => {
+			// 	console.log(response);
+			// })
+			// .catch((error) => {
+			// 	alert("Please check values before submitting")
+			// 	console.log(error);
+			// });
     }
   }
 }

@@ -3,7 +3,7 @@
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
 		<!-- <button @click="sendEmail">Test</button> -->
-		<multiselect v-model="selectedPlantName" 
+		<!-- <multiselect v-model="selectedPlantName" 
 								:options="plantNames"  
 								placeholder="Select a plant" 
 								label="name" 
@@ -13,19 +13,34 @@
 								@input="getPlantFormSizes"
 								@close="plantSelected"
 								@open="clearFormSizes"
-								class="multiselect"></multiselect>			 
+								class="multiselect"
+								:allow-empty="false"></multiselect>			 
 		<multiselect v-model="selectedFormSize" 
 								:options="formSizes"  
 								placeholder="Select a form size" 
 								label="formSize"
 								:loading="isLoading2"
 								:searchable="false" 
-								:show-labels="false"></multiselect>
+								:show-labels="false"
+								:allow-empty="false"></multiselect> -->
+		<multiselect v-model="selectedBatch" 
+								:options="batches"  
+								placeholder="Select a batch" 
+								label="plantName"
+								:loading="isLoading"
+								:custom-label="customLabel"
+								:show-labels="false"
+								:allow-empty="false"></multiselect>
 		<b-form-input v-model="quantity"
-									type="text"
-									placeholder="Enter a quantity"></b-form-input>	
+									placeholder="Enter a quantity"
+									type="number"
+                  pattern="[0-9]*"
+									v-validate="'required|numeric|min_value:1'"
+									name="quantity"
+									inputmode="numeric"></b-form-input>	
+									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
-		<b-button @click="addToList" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
+		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
 		<div style="margin-top: 10px;">
 			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
 			<b-button @click="toCust" variant="outline-danger">Chose another customer</b-button>
@@ -59,21 +74,18 @@ import moment from 'moment'
 export default {
   data () {
 		return {
-			plantNames: [],
-			formSizes: [],
-			plantName: '',
 			plants: [],
-			selectedPlantName: '',
-			selectedFormSize: '',
 			quantity: '',
 			wholesalePrice: '',
-			isLoading: false,
+			isLoading: true,
 			isLoading2: false,
 			quoteDate: null,
 			expiryDate: null,
 			siteRef: null,
 			customerInfo: '',
 			quoteObject: '',
+			batches: [],
+			selectedBatch: null,
 		}		
 	},
   methods: {
@@ -96,106 +108,115 @@ export default {
 			window.location.href = link;
 		},
 		saveQuote() {
-			console.log(this.plants);
-			this.axios.post('http://ahillsquoteservice.azurewebsites.net/api/quote', {
-        CustomerRef: this.customerInfo.CustomerRef,
+			
+			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
+        CustomerRef: this.customerInfo.customerRef,
 				TotalPrice: 1000,
 				Date: this.quoteDate,
 				ExpiryDate: this.expiryDate,
 				SiteRef: this.siteRef,
 				Active: true,
-				QuoteDetails: [
-					{PlantName: "TestName", FormSize: "TestForm", Comment: "TestComment", Price: 100, Quantity: 5},
-					{PlantName: "TestName2", FormSize: "TestForm2", Comment: "TestComment2", Price: 100, Quantity: 5},
-				]
-			})
+				QuoteDetails: this.plants,
+			}) 
 			.then((response) => {
 				console.log(response);
+				this.plants = [];
 			})
 			.catch((error) => {
 				alert("Please check values before submitting")
 				console.log(error);
 			});
-			// this.quoteObject.push({
-			// 	CustomerRef: this.customerInfo.CustomerRef,
-			// 	TotalPrice: 1000,
-			// 	Date: this.quoteDate,
-			// 	ExpiryDate: this.expiryDate,
-			// 	SiteRef: this.siteRef,
-			// 	Active: true,
-			// 	QuoteDetails: this.plants,
-			// });
-			// console.log(this.quoteObject);
+		},
+		validateBeforeSubmit(e) { //Check that all validation passes before saving
+      this.$validator.validateAll();
+        if (!this.errors.any() && this.selectedBatch != null) {
+            this.addToList();
+        }
+    },
+		getTotalPrice() {
+			this.plants.forEach(function(element) {
+				console.log(element.PlantName);
+			});
 		},
 		addToList() {
 			this.plants.push({
-				PlantName: this.selectedPlantName.name,
-				FormSize: this.selectedFormSize.formSize,
+				PlantName: this.selectedBatch.plantName,
+				FormSize: this.selectedBatch.formSize,
 				Quantity: this.quantity,
 				Comment: null,
 				Price: 100 / 100,
 			});
-			console.log(this.plants);
-			this.selectedPlantName = ''
-			this.selectedFormSize = ''
+			this.selectedBatch = null
 			this.quantity = ''
 		},
-		getPlantNames() {
-			this.isLoading = true;
-			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
-				.then((response) => {
-					this.transformPlantNames(response.data);
-				})
-				.catch((error) => {
-						alert(error);
-				});
-		},
-		transformPlantNames(data) {
-			for(var i = 0; i < data.length; i++){
-				this.plantNames.push({ //Create an array of objects
-					"name": data[i].plantName,    //Data coming in is string so just assign values in object to be displayed
-					"sku": data[i].Sku
-				});
+		getBatchList() {
+			if(sessionStorage.getItem('batchList') != null) {
+				let batchList = sessionStorage.getItem('batchList');
+				this.batches = JSON.parse(batchList);
 				this.isLoading = false;
+			} else {
+				alert("wew");
 			}
 		},
-		getPlantFormSizes() {
-			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
-				.then((response) => {
-					this.transformFormSizes(response.data);
-				})
-				.catch((error) => {
-					alert(error);
-				});
-		},
-		transformFormSizes(data) {
-			this.formSizes = [];
-			this.isLoading2 = false;
-			for(var i = 0; i < data.length; i++){
-				var potSize;
-				var RootType;
-				//String modifying so that it reads more like "FormSizes"
-				if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
-					potSize = "";
-					RootType = data[i].RootType;
-				} else if (data[i].RootType == "CG") {
-					potSize = "C" + data[i].PotSize;
-					RootType = "";
-				} else {
-					potSize = "AP" + data[i].PotSize;
-					RootType = ""
-				}
-				var formSize = potSize
-					+ " " + data[i].HeightSpread
-					+ " " + data[i].Girth
-					+ " " + data[i].Age 
-					+ " " + RootType
-					+ " " + data[i].Description
-				this.formSizes.push({
-					"formSize": formSize,
-				});
-			}
-		},
+		customLabel ({ plantName, formSize }) {
+      return `${plantName} – ${formSize}`
+    },
+		// getPlantNames() {
+		// 	this.isLoading = true;
+		// 	this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
+		// 		.then((response) => {
+		// 			this.transformPlantNames(response.data);
+		// 		})
+		// 		.catch((error) => {
+		// 				alert(error);
+		// 		});
+		// },
+		// transformPlantNames(data) {
+		// 	for(var i = 0; i < data.length; i++){
+		// 		this.plantNames.push({ //Create an array of objects
+		// 			"name": data[i].plantName,    //Data coming in is string so just assign values in object to be displayed
+		// 			"sku": data[i].Sku
+		// 		});
+		// 		this.isLoading = false;
+		// 	}
+		// },
+		// getPlantFormSizes() {
+		// 	this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
+		// 		.then((response) => {
+		// 			this.transformFormSizes(response.data);
+		// 		})
+		// 		.catch((error) => {
+		// 			alert(error);
+		// 		});
+		// },
+		// transformFormSizes(data) {
+		// 	this.formSizes = [];
+		// 	this.isLoading2 = false;
+		// 	for(var i = 0; i < data.length; i++){
+		// 		var potSize;
+		// 		var RootType;
+		// 		//String modifying so that it reads more like "FormSizes"
+		// 		if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
+		// 			potSize = "";
+		// 			RootType = data[i].RootType;
+		// 		} else if (data[i].RootType == "CG") {
+		// 			potSize = "C" + data[i].PotSize;
+		// 			RootType = "";
+		// 		} else {
+		// 			potSize = "AP" + data[i].PotSize;
+		// 			RootType = ""
+		// 		}
+		// 		var formSize = potSize
+		// 			+ " " + data[i].HeightSpread
+		// 			+ " " + data[i].Girth
+		// 			+ " " + data[i].Age 
+		// 			+ " " + RootType
+		// 			+ " " + data[i].Description
+		// 		this.formSizes.push({
+		// 			"formSize": formSize,
+		// 		});
+		// 	}
+		// },
 		getQuoteDate() {
 			this.quoteDate = moment().format('DD/MM/YYYY');
 			this.expiryDate = moment().add('30', 'days').format('DD/MM/YYYY')
@@ -208,7 +229,7 @@ export default {
 		}
 	},
 	mounted() {
-		this.getPlantNames();
+		this.getBatchList();
 		this.getQuoteDate();
 	},
 	created() {
