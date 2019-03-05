@@ -61,27 +61,12 @@ export default {
 			this.$router.push('QuoteNavigation');
 		},
 		getAllCustomers() {
-			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
-				.then((response) => {
-					this.parseCustomers(response.data);
-				})
-				.catch((error) => {
-						alert(error);
-				});
-		},
-		parseCustomers(data) {
-			for(var i = 0; i < data.length; i++){
-				this.customers.push({ //Create an array of objects
-					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
-					"customerRef": data[i].CustomerReference,
-					"customerTel": data[i].CustomerTel,
-					"customerAddress": data[i].CustomerAddress,
-					"customerEmail": data[i].CustomerEmail,
-				});
-				this.isLoading = false;
-			}
-		},
-
+      if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
+        this.customers = JSON.parse(localStorage.getItem("customers"));
+      } else {
+        alert("Customers need to be loaded into storage. Please go to the stock table")
+      }
+    },
 	},
 	mounted() {
 		this.getAllCustomers();
@@ -112,7 +97,7 @@ export default {
 
   input {
     border: 1px solid #e8e8e8;
-		font-size: 14px;
+		font-size: 16px;
 		min-height: 40px;
   }
 

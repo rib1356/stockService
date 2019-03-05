@@ -1,18 +1,15 @@
 <template>
   <section>
-  
     <p>{{msg}}</p>
     <div class="left-div">
 		  <router-link to="/StockTable" tag="button">Back to stock table</router-link>
 		  <router-link to="/QuoteNavigation" tag="button">Back to Quote Navigation</router-link>
-        <b-form-group vertical label="Filter" class="mb-0">
-          <b-input-group>
-            <b-form-input v-model="filter" placeholder="Type to Search" />
+          <b-input-group class="input-filter">
+            <b-form-input v-model="filter" placeholder="Type to Search"/>
             <b-input-group-append>
               <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
             </b-input-group-append>
           </b-input-group>
-        </b-form-group>
         <!-- <datepicker placeholder="Select Date"></datepicker> -->
     </div>
     <div class="right-div">
@@ -28,11 +25,9 @@
         <strong>Loading quotes...</strong>
       </div>       
       <template slot="actions" slot-scope="row">
-        <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
 				<router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
 					<i class="far fa-edit fa-lg" style="color:green"></i>
 				</router-link>
-					<!-- <i class="far fa-edit fa-lg" style="color:red"></i> -->
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="remove"></i>
       </template> 
     </b-table>
@@ -57,9 +52,7 @@ export default {
         { key: 'totalPrice', label: 'Quote Price' , sortable: true},
         { key: 'actions', label: 'Actions' }
 			],
-			quotes: [
-        {quoteId: 1, customerRef: "Test", customerName: "test", startDate: "test", expiryDate: "test", siteRef: "test", totalPrice: 100},
-      ],
+			quotes: [],
       customers: [],
       filter: '',
     }
@@ -76,14 +69,12 @@ export default {
 		},
     changeData (response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-        // let date = moment(response[i].Date).format('DD/MM/YYYY');
-        let customerName = this.getCustomerName(response[i].CustomerRef);
-        // console.log(date);
-        this.quotes.push({                 //This is then pushed into an array and used to populate the data table
+        let customerName = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
+        this.quotes.push({ //This is then pushed into an array and used to populate the data table
           "quoteId": response[i].QuoteId,
           "customerRef": response[i].CustomerRef,
           "customerName": customerName,
-          "startDate": moment(response[i].Date).format('DD/MM/YYYY'),
+          "startDate": moment(response[i].Date).format('DD/MM/YYYY'), //Used to format the date that was saved in the db
           "expiryDate": moment(response[i].ExpiryDate).format('DD/MM/YYYY'),
           "siteRef": response[i].SiteRef,
           "totalPrice": response[i].TotalPrice / 100,
@@ -92,35 +83,18 @@ export default {
     },
     getCustomerName(customerRef){
       let customer = this.customers;
-      for (var i = 0; i < customer.length; i++) {
+      for (var i = 0; i < customer.length; i++) { //Loops through the customers to find where the references match to get their name
         if(customerRef == customer[i].customerRef) {
-          // console.log(customer[i].customerName)
           return customer[i].customerName;
         }
       }
     },
     getAllCustomers() {
-      this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
-        .then((response) => {
-          this.parseCustomers(response.data);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-    },
-    parseCustomers(data) {
-      for(var i = 0; i < data.length; i++){
-        this.customers.push({ //Create an array of objects
-          "customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
-          "customerRef": data[i].CustomerReference,
-          "customerTel": data[i].CustomerTel,
-          "customerAddress": data[i].CustomerAddress,
-          "customerEmail": data[i].CustomerEmail,
-        });
+      if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
+        this.customers = JSON.parse(localStorage.getItem("customers"));
+      } else {
+        alert("Customers need to be loaded into storage. Please go to the stock table")
       }
-    },
-    selectQuote(item) {
-      console.log(item)
     },
     remove() {
       console.log("This will delete");
@@ -143,30 +117,28 @@ export default {
     background: aqua;
     overflow: hidden;
     overflow-y: hidden;
-    /* margin:0; */
-    /* padding: 10px; */
 	}
 
 	.left-div
 	{
     width: 20%;
 		height: 100%; 
-    /* background: red; */
 		float:left;
-		/* overflow:hidden; */
-		/* background: green; */
 	}
 
 	.right-div {
-    /* position: absolute; */
 		float: left;
-    /* height: 95%; */
     max-height: 90vh;
 		width: 80%;
 		overflow: auto;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 	}
+
+  .input-filter{
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
 
 	@media only screen and (max-width : 768px) {
 
@@ -176,9 +148,9 @@ export default {
 	}
 
 	.right-div {
+    max-height: 75vh;
 		width: 100%;
 		position: relative;
-		/* visibility: hidden; */
 	}
 
 }

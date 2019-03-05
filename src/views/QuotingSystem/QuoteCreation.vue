@@ -37,7 +37,8 @@
                   pattern="[0-9]*"
 									v-validate="'required|numeric|min_value:1'"
 									name="quantity"
-									inputmode="numeric"></b-form-input>	
+									inputmode="numeric"
+									@keyup.enter="validateBeforeSubmit"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
@@ -57,10 +58,11 @@
 			<p>Site reference: {{siteRef}}</p>
 			<p>Quote Date: {{quoteDate}}</p>
 			<p>Expiry Date: {{expiryDate}}</p>
+			<strong>Quote Price: £{{totalPrice}}</strong>
 		</div>
 		<p>Quote List</p>
       <ul>
-          <li v-for="(data, index) in plants" :key='index'>
+          <li v-for="(data, index) in plants" :key='index' @input="getTotalPrice">
             {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{data.Price}}
             <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
           </li>
@@ -86,6 +88,7 @@ export default {
 			quoteObject: '',
 			batches: [],
 			selectedBatch: null,
+			totalPrice: 0
 		}		
 	},
   methods: {
@@ -97,6 +100,7 @@ export default {
 		},
 		remove(id) {
 			this.plants.splice(id,1);
+			this.getTotalPrice();
 		},
 		sendEmail() {
 			var link = "mailto:me@example.com"
@@ -108,7 +112,6 @@ export default {
 			window.location.href = link;
 		},
 		saveQuote() {
-			
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
 				TotalPrice: 1000,
@@ -121,21 +124,24 @@ export default {
 			.then((response) => {
 				console.log(response);
 				this.plants = [];
+				this.$router.push('QuoteNavigation');
 			})
 			.catch((error) => {
 				alert("Please check values before submitting")
 				console.log(error);
 			});
 		},
-		validateBeforeSubmit(e) { //Check that all validation passes before saving
+		validateBeforeSubmit(e) { //Check that all validation passes before adding
       this.$validator.validateAll();
-        if (!this.errors.any() && this.selectedBatch != null) {
-            this.addToList();
+        if (!this.errors.any() && this.selectedBatch != null) { 
+            this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
         }
     },
 		getTotalPrice() {
-			this.plants.forEach(function(element) {
-				console.log(element.PlantName);
+			this.totalPrice = 0; //Reset total price so correct quote price stays
+			this.plants.forEach((element) => { //Loop through the array of plants on quote
+				let plantPrice = element.Quantity * element.Price; //Get the current price of that plant
+				this.totalPrice += plantPrice; //Add it to the total cost of the quote
 			});
 		},
 		addToList() {
@@ -146,6 +152,7 @@ export default {
 				Comment: null,
 				Price: 100 / 100,
 			});
+			this.getTotalPrice();
 			this.selectedBatch = null
 			this.quantity = ''
 		},
@@ -155,68 +162,37 @@ export default {
 				this.batches = JSON.parse(batchList);
 				this.isLoading = false;
 			} else {
-				alert("wew");
+				alert("Loading batches from service");
+				this.getBatches();
 			}
 		},
+		getBatches() {
+		  this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+      .then((response) => {
+        this.changeData(response.data);
+      }).catch((error) => {
+				alert("Sorry there was an error")
+				console.log(error)
+      });
+    },
+    changeData (response) {
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+				if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+					this.batches.push({                 //This is then pushed into an array and used to populate the data table
+						"batchId": response[i].Id,
+						"Sku": response[i].Sku,
+						"plantName": response[i].Name,
+						"location": response[i].Location,
+						"quantity": response[i].Quantity,
+						"formSize": response[i].FormSize,
+						"active": response[i].Active,
+					});
+     	  }     
+      }
+    },
 		customLabel ({ plantName, formSize }) {
       return `${plantName} – ${formSize}`
     },
-		// getPlantNames() {
-		// 	this.isLoading = true;
-		// 	this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
-		// 		.then((response) => {
-		// 			this.transformPlantNames(response.data);
-		// 		})
-		// 		.catch((error) => {
-		// 				alert(error);
-		// 		});
-		// },
-		// transformPlantNames(data) {
-		// 	for(var i = 0; i < data.length; i++){
-		// 		this.plantNames.push({ //Create an array of objects
-		// 			"name": data[i].plantName,    //Data coming in is string so just assign values in object to be displayed
-		// 			"sku": data[i].Sku
-		// 		});
-		// 		this.isLoading = false;
-		// 	}
-		// },
-		// getPlantFormSizes() {
-		// 	this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
-		// 		.then((response) => {
-		// 			this.transformFormSizes(response.data);
-		// 		})
-		// 		.catch((error) => {
-		// 			alert(error);
-		// 		});
-		// },
-		// transformFormSizes(data) {
-		// 	this.formSizes = [];
-		// 	this.isLoading2 = false;
-		// 	for(var i = 0; i < data.length; i++){
-		// 		var potSize;
-		// 		var RootType;
-		// 		//String modifying so that it reads more like "FormSizes"
-		// 		if (data[i].PotSize == 0) { //If the pot size = 0 it is a RB/BR/WRB so hide the potsize
-		// 			potSize = "";
-		// 			RootType = data[i].RootType;
-		// 		} else if (data[i].RootType == "CG") {
-		// 			potSize = "C" + data[i].PotSize;
-		// 			RootType = "";
-		// 		} else {
-		// 			potSize = "AP" + data[i].PotSize;
-		// 			RootType = ""
-		// 		}
-		// 		var formSize = potSize
-		// 			+ " " + data[i].HeightSpread
-		// 			+ " " + data[i].Girth
-		// 			+ " " + data[i].Age 
-		// 			+ " " + RootType
-		// 			+ " " + data[i].Description
-		// 		this.formSizes.push({
-		// 			"formSize": formSize,
-		// 		});
-		// 	}
-		// },
 		getQuoteDate() {
 			this.quoteDate = moment().format('DD/MM/YYYY');
 			this.expiryDate = moment().add('30', 'days').format('DD/MM/YYYY')
@@ -293,7 +269,7 @@ export default {
   input {
     /* width: calc(100% - 40px); */
     border: 1px solid #e8e8e8;
-		font-size: 14px;
+		font-size: 16px;
 		min-height: 40px;
     /* padding: 5px; */
     /* font-size: 1.3em; */

@@ -12,6 +12,7 @@ import Login from '@/views/Login'
 import SignUp from '@/views/SignUp'
 import ResetPassword from '@/views/ResetPassword'
 import ContactPage from '@/views/ContactPage'
+// import QuoteNavigation from '@/views/QuoteNavigation'
 
 //Quote Pages
 import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'

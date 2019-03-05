@@ -120,6 +120,7 @@ export default {
       imageURL: null,
       imgError: false,
       imageLoaded: false,
+      customers: [],
     }
   },
   computed: {
@@ -209,11 +210,33 @@ export default {
       sessionStorage.setItem('batchInMemory', true);
       }
     },
+    getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
+			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
+				.then((response) => {
+					this.parseCustomers(response.data);
+				})
+				.catch((error) => {
+						alert(error);
+				});
+		},
+		parseCustomers(data) { //Push customers into an array of objects then save to local storage
+			for(var i = 0; i < data.length; i++){
+				this.customers.push({ //Create an array of objects
+					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
+					"customerRef": data[i].CustomerReference,
+					"customerTel": data[i].CustomerTel,
+					"customerAddress": data[i].CustomerAddress,
+					"customerEmail": data[i].CustomerEmail,
+				});
+      }
+      localStorage.setItem("customers", JSON.stringify(this.customers));
+		},
     hasUserAuth() {
       this.authenticated = localStorage.getItem("logged");
       var user = firebase.auth().currentUser; 
       if (this.authenticated || user) { //If user is logged in show the available buttons
         this.authenticated = true;
+        this.getAllCustomers(); //If logged in get all customers and save to storage
       } else { //Hide any buttons
         this.authenticated = false;
       }
@@ -280,7 +303,7 @@ export default {
   created() {    
     this.pageLoadCounter();
     this.setFilter();
-    this.retrieveData(); //On webpage load 
+    this.retrieveData(); //On webpage load all batches then save into browser storage 
   },  
   mounted() {
     this.hasUserAuth();
