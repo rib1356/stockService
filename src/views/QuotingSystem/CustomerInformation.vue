@@ -23,12 +23,16 @@
 		</div>
 	</div>
 	<div class="right-div">
-			<p>Customer Name: {{selectedCustomer.customerName}}</p>
-			<p>Customer Reference: {{selectedCustomer.customerRef}}</p>
-			<p>Customer Telephone: {{selectedCustomer.customerTel}}</p>
-			<p>Customer Address: {{selectedCustomer.customerAddress}}</p>
-			<p>Customer Email: {{selectedCustomer.customerEmail}}</p>
-			<p>Site Reference: {{siteRef}}</p>
+			<p>
+				Customer Name: <strong>{{selectedCustomer.customerName}} ||</strong>
+				Customer Reference: <strong>{{selectedCustomer.customerRef}} ||</strong>
+				Customer Telephone: <strong>{{selectedCustomer.customerTel}}</strong>
+			</p>
+			<p>
+				Customer Address: <strong>{{selectedCustomer.customerAddress}} ||</strong>
+				Customer Email: <strong>{{selectedCustomer.customerEmail}} ||</strong>
+			</p>
+			<p>Site Reference: <strong>{{siteRef}}</strong></p>
 	</div>
 	
 		<!-- <button @click="toQuote" >Click me</button> -->
@@ -81,18 +85,14 @@ export default {
 	.left-div
 	{
     width: 25%;
-		height: 300px; 
-    /* background: red; */
 		float:left;
-		overflow:hidden;
-		/* background: green; */
 	}
 
 	.right-div {
 		margin-top: 2%;
 		float:left;
-		width:25%;
-		overflow:hidden;
+		width:75%;
+		/* overflow:hidden; */
 	}
 
   input {

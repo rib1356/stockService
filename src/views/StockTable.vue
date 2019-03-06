@@ -200,8 +200,9 @@ export default {
           "location": response[i].Location,
           "quantity": response[i].Quantity,
           "formSize": response[i].FormSize,
+          "batchPrice": response[i].WholesalePrice, 
           "active": response[i].Active,
-           });
+        });
       }     
       }
       //If the user is logged in save the data to session storage for easier retrieval

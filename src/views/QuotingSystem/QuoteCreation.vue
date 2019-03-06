@@ -50,20 +50,26 @@
 	</div>
 	<div class="right-div">
 		<div>
-			<p>Customer Name: {{customerInfo.customerName}}</p>
-			<p>Customer Reference: {{customerInfo.customerRef}}</p>
-			<p>Customer Telephone: {{customerInfo.customerTel}}</p>
-			<p>Customer Address: {{customerInfo.customerAddress}}</p>
-			<p>Customer Email: {{customerInfo.customerEmail}}</p>
-			<p>Site reference: {{siteRef}}</p>
-			<p>Quote Date: {{quoteDate}}</p>
-			<p>Expiry Date: {{expiryDate}}</p>
-			<strong>Quote Price: £{{totalPrice}}</strong>
+			<p>
+				Customer Name: <strong>{{customerInfo.customerName}}</strong>
+			  Customer Reference: <strong>{{customerInfo.customerRef}}</strong>
+				Customer Telephone: <strong>{{customerInfo.customerTel}}</strong>
+			</p>
+			<p>	
+				Customer Address: <strong>{{customerInfo.customerAddress}}</strong>
+				Customer Email: <strong>{{customerInfo.customerEmail}}</strong>
+			</p>
+			<p>
+				Site reference: <strong>{{siteRef}}</strong>
+			  Quote Date: <strong>{{quoteDate}}</strong>
+			  Expiry Date: <strong>{{expiryDate}}</strong>
+			</p>
+			<strong>Quote Price: £{{computedTotalPrice}}</strong>
 		</div>
 		<p>Quote List</p>
       <ul>
           <li v-for="(data, index) in plants" :key='index' @input="getTotalPrice">
-            {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{data.Price}}
+            {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{getPrice(data.Price)}}
             <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
           </li>
       </ul>
@@ -112,9 +118,11 @@ export default {
 			window.location.href = link;
 		},
 		saveQuote() {
+			console.log(this.totalPrice);
+			console.log(this.plants);
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
-				TotalPrice: 1000,
+				TotalPrice: this.totalPrice,
 				Date: this.quoteDate,
 				ExpiryDate: this.expiryDate,
 				SiteRef: this.siteRef,
@@ -150,7 +158,7 @@ export default {
 				FormSize: this.selectedBatch.formSize,
 				Quantity: this.quantity,
 				Comment: null,
-				Price: 100 / 100,
+				Price: this.selectedBatch.batchPrice,
 			});
 			this.getTotalPrice();
 			this.selectedBatch = null
@@ -202,7 +210,15 @@ export default {
 		},
 		clearFormSizes() {
 			this.selectedFormSize = '';
-		}
+		},
+		getPrice (price) { //Does the same as computed method but passed in a value
+      return (price/100).toFixed(2);
+    },
+	},
+	computed: {
+    computedTotalPrice () { ///Whenever total value is shown this will format to look monitary
+      return (this.totalPrice/100).toFixed(2);
+    },
 	},
 	mounted() {
 		this.getBatchList();

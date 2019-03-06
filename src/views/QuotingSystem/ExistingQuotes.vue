@@ -77,9 +77,10 @@ export default {
           "startDate": moment(response[i].Date).format('DD/MM/YYYY'), //Used to format the date that was saved in the db
           "expiryDate": moment(response[i].ExpiryDate).format('DD/MM/YYYY'),
           "siteRef": response[i].SiteRef,
-          "totalPrice": response[i].TotalPrice / 100,
+          "totalPrice": "£"+(response[i].TotalPrice / 100).toFixed(2),
         });
       }
+      console.log(this.quotes)
     },
     getCustomerName(customerRef){
       let customer = this.customers;
