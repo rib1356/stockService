@@ -1,5 +1,6 @@
 <template>
 	<div>
+	<quote-navbar></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a customer</label>		 
 		<multiselect v-model="selectedCustomer"
@@ -40,8 +41,11 @@
 </template>
 
 <script>
-//
+import QuoteNavbar from '@/components/QuoteNavbar.vue'
 export default {
+	components: {
+		QuoteNavbar,
+	},
   data () {
 		return {
 			selectedCustomer: '',

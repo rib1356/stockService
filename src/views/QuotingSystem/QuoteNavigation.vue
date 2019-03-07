@@ -2,13 +2,13 @@
   <div>
     <p>{{msg}}</p>
     <router-link to="/ExistingQuotes" class="my-nav">
-      <b-button variant="outline-primary">Existing Quotes</b-button>
+      <b-button variant="outline-primary" class="my-btn">Existing Quotes</b-button>
     </router-link>
     <router-link to="/CustomerInformation" class="my-nav">
-    <b-button variant="outline-primary">Create New Quote</b-button>
+    <b-button variant="outline-primary" class="my-btn">Create New Quote</b-button>
     </router-link>
     <router-link to="/StockTable" class="my-nav">
-    <b-button variant="outline-danger">Back to Stock Table</b-button>
+    <b-button variant="outline-danger" class="my-btn">Back to Stock Table</b-button>
     </router-link>
     <router-view></router-view>
     <!-- {{testObj}} -->
@@ -35,7 +35,19 @@ export default {
 
   .my-nav{
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     text-align: center;
   }
+
+  .my-btn {
+    width: 15%;
+    height: 50px;
+  }
+
+	@media only screen and (max-width : 768px) {
+    .my-btn {
+    width: 80%;
+    }
+  }
+ 
 </style>

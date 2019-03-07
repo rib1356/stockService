@@ -1,28 +1,8 @@
 <template>
 <section>
+	<quote-navbar></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
-		<!-- <button @click="sendEmail">Test</button> -->
-		<!-- <multiselect v-model="selectedPlantName" 
-								:options="plantNames"  
-								placeholder="Select a plant" 
-								label="name" 
-								track-by="name"
-								:loading="isLoading"
-								:show-labels="false"
-								@input="getPlantFormSizes"
-								@close="plantSelected"
-								@open="clearFormSizes"
-								class="multiselect"
-								:allow-empty="false"></multiselect>			 
-		<multiselect v-model="selectedFormSize" 
-								:options="formSizes"  
-								placeholder="Select a form size" 
-								label="formSize"
-								:loading="isLoading2"
-								:searchable="false" 
-								:show-labels="false"
-								:allow-empty="false"></multiselect> -->
 		<multiselect v-model="selectedBatch" 
 								:options="batches"  
 								placeholder="Select a batch" 
@@ -79,7 +59,11 @@
 
 <script>
 import moment from 'moment'
+import QuoteNavbar from '@/components/QuoteNavbar.vue'
 export default {
+	components: {
+		QuoteNavbar,
+	},
   data () {
 		return {
 			plants: [],
@@ -118,8 +102,7 @@ export default {
 			window.location.href = link;
 		},
 		saveQuote() {
-			console.log(this.totalPrice);
-			console.log(this.plants);
+			console.log(this.quoteDate);
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
 				TotalPrice: this.totalPrice,

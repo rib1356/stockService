@@ -1,5 +1,6 @@
 <template>
   <section>
+    <quote-navbar></quote-navbar>
     <p>{{msg}}</p>
     <div class="left-div">
 		  <router-link to="/StockTable" tag="button">Back to stock table</router-link>
@@ -37,8 +38,12 @@
 
 <script>
 import moment from 'moment'
+import QuoteNavbar from '@/components/QuoteNavbar.vue'
 export default {
   name: 'ExistingQuotes',
+  components: {
+		QuoteNavbar,
+	},
   data () {
     return {
 			msg: 'Existing Quotes',
@@ -70,17 +75,19 @@ export default {
     changeData (response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
         let customerName = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
-        this.quotes.push({ //This is then pushed into an array and used to populate the data table
-          "quoteId": response[i].QuoteId,
-          "customerRef": response[i].CustomerRef,
-          "customerName": customerName,
-          "startDate": moment(response[i].Date).format('DD/MM/YYYY'), //Used to format the date that was saved in the db
-          "expiryDate": moment(response[i].ExpiryDate).format('DD/MM/YYYY'),
-          "siteRef": response[i].SiteRef,
-          "totalPrice": "£"+(response[i].TotalPrice / 100).toFixed(2),
-        });
+        if(response[i].Active === true) {
+          this.quotes.push({ //This is then pushed into an array and used to populate the data table
+            "quoteId": response[i].QuoteId,
+            "customerRef": response[i].CustomerRef,
+            "customerName": customerName,
+            "startDate": response[i].Date, //Used to format the date that was saved in the db
+            "expiryDate": response[i].ExpiryDate,
+            "siteRef": response[i].SiteRef,
+            "totalPrice": "£"+(response[i].TotalPrice / 100).toFixed(2),
+          });
+        }
       }
-      console.log(this.quotes)
+      console.log(this.quotes);
     },
     getCustomerName(customerRef){
       let customer = this.customers;
