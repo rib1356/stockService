@@ -18,10 +18,10 @@
 			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, siteRef: siteRef } }">
 				<b-button :disabled="disabled == 1 ? true : false" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
-		<div style="margin-top: 10px;">
+		<!-- <div style="margin-top: 10px;">
 			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
 			<b-button @click="toQuoteNav" variant="outline-danger">Back to quote navigation</b-button>
-		</div>
+		</div> -->
 	</div>
 	<div class="right-div">
 			<p>

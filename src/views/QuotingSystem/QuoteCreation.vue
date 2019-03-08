@@ -20,13 +20,17 @@
 									inputmode="numeric"
 									@keyup.enter="validateBeforeSubmit"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+		<b-form-input v-model="comment"
+									placeholder="Enter a plant comment"
+									type="text"
+									style="margin-top: 10px;"
+									@keyup.enter="validateBeforeSubmit"></b-form-input>	
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
-		<div style="margin-top: 10px;">
+		<!-- <div style="margin-top: 10px;">
 			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
 			<b-button @click="toCust" variant="outline-danger">Chose another customer</b-button>
-			
-		</div>
+		</div> -->
 	</div>
 	<div class="right-div">
 		<div>
@@ -49,8 +53,8 @@
 		<p>Quote List</p>
       <ul>
           <li v-for="(data, index) in plants" :key='index' @input="getTotalPrice">
-            {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{getPrice(data.Price)}}
-            <i class="fas fa-trash-alt" v-on:click="remove(index)"></i>
+            {{ data.PlantName }} {{data.FormSize}} x {{data.Quantity}} @ £{{getPrice(data.Price)}} {{data.Comment}}
+            <i class="fas fa-trash-alt" @click="remove(index)"></i>
           </li>
       </ul>
 	</div>
@@ -71,9 +75,10 @@ export default {
 			wholesalePrice: '',
 			isLoading: true,
 			isLoading2: false,
-			quoteDate: null,
+			quoteDate: "22/03/2019",
 			expiryDate: null,
 			siteRef: null,
+			comment: null,
 			customerInfo: '',
 			quoteObject: '',
 			batches: [],
@@ -103,6 +108,7 @@ export default {
 		},
 		saveQuote() {
 			console.log(this.quoteDate);
+			console.log(this.expiryDate);
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
 				TotalPrice: this.totalPrice,
@@ -113,6 +119,7 @@ export default {
 				QuoteDetails: this.plants,
 			}) 
 			.then((response) => {
+				console.log("D" + this.quoteDate + "   ExD" + this.expiryDate);
 				console.log(response);
 				this.plants = [];
 				this.$router.push('QuoteNavigation');
@@ -140,12 +147,12 @@ export default {
 				PlantName: this.selectedBatch.plantName,
 				FormSize: this.selectedBatch.formSize,
 				Quantity: this.quantity,
-				Comment: null,
+				Comment: this.comment,
 				Price: this.selectedBatch.batchPrice,
 			});
 			this.getTotalPrice();
 			this.selectedBatch = null
-			this.quantity = ''
+			this.quantity = null
 		},
 		getBatchList() {
 			if(sessionStorage.getItem('batchList') != null) {

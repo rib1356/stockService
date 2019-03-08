@@ -3,8 +3,8 @@
     <quote-navbar></quote-navbar>
     <p>{{msg}}</p>
     <div class="left-div">
-		  <router-link to="/StockTable" tag="button">Back to stock table</router-link>
-		  <router-link to="/QuoteNavigation" tag="button">Back to Quote Navigation</router-link>
+		  <!-- <router-link to="/StockTable" tag="button">Back to stock table</router-link> -->
+		  <!-- <router-link to="/QuoteNavigation" tag="button">Back to Quote Navigation</router-link> -->
           <b-input-group class="input-filter">
             <b-form-input v-model="filter" placeholder="Type to Search"/>
             <b-input-group-append>
@@ -29,7 +29,7 @@
 				<router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
 					<i class="far fa-edit fa-lg" style="color:green"></i>
 				</router-link>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="remove"></i>
+				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteQuote(row.item)"></i>
       </template> 
     </b-table>
   </div>
@@ -80,14 +80,20 @@ export default {
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
             "customerName": customerName,
-            "startDate": response[i].Date, //Used to format the date that was saved in the db
-            "expiryDate": response[i].ExpiryDate,
+            "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
+            "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
-            "totalPrice": "£"+(response[i].TotalPrice / 100).toFixed(2),
+            "totalPrice": this.getPrice(response[i].TotalPrice),
           });
         }
       }
-      console.log(this.quotes);
+    },
+    getPrice (price) { //Does the same as computed method but passed in a value
+      return (price/100).toFixed(2);
+    },
+    convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"
+        var p = dateString.split(/\D/g)
+        return [p[2],p[1],p[0] ].join("/")
     },
     getCustomerName(customerRef){
       let customer = this.customers;
@@ -104,10 +110,20 @@ export default {
         alert("Customers need to be loaded into storage. Please go to the stock table")
       }
     },
-    remove() {
-      console.log("This will delete");
-    },
-	},
+    deleteQuote (row){
+      var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
+      let data = { "QuoteId": row.quoteId, "Active": false} ;
+      this.axios.put(url, data)
+			  .then((response) => {
+          console.log(response);
+          confirm("Quote deleted"); //This needed?
+          location.reload();
+			  })
+			  .catch((error) => {
+				  alert(error);
+			});
+    }
+  },
 	mounted() {
     this.getAllCustomers();
 		this.getExistingQuotes();
@@ -136,7 +152,7 @@ export default {
 
 	.right-div {
 		float: left;
-    max-height: 90vh;
+    max-height: 85vh;
 		width: 80%;
 		overflow: auto;
     overflow-y: scroll;
@@ -145,7 +161,6 @@ export default {
 
   .input-filter{
     margin-bottom: 5px;
-    margin-top: 5px;
   }
 
 	@media only screen and (max-width : 768px) {

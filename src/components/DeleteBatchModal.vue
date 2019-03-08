@@ -40,8 +40,7 @@ export default {
     },
     deleteBatch (){
       var url = ("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId); 
-      this.active = false;
-      let data = { "Id": this.batchId, "Active": this.active} ;
+      let data = { "Id": this.batchId, "Active": false} ;
       this.axios.put(url, data)
 			  .then((response) => {
           console.log(response);

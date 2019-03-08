@@ -2,7 +2,14 @@
   <div>
     <p>{{msg}}</p>
 		<router-link to="/ExistingQuotes" tag="button">Back to quotes</router-link>
-		<p>{{selectedQuote}}</p>
+    <b-button @click="saveEdits" variant="outline-success">Save Edits</b-button>
+		<p>
+      Customer Ref: {{selectedQuote.customerRef}} ||
+      Customer Name: {{selectedQuote.customerName}} ||
+      Quote Start Date: {{selectedQuote.startDate}} ||
+      Quote Expiry Date: {{selectedQuote.expiryDate}}
+    </p>
+		<p>Site Ref: {{selectedQuote.siteRef}} || Total Price: {{selectedQuote.totalPrice}}</p>
     <b-table show-empty
              stacked="md"
              :items="quotePlants"
@@ -12,12 +19,12 @@
       <div slot="empty">
         <strong>Loading quotes plants...</strong>
       </div>       
-      <template slot="actions" slot-scope="">
-        <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-				<i class="far fa-edit fa-lg" style="color:green"></i>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="remove"></i>
-      </template> 
+      <template slot="actions" slot-scope="row">
+				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item)" id="popUp"></i>
+				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteItem(row.id)"></i>
+      </template>
     </b-table>
+ 
   </div>
 </template>
 
@@ -33,7 +40,7 @@ export default {
         { key: 'formSize', label: 'Form Size'},
         { key: 'comment', label: 'Comment'},
         { key: 'quantity', label: 'Quantity', sortable: true},
-        { key: 'Price', label: 'Item Price', sortable: true},
+        { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
         { key: 'actions', label: 'Actions' }
 			],
 			quotePlants: [],
@@ -43,7 +50,6 @@ export default {
 		getQuotePlants() {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/detail?id=' + this.selectedQuote.quoteId)
       .then((response) => {
-				console.log(response.data.QuoteDetails)
 				this.changeData(response.data.QuoteDetails); //Pass in just the plants on the quote to be displayed on table
       })
       .catch((error) => {
@@ -57,10 +63,24 @@ export default {
           "formSize": response[i].FormSize,
           "comment": response[i].Comment,
           "quantity": response[i].Quantity,
-          "Price": response[i].Price / 100,
+          "Price": this.getPrice(response[i].Price),
         });   
     }
-	},
+  },
+  getPrice (price) { //Does the same as computed method but passed in a value
+      return (price/100).toFixed(2);
+  },
+  editItem(row) {
+    row.quantity = 0;
+  },
+  deleteItem(id) {
+    this.quotePlants.splice(id,1);
+    console.log(this.quotePlants);
+  },
+  saveEdits() {
+    console.log(this.selectedQuote);
+    console.log(this.quotePlants);
+  }
 	},
 	created() {
 		this.selectedQuote = this.$route.params.selectedQuote;
