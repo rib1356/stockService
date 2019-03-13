@@ -26,8 +26,11 @@
 							 track-by="location"
 							 :show-labels="false"></multiselect>		
 	<b-form-input v-model="quantity"
-                  type="text"
-                  placeholder="Enter a quantity"></b-form-input>
+                placeholder="Enter a quantity"
+								type="number"
+                pattern="[0-9]*"
+								name="quantity"
+								inputmode="numeric"></b-form-input>	
 	<b-modal ref="imageAskModal" size="sm" title="Add a batch image?" centered hide-footer hide-header-close no-close-on-backdrop>
 		<div class="modal__footer">
       <b-btn class="mt-3" variant="outline-danger" @click="noImage">No Image</b-btn>

@@ -44,7 +44,6 @@ export default {
       this.axios.put(url, data)
 			  .then((response) => {
           console.log(response);
-          confirm("Batch deleted"); //This needed?
           sessionStorage.removeItem('selectedBatchInformation');
           sessionStorage.removeItem('batchInMemory');
 				  this.$router.push('StockTable');

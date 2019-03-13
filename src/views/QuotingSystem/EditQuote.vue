@@ -81,37 +81,39 @@ export default {
           "price": this.getPrice(response[i].Price),
         });   
     }
-  },
-  getPrice (price) { //Does the same as computed method but passed in a value
+    },
+    getPrice (price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);
-  },
-  editItem(row) {
-    if(this.edited) {
-      console.log("im here")
-      row.Comment = this.rowComment;
-      row.Quantity = this.rowQuantity
-      row.Price = this.rowPrice;
-    } else {
-      this.$refs.editModal.show();
-      this.rowName = row.plantName;
-      this.rowComment = row.comment;
-      this.rowQuantity = row.quantity;
-      this.rowPrice = row.price;
+    },
+    editItem(row) {
+      if(this.edited) {
+        console.log("im here")
+        console.log(row)
+        row.comment = this.rowComment;
+        row.quantity = this.rowQuantity
+        row.price = this.rowPrice;
+      } else {
+        console.log(row);
+        this.$refs.editModal.show();
+        this.rowName = row.plantName;
+        this.rowComment = row.comment;
+        this.rowQuantity = row.quantity;
+        this.rowPrice = row.price;
+      }
+    },
+    hideModal() {
+      this.$refs.editModal.hide();
+      this.edited = false;
+    },
+    deleteItem(id) {
+      this.quotePlants.splice(id,1);
+      console.log(this.quotePlants);
+    },
+    saveEdits(row) {
+      this.edited = true;
+      this.editItem();
+      this.hideModal();
     }
-  },
-  hideModal() {
-    this.$refs.editModal.hide();
-    this.edited = false;
-  },
-  deleteItem(id) {
-    this.quotePlants.splice(id,1);
-    console.log(this.quotePlants);
-  },
-  saveEdits(row) {
-    this.edited = true;
-    this.editItem();
-    this.hideModal();
-  }
 	},
 	created() {
 		this.selectedQuote = this.$route.params.selectedQuote;
