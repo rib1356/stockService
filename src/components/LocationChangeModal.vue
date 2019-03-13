@@ -191,7 +191,7 @@ export default {
         }
     },
     saveDbLocation(newLocation) { //Save the new location of the batch in the database
-      let data = { "Id": this.batchId, "Location": newLocation};
+      let data = { "Id": this.batchId, "Location": newLocation, "Active": true};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
@@ -222,6 +222,7 @@ export default {
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, {
         "Id": this.batchId,
         "Quantity": parseInt(newQuantity),
+        "Active": true,
       })
 			.then((response) => {
         console.log(response);

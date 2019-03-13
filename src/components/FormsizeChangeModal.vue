@@ -150,7 +150,7 @@ export default {
     saveFormSizes() {
       this.updateFormSize();
       this.hideConfirmModal();
-      let data = { "Id": this.batchId, "FormSize": this.selectedFormSize};
+      let data = { "Id": this.batchId, "FormSize": this.selectedFormSize, "Active": true};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);    

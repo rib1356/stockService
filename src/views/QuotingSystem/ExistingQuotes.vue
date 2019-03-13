@@ -113,15 +113,18 @@ export default {
     deleteQuote (row){
       var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
       let data = { "QuoteId": row.quoteId, "Active": false} ;
-      this.axios.put(url, data)
-			  .then((response) => {
-          console.log(response);
-          confirm("Quote deleted"); //This needed?
-          location.reload();
-			  })
-			  .catch((error) => {
-				  alert(error);
-			});
+      if(confirm("Delete Quote?")) { //Bring up confirm dialog before deleting
+        this.axios.put(url, data)
+          .then((response) => {
+            console.log(response);
+            location.reload();
+          })
+          .catch((error) => {
+            alert(error);
+        });
+      } else {
+        //do nothing?
+      }
     }
   },
 	mounted() {

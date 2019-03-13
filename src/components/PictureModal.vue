@@ -86,7 +86,8 @@ export default {
       }).then(
         this.loaded = true, //Show loading bar
         setTimeout(this.progressFinish, 3000), //Once the progress bar has finished call this method and enable buttons etc
-        this.progressBar()//Start counter on loading bar
+        this.progressBar(),//Start counter on loading bar
+        this.updateImageStatus(),
       );
     },
     progressBar() {
@@ -117,6 +118,19 @@ export default {
       } else {
         //do nothing
       }
+    },
+    updateImageStatus() {
+      this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, {
+        "Id": this.batchId,
+        "ImageExists": true,
+        "Active": true,
+      })
+			.then((response) => {
+          console.log(response);
+			})
+			.catch((error) => {
+				alert(error);
+			});
     },
     checkButton() { //Hide or show the button
       if(sessionStorage.getItem('selectedBatchInformation') == null) {

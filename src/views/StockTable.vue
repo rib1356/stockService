@@ -70,7 +70,8 @@
       </div>       
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-        <b-button size="sm" variant="outline-primary" @click.stop="info(row.item, $event.target)" >
+        <p v-if="batchHasImage(row.index)" >*</p>
+        <b-button size="sm" variant="outline-primary" class="image-btn" @click.stop="info(row.item, $event.target)" >
           View Image
         </b-button>
         <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
@@ -83,8 +84,8 @@
       <!-- Picture Modal -->
      <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
         <img v-if="imageLoaded" :src="imageURL" height="400" width="300">
+        <h2 v-else-if="imgError" v>Sorry no picture exists for this batch</h2>
         <h2 v-else>Image Loading</h2>
-        <h2 v-if="imgError">Sorry there was an error</h2>
       </b-modal>
     </div>
   </b-container>
@@ -129,9 +130,13 @@ export default {
       return this.fields
         .filter(f => f.sortable)
         .map(f => { return { text: f.label, value: f.key } })
-    }
+    },
+
   },
   methods: {
+    batchHasImage(rowIndex) {
+      return this.plantData[rowIndex].imageExists;
+    },
     info(item, button) {
       this.modalInfo.title = `Name: ${item.plantName}`
       // this.modalInfo.content = JSON.stringify(item, null, 2)
@@ -201,10 +206,11 @@ export default {
           "quantity": response[i].Quantity,
           "formSize": response[i].FormSize,
           "batchPrice": response[i].WholesalePrice, 
+          "imageExists": response[i].ImageExists,
           "active": response[i].Active,
         });
-      }     
       }
+      }   
       //If the user is logged in save the data to session storage for easier retrieval
       if(this.authenticated) {
       sessionStorage.setItem('batchList', JSON.stringify(this.plantData));
@@ -341,6 +347,15 @@ export default {
     right: 50%;
   }
 
+  /* .image-btn {
+    color: green;
+    border-color: green;
+  } */
+  
+  .myBtn {
+  margin-top: 1px;
+  }
+
 	.table-div {
 		float: left;
     max-height: 85vh;
@@ -378,9 +393,7 @@ export default {
 }
 }
 
-.myBtn {
-  margin-top: 1px;
-}
+
 /* 
 tbody {
   height: 100%;

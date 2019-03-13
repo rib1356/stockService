@@ -82,7 +82,7 @@ export default {
 			"Location":  this.selectedLocation.location,
 			"Quantity": this.quantity,
 			"WholesalePrice": null,
-			"Image": null,
+			"ImageExists": false,
 			"Active": true,
 		})
 		.then((response) => {

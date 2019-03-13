@@ -20,9 +20,19 @@
         <strong>Loading quotes plants...</strong>
       </div>       
       <template slot="actions" slot-scope="row">
-				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item)" id="popUp"></i>
+				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item)"></i>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteItem(row.id)"></i>
+        <b-modal ref="editModal" hide-footer :title="rowName">
+          <div class="d-block text-center">
+            <p>Comment: <input type="text" v-model="rowComment"></p>
+            <p>Quantity: <input type="text" v-model="rowQuantity"><p>
+            <p>Price: <input type="text" v-model="rowPrice"></p>
+          </div>
+            <b-button class="mt-3" variant="outline-primary" block @click.stop="saveEdits">Save Edits</b-button>
+            <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-button>
+        </b-modal>
       </template>
+
     </b-table>
  
   </div>
@@ -40,10 +50,15 @@ export default {
         { key: 'formSize', label: 'Form Size'},
         { key: 'comment', label: 'Comment'},
         { key: 'quantity', label: 'Quantity', sortable: true},
-        { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
+        { key: 'price', label: 'Item Price', sortable: true, contenteditable: true},
         { key: 'actions', label: 'Actions' }
 			],
-			quotePlants: [],
+      quotePlants: [],
+      rowName: '',
+      rowComment: '',
+      rowQuantity: '',
+      rowPrice: '',
+      edited: false,
     }
 	},
 	methods: {
@@ -63,7 +78,7 @@ export default {
           "formSize": response[i].FormSize,
           "comment": response[i].Comment,
           "quantity": response[i].Quantity,
-          "Price": this.getPrice(response[i].Price),
+          "price": this.getPrice(response[i].Price),
         });   
     }
   },
@@ -71,15 +86,31 @@ export default {
       return (price/100).toFixed(2);
   },
   editItem(row) {
-    row.quantity = 0;
+    if(this.edited) {
+      console.log("im here")
+      row.Comment = this.rowComment;
+      row.Quantity = this.rowQuantity
+      row.Price = this.rowPrice;
+    } else {
+      this.$refs.editModal.show();
+      this.rowName = row.plantName;
+      this.rowComment = row.comment;
+      this.rowQuantity = row.quantity;
+      this.rowPrice = row.price;
+    }
+  },
+  hideModal() {
+    this.$refs.editModal.hide();
+    this.edited = false;
   },
   deleteItem(id) {
     this.quotePlants.splice(id,1);
     console.log(this.quotePlants);
   },
-  saveEdits() {
-    console.log(this.selectedQuote);
-    console.log(this.quotePlants);
+  saveEdits(row) {
+    this.edited = true;
+    this.editItem();
+    this.hideModal();
   }
 	},
 	created() {
