@@ -70,13 +70,15 @@
       </div>       
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-        <p v-if="batchHasImage(row.index)" >*</p>
-        <b-button size="sm" variant="outline-primary" class="image-btn" @click.stop="info(row.item, $event.target)" >
+        <!-- <p v-if="batchHasImage(row.index)" >*</p> -->
+        <b-button size="sm" variant="outline-primary" v-if="batchHasImage(row.index)" class="image-btn" @click.stop="info(row.item, $event.target)" >
           View Image
         </b-button>
-        <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
+        
+        <b-button size="sm" variant="outline-primary" v-else-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
+        <p v-else>No image yet</p>
       </template> 
     </b-table>
     </div>
