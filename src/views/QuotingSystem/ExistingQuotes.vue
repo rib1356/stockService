@@ -3,8 +3,6 @@
     <quote-navbar></quote-navbar>
     <p>{{msg}}</p>
     <div class="left-div">
-		  <!-- <router-link to="/StockTable" tag="button">Back to stock table</router-link> -->
-		  <!-- <router-link to="/QuoteNavigation" tag="button">Back to Quote Navigation</router-link> -->
           <b-input-group class="input-filter">
             <b-form-input v-model="filter" placeholder="Type to Search"/>
             <b-input-group-append>

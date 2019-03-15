@@ -101,14 +101,10 @@ export default {
 			var link = "mailto:me@example.com"
 							+ "?cc="
 							+ "&subject=" + escape("Plant enquiry")
-							+ "&body=" + escape("This is the body: " + JSON.stringify(this.plants))
-			;
-
+							+ "&body=" + escape("This is the body: " + JSON.stringify(this.plants));
 			window.location.href = link;
 		},
 		saveQuote() {
-			console.log(this.quoteDate);
-			console.log(this.expiryDate);
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
 				TotalPrice: this.totalPrice,
@@ -119,7 +115,6 @@ export default {
 				QuoteDetails: this.plants,
 			}) 
 			.then((response) => {
-				console.log("D" + this.quoteDate + "   ExD" + this.expiryDate);
 				console.log(response);
 				this.plants = [];
 				this.$router.push('QuoteNavigation');
@@ -149,6 +144,7 @@ export default {
 				Quantity: this.quantity,
 				Comment: this.comment,
 				Price: this.selectedBatch.batchPrice,
+				Active: true,
 			});
 			this.getTotalPrice();
 			this.selectedBatch = null
