@@ -17,6 +17,9 @@ Vue.component('multiselect', Multiselect)
 import moment from 'moment'
 Vue.use(moment);
 
+// import jsPDF from 'jspdf'
+// Vue.use(jsPDF);
+
 import Datepicker from 'vuejs-datepicker';
 Vue.use(Datepicker);
 

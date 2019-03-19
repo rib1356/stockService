@@ -1,6 +1,7 @@
 <template>
   <section>
     <quote-navbar></quote-navbar>
+    <!-- Quote Informatmion -->
     <p>{{msg}}</p>
     <div class="left-div">
           <b-input-group class="input-filter">
@@ -11,18 +12,24 @@
           </b-input-group>
         <!-- <datepicker placeholder="Select Date"></datepicker> -->
     </div>
+    <!-- Quote Table -->
     <div class="right-div">
 		<b-table show-empty
-             stacked="md"
+             stacked="sm"
              :items="quotes"
              :fields="fields"
              :filter="filter"
+             sort-by="quoteId"
+             :sort-desc="true"
              class="table" 
              outlined   
              >
       <div slot="empty">
         <strong>Loading quotes...</strong>
-      </div>       
+      </div>   
+      <template slot="totalPrice" slot-scope="row">
+        £{{row.item.totalPrice}}
+      </template>    
       <template slot="actions" slot-scope="row">
 				<router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
 					<i class="far fa-edit fa-lg" style="color:green"></i>
@@ -46,11 +53,11 @@ export default {
     return {
 			msg: 'Existing Quotes',
 			fields: [
-        { key: 'quoteId', label: 'QuoteId', sortable: true},
+        { key: 'quoteId', label: 'QuoteId', sortable: true, sortDirection: 'desc'},
         { key: 'customerRef', label: 'Customer Ref'},
         { key: 'customerName', label: 'Customer Name'},
-        { key: 'startDate', label: 'Start Date', sortable: true},
-        { key: 'expiryDate', label: 'Expiry Date', sortable: true},
+        { key: 'startDate', label: 'Start Date'},
+        { key: 'expiryDate', label: 'Expiry Date'},
         { key: 'siteRef', label: 'Site Reference'},
         { key: 'totalPrice', label: 'Quote Price' , sortable: true},
         { key: 'actions', label: 'Actions' }

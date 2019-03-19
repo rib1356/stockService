@@ -1,7 +1,10 @@
 <template>
   <div>
     <p>{{msg}}</p>
-		<router-link to="/ExistingQuotes" tag="button">Back to quotes</router-link>
+    <!-- Quote information -->
+		<router-link to="/ExistingQuotes">
+      <b-button variant="outline-danger">Back to quotes</b-button>
+    </router-link>
     <b-button @click="saveQuote" variant="outline-success">Save Edits</b-button>
 		<p>
       Customer Ref: {{selectedQuote.customerRef}} ||
@@ -10,6 +13,8 @@
       Quote Expiry Date: {{selectedQuote.expiryDate}}
     </p>
 		<p>Site Ref: {{selectedQuote.siteRef}} || Total Price: £{{computedTotalPrice}}</p>
+
+    <!-- EditQuote table -->
     <b-table show-empty
              stacked="md"
              :items="quotePlants"
@@ -17,29 +22,44 @@
              >
       <div slot="empty">
         <strong>Loading quotes plants...</strong>
-      </div>       
+      </div>   
+      <template slot="Price" slot-scope="row">
+        £{{row.item.Price/100}}
+      </template>      
       <template slot="actions" slot-scope="row">
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteItem(row.item, row.index)"></i>
+        <!-- Editing modal -->
         <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName">
           <div>
             <b-form-group horizontal label="Comment:" >
-              <b-form-input v-model="rowComment" />
+              <b-form-input v-model="rowComment"
+                            placeholder="Enter a comment" />
             </b-form-group>
             <b-form-group horizontal label="Quantity:" >
-              <b-form-input v-model="rowQuantity" />
+              <b-form-input v-model="rowQuantity"
+                            placeholder="Enter a quantity"
+                            type="number"
+                            pattern="[0-9]*"
+                            name="rowQuantity"
+                            inputmode="numeric"
+                            v-validate="'required|numeric|min_value:1'"  />
             </b-form-group>
+            <p class="text-danger" v-if="errors.has('rowQuantity')">{{ errors.first('rowQuantity') }}</p>
             <b-form-group horizontal label="Price" >
-              <b-form-input v-model="rowPrice" />
+              <b-form-input v-model="rowPrice"
+                            placeholder="Enter a price"
+                            type="number"
+                            name="rowPrice"
+                            v-validate="'required|decimal:2|min_value:0.01'" />
             </b-form-group>
+            <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
           </div>
-            <b-button class="mt-3" variant="outline-primary" block @click.stop="saveEdits">Save Edits</b-button>
+            <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
             <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-button>
         </b-modal>
       </template>
-
     </b-table>
- 
   </div>
 </template>
 
@@ -100,10 +120,6 @@ export default {
        }
       }
       this.getTotalPrice(); //Once the plants have loaded calculate the current price of the quote
-      console.log(this.quotePlants);
-    },
-    getPrice (price) { //Does the same as computed method but passed in a value
-      return (price/100).toFixed(2);
     },
     editItem(row, rowId) {
       if(row.Active == true){ //If the row hasnt been "deleted" open the edit modal
@@ -114,7 +130,7 @@ export default {
       this.rowForm = row.FormSize
       this.rowComment = row.Comment;
       this.rowQuantity = row.Quantity;
-      this.rowPrice = row.Price; 
+      this.rowPrice = (row.Price/100).toFixed(2); 
       this.rowActive = row.Active;
       }
     },
@@ -136,21 +152,26 @@ export default {
         PlantName: this.rowName,                  //its current postion
         FormSize: this.rowForm,
         Comment: this.rowComment,
-        Quantity: this.rowQuantity,
-        Price:  this.rowPrice,
+        Quantity: parseInt(this.rowQuantity),
+        Price:  parseFloat(this.rowPrice)*100, //Parsing edited value eg: "1.55" = 155 so it can be saved to db
         Active: this.rowActive,
         _rowVariant: '',
       });
+      console.log(this.quotePlants);
       this.getTotalPrice();
       this.hideModal();
     },
+    validateBeforeSubmit(e) { //Check that all validation passes before saving
+      this.$validator.validateAll();
+        if (!this.errors.any()) {
+            this.saveEdits();
+        }
+    },
     saveQuote() {
-      console.log(this.selectedQuote);      
-      console.log(this.quotePlants);
       this.axios.put('https://ahillsquoteservice.azurewebsites.net/api/quote/edit?id=' + this.selectedQuote.quoteId, {
         QuoteId: this.selectedQuote.quoteId,
         CustomerRef: this.selectedQuote.customerRef,
-				TotalPrice: this.totalPrice, //Change this-----------------------------------------------------------------------
+				TotalPrice: this.totalPrice,
 				SiteRef: this.selectedQuote.siteRef,
 				QuoteDetails: this.quotePlants,
 			}) 

@@ -101,6 +101,7 @@ export default {
   data () {
     return {
       fields: [
+        { key: 'batchId', label: 'Latest Batches', thClass: 'd-none', tdClass: 'd-none', sortable: true},
         { key: 'plantName', label: 'Plant Full Name', sortable: true, sortDirection: 'desc' },
         { key: 'formSize', label: 'Form Size' },
         { key: 'location', label: 'Location', sortable: true },

@@ -9,7 +9,6 @@
 							 :loading="isLoading"
 							 :show-labels="false"
 							 @input="getPlantFormSizes"
-							 @close="plantSelected"
 							 @open="clearFormSizes"
 							 class="multiselect"></multiselect>			 
 	<multiselect v-model="selectedFormSize" 
@@ -124,9 +123,11 @@ export default {
     }
 	},
 	getPlantFormSizes() { //Query the database to get the form sizes from what plant has been chosen
+		this.loading2 = true;
 		this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
       .then((response) => {
 				this.transformFormSizes(response.data);
+				this.loading2 = false
       })
       .catch((error) => {
         alert(error);
@@ -134,7 +135,6 @@ export default {
 	},
 	transformFormSizes(data) {
 		this.formSizes = [];
-		this.isLoading2 = false;
     for(var i = 0; i < data.length; i++){
   	  var potSize;
       var RootType;
@@ -175,9 +175,6 @@ export default {
 				"location": data[i].MainLocation + data[i].SubLocation
     });
     }
-	},
-	plantSelected() { //When a plant has been selected show a loading wheel while the form sizes are been retrieved
-		this.isLoading2 = true;
 	},
 	clearFormSizes() { //When selecting a new plant from the dropdown clear the selected form size
 		this.selectedFormSize = '';
