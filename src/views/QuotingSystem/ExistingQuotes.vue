@@ -4,13 +4,30 @@
     <!-- Quote Informatmion -->
     <p>{{msg}}</p>
     <div class="left-div">
-          <b-input-group class="input-filter">
-            <b-form-input v-model="filter" placeholder="Type to Search"/>
-            <b-input-group-append>
-              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-            </b-input-group-append>
-          </b-input-group>
-        <!-- <datepicker placeholder="Select Date"></datepicker> -->
+      <b-input-group class="input-filter">
+        <b-form-input v-model="filter" placeholder="Type to Search"/>
+          <b-input-group-append>
+            <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+          </b-input-group-append>
+      </b-input-group>
+      <b-input-group class="input-filter">
+        <b-form-select v-model="sortBy" :options="sortOptions">
+          <option slot="first" :value="null"> Choose Sort Option</option>
+        </b-form-select>
+        <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
+          <option :value="false">Asc</option>
+          <option :value="true">Desc</option>
+        </b-form-select>
+      </b-input-group>
+      <datepicker placeholder="Select Date"
+                  v-model="selectedDate"
+                  :format="customFormatter"
+                  @selected="setFilter"
+                  @cleared="clearDate"
+                  monday-first
+                  clear-button
+                  bootstrap-styling
+                  ></datepicker>
     </div>
     <!-- Quote Table -->
     <div class="right-div">
@@ -19,8 +36,9 @@
              :items="quotes"
              :fields="fields"
              :filter="filter"
-             sort-by="quoteId"
-             :sort-desc="true"
+             :sort-by.sync="sortBy"
+             :sort-desc.sync="sortDesc"
+             :sort-direction="sortDirection"
              class="table" 
              outlined   
              >
@@ -43,11 +61,13 @@
 
 <script>
 import moment from 'moment'
+import Datepicker from 'vuejs-datepicker';
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
 export default {
   name: 'ExistingQuotes',
   components: {
-		QuoteNavbar,
+    QuoteNavbar,
+    Datepicker,
 	},
   data () {
     return {
@@ -65,13 +85,35 @@ export default {
 			quotes: [],
       customers: [],
       filter: '',
+      sortBy: "quoteId",
+      sortDesc: true,
+      sortSearch: false,
+      sortDirection: 'asc',
+      selectedDate: '',
     }
   },
+  computed: {
+    sortOptions () {
+      // Create an options list from our fields
+      return this.fields
+        .filter(f => f.sortable)
+        .map(f => { return { text: f.label, value: f.key } })
+    },
+  },
   methods: {
+    clearDate(){ //When the clear button is pressed completely clear the filters
+      this.filter = ''
+    },
+    customFormatter(date) { //Return the correct format so that the table dates can be filtered
+      return moment(new Date(date)).format('DD/MM/YYYY');
+    },
+    setFilter(date) {
+      this.filter = this.customFormatter(date)
+    },
     getExistingQuotes() {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')
       .then((response) => {
-				this.changeData(response.data);
+        this.changeData(response.data);
       })
       .catch((error) => {
           alert(error);
@@ -146,7 +188,7 @@ export default {
 	.section {
     width: 100%;
 		max-height: 95vh;
-    background: aqua;
+    /* background: aqua; */
     overflow: hidden;
     overflow-y: hidden;
 	}
@@ -169,6 +211,10 @@ export default {
 
   .input-filter{
     margin-bottom: 5px;
+  }
+
+  p {
+    margin-bottom: 0;
   }
 
 	@media only screen and (max-width : 768px) {

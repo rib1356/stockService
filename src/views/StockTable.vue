@@ -134,7 +134,6 @@ export default {
         .filter(f => f.sortable)
         .map(f => { return { text: f.label, value: f.key } })
     },
-
   },
   methods: {
     info(item, button) {

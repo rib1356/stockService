@@ -14,14 +14,14 @@ Vue.use(VueAxios, axios)
 import Multiselect from 'vue-multiselect'
 Vue.component('multiselect', Multiselect)
 
-import moment from 'moment'
-Vue.use(moment);
+// import moment from 'moment'
+// Vue.use(moment);
 
 // import jsPDF from 'jspdf'
 // Vue.use(jsPDF);
 
-import Datepicker from 'vuejs-datepicker';
-Vue.use(Datepicker);
+// import Datepicker from 'vuejs-datepicker';
+// Vue.use(Datepicker);
 
 import * as VueGoogleMaps from "vue2-google-maps";
 

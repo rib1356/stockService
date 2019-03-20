@@ -125,7 +125,6 @@ export default {
 			.then((response) => {
 				console.log(response);
 				this.quoteId = response.data
-				this.plants = [];
 				this.$refs.createPDFModal.show()
 			})
 			.catch((error) => {
@@ -247,8 +246,8 @@ export default {
 			this.$router.push('QuoteNavigation');
   	},
 		getQuoteDate() {
-			this.quoteDate = moment().format('DD/MM/YYYY');
-			this.expiryDate = moment().add('30', 'days').format('DD/MM/YYYY')
+			this.quoteDate = moment(new Date).format('DD/MM/YYYY');
+			this.expiryDate = moment(new Date).add('30', 'days').format('DD/MM/YYYY')
 		},
 		getPrice (price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);

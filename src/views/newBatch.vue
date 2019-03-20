@@ -89,10 +89,12 @@ export default {
 		})
 		.then((response) => {
 			console.log(response);
-			var newBatch = new this.newBatchInformation(); //Save these values so when a new image is taken it will know the
+			var newBatch = new this.newBatchInformation(); //Save these values so if a new image is taken it will know the
       newBatch.Id = response.data.Id								//batchId and the name to create a unique ID
       newBatch.Name = response.data.Name
-      sessionStorage.setItem('newBatchInformation', JSON.stringify(newBatch)); //Save information to be used by PictureModal
+			sessionStorage.setItem('newBatchInformation', JSON.stringify(newBatch)); //Save information to be used by PictureModal
+			sessionStorage.removeItem('batchInMemory');
+			sessionStorage.removeItem('batchList')
 			this.$refs.imageAskModal.show() //Show the modal to see if the user wants to add an image to the batch
 		})
 		.catch((error) => {
