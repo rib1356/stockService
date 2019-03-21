@@ -56,7 +56,6 @@ export default {
   },
   methods: {
 		toQuote() {
-			console.log(this.customerName);
 			this.$router.push('QuoteCreation');
 		},
 		cancel() {

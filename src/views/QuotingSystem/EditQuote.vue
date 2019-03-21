@@ -12,7 +12,12 @@
       Quote Start Date: {{selectedQuote.startDate}} ||
       Quote Expiry Date: {{selectedQuote.expiryDate}}
     </p>
-		<p>Site Ref: {{selectedQuote.siteRef}} || Total Price: £{{computedTotalPrice}}</p>
+		<!-- <p>Site Ref: <b-form-input class="site-input" type="text" size="sm" v-model="selectedQuote.siteRef"/></p> -->
+    <b-form-group class="site-input" horizontal label="Site Ref: " >
+      <b-form-input v-model="selectedQuote.siteRef"
+                    size="sm"/>
+    </b-form-group>
+    <p>Total Price: £{{computedTotalPrice}}</p>
     <!-- EditQuote table -->
     <b-table show-empty
              stacked="md"
@@ -204,17 +209,23 @@ export default {
     },
     getCustomerInfo() {
       if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
-        let customers = JSON.parse(localStorage.getItem("customers"));
-        for (let i = 0; i < customers.length; i++) {
+        let customers = JSON.parse(localStorage.getItem("customers")); 
+        for (let i = 0; i < customers.length; i++) { //Loop through the current customers to find whos quote it belongs to
           if(customers[i].customerRef === this.selectedQuote.customerRef) {
-            this.currentCustomer = customers[i];
+            this.currentCustomer = customers[i]; //Set an accessable variable so that their information can be added on the pdf
           }
         }
       } else {
         alert("Customers need to be loaded into storage. Please go to the stock table")
       }
     },
+    formatPriceForPDF() {
+      //This is done after the quote has been saved to the database so changes will only show on created PDF
+      //Map through the list of plants changing the price from "250p to 2.50"
+      this.quotePlants.map(o => Object.assign(o, {Price: "£"+(o.Price/100).toFixed(2)}))
+    },
     createPDF () {
+      this.formatPriceForPDF();
 			let pdfName = this.selectedQuote.quoteId  + "-" + this.selectedQuote.customerName + "-" + this.selectedQuote.startDate;
 			var columns = [
 				{title: "Plant Name", dataKey: "PlantName"},
@@ -275,5 +286,22 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
+  p{
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  .site-input {
+    width: 20%;
+    display: inline-block;
+    margin-bottom: 0;
+  }
+
+  @media only screen and (max-width : 768px) {
+
+    .site-input {
+      width: 50%;
+    }
+
+  }
 
 </style>

@@ -79,7 +79,7 @@ export default {
   data () {
 		return {
 			plants: [],
-			quantity: '',
+			quantity: null,
 			wholesalePrice: '',
 			isLoading: true,
 			isLoading2: false,
@@ -134,7 +134,7 @@ export default {
 		},
 		validateBeforeSubmit(e) { //Check that all validation passes before adding
       this.$validator.validateAll();
-        if (!this.errors.any() && this.selectedBatch != null) { 
+        if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
             this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
         }
     },
@@ -158,6 +158,7 @@ export default {
 			this.selectedBatch = null
 			this.quantity = null
 			this.comment = null
+			this.$validator.reset();
 		},
 		getBatchList() {
 			if(sessionStorage.getItem('batchList') != null) {
@@ -196,7 +197,13 @@ export default {
 		customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
       return `${plantName} | ${formSize} | Qty: (${quantity})`
 		},
+		formatPriceForPDF() {
+      //This is done after the quote has been saved to the database so changes will only show on created PDF
+      //Map through the list of plants changing the price from "250p to 2.50"
+      this.plants.map(o => Object.assign(o, {Price: "£"+(o.Price/100).toFixed(2)}))
+    },
 		createPDF () {
+			this.formatPriceForPDF();
 			let pdfName = this.quoteId + "-" + this.customerInfo.customerName + "-" + this.quoteDate; 
 			var columns = [
 				{title: "Plant Name", dataKey: "PlantName"},
