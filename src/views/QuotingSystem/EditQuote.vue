@@ -1,28 +1,70 @@
 <template>
   <div>
-    <p>{{msg}}</p>
-    <!-- Quote information -->
-		<router-link to="/ExistingQuotes">
-      <b-button variant="outline-danger">Back to quotes</b-button>
-    </router-link>
-    <b-button @click="saveQuote" variant="outline-success">Save Edits</b-button>
-		<p>
-      Customer Ref: {{selectedQuote.customerRef}} ||
-      Customer Name: {{selectedQuote.customerName}} ||
-      Quote Start Date: {{selectedQuote.startDate}} ||
-      Quote Expiry Date: {{selectedQuote.expiryDate}}
-    </p>
-		<!-- <p>Site Ref: <b-form-input class="site-input" type="text" size="sm" v-model="selectedQuote.siteRef"/></p> -->
-    <b-form-group class="site-input" horizontal label="Site Ref: " >
-      <b-form-input v-model="selectedQuote.siteRef"
-                    size="sm"/>
-    </b-form-group>
-    <p>Total Price: £{{computedTotalPrice}}</p>
+    <quote-navbar></quote-navbar>
+    <!-- <p>{{msg}}</p> -->
+    <!-- Quote information -->  
+    <div class="left-div">
+      <label class="typo__label">Quote Information</label>
+      	<p>
+          Customer Ref: {{selectedQuote.customerRef}} ||
+          Customer Name: {{selectedQuote.customerName}} ||
+          Quote Start Date: {{selectedQuote.startDate}} ||
+          Quote Expiry Date: {{selectedQuote.expiryDate}}
+        </p>
+      <strong>Total Price: £{{computedTotalPrice}}</strong>  
+      <!-- Collapsible area to edit SiteRef and add plants to quote -->
+      <b-button @click="showCollapse = !showCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+        Edit SiteRef / Add Plants
+        <i class="fas fa-plus plus"></i>
+      </b-button>
+      <b-collapse v-model="showCollapse" id="collapse">
+        <b-form-group class="site-input" horizontal label="Site Ref: " >
+          <b-form-input v-model="selectedQuote.siteRef"/>
+        </b-form-group>
+          <multiselect v-model="selectedBatch" 
+                       :options="batches"  
+                       placeholder="Select a batch" 
+                       label="plantName"
+                       :loading="isLoading"
+                       :custom-label="customLabel"
+                       :show-labels="false"
+                       :allow-empty="false"
+                       style="margin-bottom: 5px;"></multiselect>
+          <b-form-input v-model="batchQuantity"
+                        placeholder="Enter a quantity"
+                        type="number"
+                        pattern="[0-9]*"
+                        v-validate="'required|numeric|min_value:1'"
+                        name="batchQuantity"
+                        inputmode="numeric"></b-form-input>	
+                        <p class="text-danger" v-if="errors.has('batchQuantity')">{{ errors.first('batchQuantity') }}</p>
+          <b-form-input v-model="comment"
+                        placeholder="Enter a plant comment"
+                        type="text"
+                        style="margin-top: 5px;">
+        </b-form-input>
+        <b-button @click="validateBatch" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>	
+      </b-collapse>
+      <hr>
+      <!-- Buttons to exit or save -->
+    	<router-link to="/ExistingQuotes">
+        <b-button variant="outline-danger">Back to quotes</b-button>
+      </router-link>
+        <b-button @click="saveQuote" variant="outline-success">Save Edits</b-button>
+    </div>
     <!-- EditQuote table -->
+    <div class="right-div">
     <b-table show-empty
              stacked="md"
              :items="quotePlants"
-             :fields="fields"           
+             :fields="fields"   
+             outlined       
              >
       <div slot="empty">
         <strong>Loading quotes plants...</strong>
@@ -32,7 +74,8 @@
       </template>      
       <template slot="actions" slot-scope="row">
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteItem(row.item, row.index)"></i>
+				<i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
+				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
         <!-- Editing modal -->
         <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName">
           <div>
@@ -53,7 +96,7 @@
             <b-form-group horizontal label="Price" >
               <b-form-input v-model="rowPrice"
                             placeholder="Enter a price"
-                            type="number"
+                            inputmode="numeric"
                             name="rowPrice"
                             v-validate="'required|decimal:2|min_value:0.01'" />
             </b-form-group>
@@ -64,6 +107,7 @@
         </b-modal>
       </template>
     </b-table>
+    </div>
     <b-modal ref="createPDFModal" size="sm" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
 		  <div class="modal__footer">
         <router-link to="/ExistingQuotes">
@@ -78,8 +122,12 @@
 <script>
 import jsPDF from 'jspdf'
 import 'jspdf-autotable';
+import QuoteNavbar from '@/components/QuoteNavbar.vue';
 export default {
   name: 'EditQuote',
+  components: {
+    QuoteNavbar,
+  },
   data () {
     return {
 			msg: 'Quote Editing',
@@ -102,6 +150,12 @@ export default {
       rowActive: '',
       totalPrice: 0,
       currentCustomer: null,
+      showCollapse: true,
+      batches: [],
+      selectedBatch: null,
+      comment: null,
+      batchQuantity: null,
+      isLoading: true,
     }
   },
   computed: {
@@ -136,23 +190,69 @@ export default {
       }
       this.getTotalPrice(); //Once the plants have loaded calculate the current price of the quote
     },
+    getBatches() {
+		  this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+      .then((response) => {
+        this.changeBatchData(response.data);
+        this.isLoading = false;
+      }).catch((error) => {
+				alert("Sorry there was an error")
+				console.log(error)
+      });
+    },
+    changeBatchData (response) {
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+				if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+					this.batches.push({                 //This is then pushed into an array and used to populate the data table
+						"batchId": response[i].Id,
+						"Sku": response[i].Sku,
+						"plantName": response[i].Name,
+						"location": response[i].Location,
+						"quantity": response[i].Quantity,
+						"formSize": response[i].FormSize,
+            "price": response[i].WholesalePrice,
+            "active": response[i].Active,
+					});
+     	  }     
+      }
+    },
+		customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
+      return `${plantName} | ${formSize} | Qty: (${quantity})`
+    },
+    addToList() {
+      this.quotePlants.push({ //This is then pushed into an array and used to populate the data table
+        PlantForQuoteId : -1, //Id is -1 so when it is passed to the back end, it will check if Ids are greater than 0 edit them
+        PlantName: this.selectedBatch.plantName, //Otherwise it is a new plant so add it to the database
+        FormSize: this.selectedBatch.formSize,
+        Comment: this.comment,
+        Quantity: parseInt(this.batchQuantity),
+        Price: this.selectedBatch.price,
+        Active: true,
+        _rowVariant: '',
+      });
+      this.getTotalPrice(); //Once a plant is added recalculate the current quote price
+			this.selectedBatch = null
+			this.batchQuantity = null
+			this.comment = null
+			this.$validator.reset();
+    },
     editItem(row, rowId) {
       if(row.Active == true){ //If the row hasnt been "deleted" open the edit modal
-      this.$refs.editModal.show(); //Open editing modal
-      this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
-      this.rowPlantForQuoteId = row.PlantForQuoteId;
-      this.rowName = row.PlantName;
-      this.rowForm = row.FormSize
-      this.rowComment = row.Comment;
-      this.rowQuantity = row.Quantity;
-      this.rowPrice = (row.Price/100).toFixed(2); 
-      this.rowActive = row.Active;
+        this.$refs.editModal.show(); //Open editing modal
+        this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
+        this.rowPlantForQuoteId = row.PlantForQuoteId;
+        this.rowName = row.PlantName;
+        this.rowForm = row.FormSize
+        this.rowComment = row.Comment;
+        this.rowQuantity = row.Quantity;
+        this.rowPrice = (row.Price/100).toFixed(2); 
+        this.rowActive = row.Active;
       }
     },
     hideModal() {
       this.$refs.editModal.hide();
     },
-    deleteItem(row) {
+    deleteItem(row) { //This will make the row not Active so will delete when sent to database
       row.Active = !row.Active; //Allow for the boolean to be flipped each time the button is pressed
       if(row.Active == true) { 
         row._rowVariant = '' //If true take the red row highlight away
@@ -161,6 +261,10 @@ export default {
       }
       this.getTotalPrice();
     },
+    remove(id) { //This method is called for when new plants are added to the quote meaning youre able to remove if there was a mistake
+			this.quotePlants.splice(id,1);
+			this.getTotalPrice();
+		},
     saveEdits() {
       this.quotePlants.splice(this.currentRowId, 1,{ //Replace current row with new values inputted by splicing new object into
         PlantForQuoteId: this.rowPlantForQuoteId,
@@ -174,12 +278,19 @@ export default {
       });
       this.getTotalPrice();
       this.hideModal();
+      this.$validator.reset();
     },
     validateBeforeSubmit(e) { //Check that all validation passes before saving
       this.$validator.validateAll();
-        if (!this.errors.any()) {
-            this.saveEdits();
-        }
+      if (!this.errors.any()) { 
+          this.saveEdits(); //If there are no validation errors and a batch has been selected add a plant to the list
+      }
+    },
+    validateBatch(e) { //Check that all validation passes before saving
+      this.$validator.validateAll();
+      if (!this.errors.any() && this.selectedBatch != null && this.batchQuantity != null) { 
+          this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
+      }
     },
     saveQuote() {
       this.axios.put('https://ahillsquoteservice.azurewebsites.net/api/quote/edit?id=' + this.selectedQuote.quoteId, {
@@ -279,10 +390,11 @@ export default {
     this.selectedQuote = this.$route.params.selectedQuote;
     this.getQuotePlants();
     this.getCustomerInfo();
+    this.getBatches();
 	}
 }
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
@@ -290,11 +402,32 @@ export default {
     margin-top: 0;
     margin-bottom: 0;
   }
-  .site-input {
-    width: 20%;
-    display: inline-block;
-    margin-bottom: 0;
+  
+  .plus{
+    float: right;
+    text-align: center;
   }
+
+  input{
+    font-size: 16px;
+  }
+
+  .left-div
+	{
+    width: 25%;
+		height: 100%; 
+    /* background: red; */
+    
+		float:left;
+		/* overflow:hidden; */
+		/* background: green; */
+	}
+
+	.right-div {
+		float:left;
+		width:75%;
+		overflow:hidden;
+	}
 
   @media only screen and (max-width : 768px) {
 
@@ -302,6 +435,15 @@ export default {
       width: 50%;
     }
 
+    .left-div {
+		  position: relative;
+		  width: 100%;
+	  }
+
+	  .right-div {
+		width: 100%;
+		position: relative;
+		}
   }
 
 </style>
