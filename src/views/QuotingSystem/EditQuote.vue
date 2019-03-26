@@ -1,6 +1,6 @@
 <template>
   <div>
-    <quote-navbar></quote-navbar>
+    <quote-navbar class="navbar-custom"></quote-navbar>
     <!-- <p>{{msg}}</p> -->
     <!-- Quote information -->  
     <div class="left-div">
@@ -42,12 +42,14 @@
                         pattern="[0-9]*"
                         v-validate="'required|numeric|min_value:1'"
                         name="batchQuantity"
-                        inputmode="numeric"></b-form-input>	
+                        inputmode="numeric"
+                        @keyup.enter.native="validateBatch"></b-form-input>	
                         <p class="text-danger" v-if="errors.has('batchQuantity')">{{ errors.first('batchQuantity') }}</p>
           <b-form-input v-model="comment"
                         placeholder="Enter a plant comment"
                         type="text"
-                        style="margin-top: 5px;">
+                        style="margin-top: 5px;"
+                        @keyup.enter.native="validateBatch">
         </b-form-input>
         <b-button @click="validateBatch" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>	
       </b-collapse>
@@ -77,7 +79,7 @@
 				<i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
 				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
         <!-- Editing modal -->
-        <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName">
+        <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateBeforeSubmit">
           <div>
             <b-form-group horizontal label="Comment:" >
               <b-form-input v-model="rowComment"
@@ -150,7 +152,7 @@ export default {
       rowActive: '',
       totalPrice: 0,
       currentCustomer: null,
-      showCollapse: true,
+      showCollapse: false,
       batches: [],
       selectedBatch: null,
       comment: null,
@@ -281,7 +283,8 @@ export default {
       this.$validator.reset();
     },
     validateBeforeSubmit(e) { //Check that all validation passes before saving
-      this.$validator.validateAll();
+      this.$validator.validate('rowQuantity', this.rowQuantity); //Validate the inputs on the modal
+      this.$validator.validate('rowPrice', this.rowPrice);
       if (!this.errors.any()) { 
           this.saveEdits(); //If there are no validation errors and a batch has been selected add a plant to the list
       }
@@ -335,8 +338,16 @@ export default {
       //Map through the list of plants changing the price from "250p to 2.50"
       this.quotePlants.map(o => Object.assign(o, {Price: "£"+(o.Price/100).toFixed(2)}))
     },
+    formatTableForPDF() {
+      for (let i = 0; i < this.quotePlants.length; i++) {
+        if(this.quotePlants[i].Active == false) { //Loops through the array and will remove any items that have been deleted on the quote
+          this.quotePlants.splice(i,1); //This is done after the quote has been saved to the database so it show when the PDF is created
+        }
+      }
+    },
     createPDF () {
       this.formatPriceForPDF();
+      this.formatTableForPDF();
 			let pdfName = this.selectedQuote.quoteId  + "-" + this.selectedQuote.customerName + "-" + this.selectedQuote.startDate;
 			var columns = [
 				{title: "Plant Name", dataKey: "PlantName"},
@@ -427,6 +438,10 @@ export default {
 		float:left;
 		width:75%;
 		overflow:hidden;
+	}
+
+  .navbar-custom {
+			background-color: #49aa09b0;
 	}
 
   @media only screen and (max-width : 768px) {

@@ -1,9 +1,21 @@
 <template>
   <section>
-    <quote-navbar></quote-navbar>
+    <quote-navbar class="navbar-custom"></quote-navbar>
     <!-- Quote Informatmion -->
     <p>{{msg}}</p>
     <div class="left-div">
+      <b-button @click="showCollapse = !showCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+        <p v-if="showCollapse">Hide Filters<i class="fas fa-plus plus"></i></p>
+        <p v-else>Show Filters<i class="fas fa-plus plus"></i></p>
+      </b-button>  
+      <!-- Collapsible area to show the filters for the table -->
+      <b-collapse v-model="showCollapse" id="collapse">
       <b-input-group class="input-filter">
         <b-form-input v-model="filter" placeholder="Type to Search"/>
           <b-input-group-append>
@@ -28,6 +40,10 @@
                   clear-button
                   bootstrap-styling
                   ></datepicker>
+      </b-collapse>   
+      <b-form-checkbox 
+      @input="test"
+      switch></b-form-checkbox>
     </div>
     <!-- Quote Table -->
     <div class="right-div">
@@ -84,12 +100,14 @@ export default {
 			],
 			quotes: [],
       customers: [],
+      showCollapse: true,
       filter: '',
       sortBy: "quoteId",
       sortDesc: true,
       sortSearch: false,
       sortDirection: 'asc',
       selectedDate: '',
+      
     }
   },
   computed: {
@@ -101,6 +119,12 @@ export default {
     },
   },
   methods: {
+    test() {
+      console.log("ree")
+      for (let i = 0; i < this.quotes.length; i++) {
+        this.quotes[i]._rowVariant = 'danger'
+      }
+    },
     clearDate(){ //When the clear button is pressed completely clear the filters
       this.filter = ''
     },
@@ -199,7 +223,7 @@ export default {
 		height: 100%; 
 		float:left;
 	}
-
+  
 	.right-div {
 		float: left;
     max-height: 85vh;
@@ -209,12 +233,21 @@ export default {
     -webkit-overflow-scrolling: touch;
 	}
 
+  .navbar-custom {
+			background-color: #49aa09b0;
+	}
+
   .input-filter{
     margin-bottom: 5px;
   }
 
   p {
     margin-bottom: 0;
+  }
+
+  .plus{
+    float: right;
+    text-align: center;
   }
 
 	@media only screen and (max-width : 768px) {

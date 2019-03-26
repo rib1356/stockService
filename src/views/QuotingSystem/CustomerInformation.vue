@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<quote-navbar></quote-navbar>
+	<quote-navbar class="navbar-custom"></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a customer</label>		 
 		<multiselect v-model="selectedCustomer"
@@ -108,6 +108,9 @@ export default {
 		margin-bottom: 10px;
 	}
 
+	.navbar-custom {
+			background-color: #2a6105;
+	}
 
 	@media only screen and (max-width : 768px) {
 

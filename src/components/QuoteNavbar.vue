@@ -1,6 +1,6 @@
 <template>
   <div class="my-nav">
-		<b-navbar type="light" >
+		<b-navbar class="navbar navbar-custom" >
       <b-navbar-brand >
         <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
         <strong>Quote Navigation</strong>
@@ -46,8 +46,8 @@
 <style scoped>
 
 .navbar {
-  padding-top:    0.25rem; 
-  padding-bottom: 0.25rem;
+  padding-top:    0rem; 
+  padding-bottom: 0rem;
 }
 
 </style>

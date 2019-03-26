@@ -1,6 +1,6 @@
 <template>
 <section>
-	<quote-navbar></quote-navbar>
+	<quote-navbar class="navbar-custom"></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
 		<multiselect v-model="selectedBatch" 
@@ -18,13 +18,13 @@
 									v-validate="'required|numeric|min_value:1'"
 									name="quantity"
 									inputmode="numeric"
-									@keyup.enter="validateBeforeSubmit"></b-form-input>	
+									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
 		<b-form-input v-model="comment"
 									placeholder="Enter a plant comment"
 									type="text"
 									style="margin-top: 10px;"
-									@keyup.enter="validateBeforeSubmit"></b-form-input>	
+									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
 		<!-- <br> -->
@@ -48,14 +48,61 @@
 			</p>
 			<strong>Quote Price: £{{computedTotalPrice}}</strong>
 		</div>
-		<p>Quote List</p>
-      <ul>
+		<!-- <p>Quote List</p> -->
+      <!-- <ul>
           <li v-for="(data, index) in plants" :key='index' @input="getTotalPrice">
             {{ data.PlantName }} | {{data.FormSize}} x ({{data.Quantity}}) @ £{{getPrice(data.Price)}} {{data.Comment}}
-            <i class="fas fa-trash-alt" @click="remove(index)"></i>
+						<i class="far fa-edit fa-lg" style="color:green"></i>
+            <i class="fas fa-trash-alt fa-lg" style="color:red;" @click="remove(index)"></i>
           </li>
-      </ul>
+      </ul> -->
+		    <b-table show-empty
+								 stacked="md"
+								 :items="plants"
+								 :fields="fields"   
+								 outlined>
+      <div slot="empty">
+        <strong>Add a plant to the quote</strong>
+      </div>   
+      <template slot="Price" slot-scope="row">
+        £{{row.item.Price/100}}
+      </template> 
+			<template slot="actions" slot-scope="row">
+				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
+				<i class="fas fa-trash-alt fa-lg" style="color:red" @click="remove(index)"></i>
+        <!-- Editing modal -->
+        <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateEdits">
+          <div>
+            <b-form-group horizontal label="Comment:" >
+              <b-form-input v-model="rowComment"
+                            placeholder="Enter a comment" />
+            </b-form-group>
+            <b-form-group horizontal label="Quantity:" >
+              <b-form-input v-model="rowQuantity"
+                            placeholder="Enter a quantity"
+                            type="number"
+                            pattern="[0-9]*"
+                            name="rowQuantity"
+                            inputmode="numeric"
+                            v-validate="'required|numeric|min_value:1'"  />
+            </b-form-group>
+            <p class="text-danger" v-if="errors.has('rowQuantity')">{{ errors.first('rowQuantity') }}</p>
+            <b-form-group horizontal label="Price" >
+              <b-form-input v-model="rowPrice"
+                            placeholder="Enter a price"
+                            inputmode="numeric"
+                            name="rowPrice"
+                            v-validate="'required|decimal:2|min_value:0.01'" />
+            </b-form-group>
+            <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
+          </div>
+            <b-button class="mt-3" variant="outline-primary" block @click.stop="validateEdits">Save Edits</b-button>
+            <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-button>
+        </b-modal>
+      </template>     
+    </b-table>	
 	</div>
+	<!-- PDF Modal -- this will popup once the quote has been saved to the database -->
 	<b-modal ref="createPDFModal" size="sm" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
 		<div class="modal__footer">
       <router-link to="/ExistingQuotes">
@@ -79,19 +126,32 @@ export default {
   data () {
 		return {
 			plants: [],
-			quantity: null,
-			wholesalePrice: '',
+			fields: [
+        { key: 'PlantName', label: 'Plant Name', sortable: true},
+        { key: 'FormSize', label: 'Form Size'},
+        { key: 'Comment', label: 'Comment'},
+        { key: 'Quantity', label: 'Quantity', sortable: true},
+        { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
+        { key: 'actions', label: 'Actions' }
+			],
 			isLoading: true,
 			isLoading2: false,
 			quoteDate: null,
 			expiryDate: null,
 			siteRef: null,
+			quantity: null,
 			comment: null,
 			customerInfo: '',
 			batches: [],
 			selectedBatch: null,
 			totalPrice: 0,
 			quoteId: '',
+			rowName: '',
+      rowForm: '',
+      rowComment: '',
+      rowQuantity: '',
+      rowPrice: '',
+      rowActive: '',
 		}		
 	},
   methods: {
@@ -124,7 +184,7 @@ export default {
 			}) 
 			.then((response) => {
 				console.log(response);
-				this.quoteId = response.data
+				this.quoteId = response.data //Get the quoteId that is returned by the server to display on PDF
 				this.$refs.createPDFModal.show()
 			})
 			.catch((error) => {
@@ -133,10 +193,17 @@ export default {
 			});
 		},
 		validateBeforeSubmit(e) { //Check that all validation passes before adding
-      this.$validator.validateAll();
-        if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
-            this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
-        }
+			this.$validator.validateAll();
+      if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
+          this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
+      }
+		},
+		validateEdits(e) { //Check that all validation passes before saving
+      this.$validator.validate('rowQuantity', this.rowQuantity); //Validate the inputs on the modal
+      this.$validator.validate('rowPrice', this.rowPrice);
+      if (!this.errors.any()) { 
+          this.saveEdits(); //If there are no validation errors and a batch has been selected add a plant to the list
+      }
     },
 		getTotalPrice() {
 			this.totalPrice = 0; //Reset total price so correct quote price stays
@@ -153,12 +220,49 @@ export default {
 				Comment: this.comment,
 				Price: this.selectedBatch.batchPrice,
 				Active: true,
+				_rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
 			});
 			this.getTotalPrice(); //Once a plant is added recalculate the current quote price
+			//Reset input and validation
 			this.selectedBatch = null
 			this.quantity = null
 			this.comment = null
 			this.$validator.reset();
+		},
+		editItem(row, rowId) {
+    	this.$refs.editModal.show(); //Open editing modal
+      this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
+      this.rowPlantForQuoteId = row.PlantForQuoteId;
+      this.rowName = row.PlantName;
+      this.rowForm = row.FormSize
+      this.rowComment = row.Comment;
+      this.rowQuantity = row.Quantity;
+      this.rowPrice = (row.Price/100).toFixed(2); 
+      this.rowActive = row.Active;
+		},
+		saveEdits() {
+      this.plants.splice(this.currentRowId, 1,{ //Replace current row with new values inputted by splicing new object into
+        PlantName: this.rowName,                  //its current postion
+        FormSize: this.rowForm,
+        Comment: this.rowComment,
+        Quantity: parseInt(this.rowQuantity),
+        Price:  parseFloat(this.rowPrice)*100, //Parsing edited value eg: "1.55" = 155 so it can be saved to db
+        Active: this.rowActive,
+        _rowVariant: '',
+      });
+      this.getTotalPrice();
+      this.hideModal();
+      this.$validator.reset();
+    },
+		hideModal() {
+			this.$refs.editModal.hide();
+		},
+		checkIfBatchHasPrice(price) { //This method will determine if the batch has a price or not
+			if(price <= 0) {
+				return 'danger' //If it doesnt change the _rowVariant which will then highlight the row red
+			} else {
+				return '' //Else it has a price so dont highlight the row
+			}
 		},
 		getBatchList() {
 			if(sessionStorage.getItem('batchList') != null) {
@@ -325,26 +429,26 @@ export default {
   .container {
     box-shadow: 0px 0px 40px lightgray;
   }
+
   input {
-    /* width: calc(100% - 40px); */
-    border: 1px solid #e8e8e8;
+  	border: 1px solid #e8e8e8;
 		font-size: 16px;
 		min-height: 40px;
-    /* padding: 5px; */
-    /* font-size: 1.3em; */
-    /* background-color: #323333; */
-    /* color: #adadad !important; */
-		
   }
+
 	i {
-	margin-top: 3px;	
-  float:right;
-  cursor:pointer;
+		margin-top: 3px;	
+		cursor:pointer;
+		margin-left: 10px;
 	}
 
 	/* Ends here */
 	.multiselect {
 		margin-bottom: 10px;
+	}
+
+	.navbar-custom {
+			background-color: #2a6105;
 	}
 
 	@media only screen and (max-width : 768px) {
