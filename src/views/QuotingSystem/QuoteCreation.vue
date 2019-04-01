@@ -18,8 +18,15 @@
 									v-validate="'required|numeric|min_value:1'"
 									name="quantity"
 									inputmode="numeric"
-									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
+									@keyup.enter.native="validateBeforeSubmit"
+									@input="calculatePrice"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
+		<strong>Calculated Price £{{calculatedPrice}}</strong>
+		<br>							
+		<strong>Qtn needed until next band {{untilNextBand}}</strong>
+		<br>
+		<strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							
 		<b-form-input v-model="comment"
 									placeholder="Enter a plant comment"
 									type="text"
@@ -143,7 +150,7 @@ export default {
 			comment: null,
 			customerInfo: '',
 			batches: [],
-			selectedBatch: null,
+			selectedBatch: '',
 			totalPrice: 0,
 			quoteId: '',
 			rowName: '',
@@ -151,7 +158,17 @@ export default {
       rowComment: '',
       rowQuantity: '',
       rowPrice: '',
-      rowActive: '',
+			rowActive: '',
+			pricingValues: [
+				{quantityMin: 1, quantityMax: 10, multiplier: 1},
+				{quantityMin: 11, quantityMax: 20, multiplier: 0.9},
+				{quantityMin: 21, quantityMax: 40, multiplier: 0.8},
+				{quantityMin: 41, quantityMax: 60, multiplier: 0.75},
+				{quantityMin: 61,quantityMax: 100, multiplier: 0.7},
+			],
+			calculatedPrice: '',
+			nextCalculatedPrice: '',
+			untilNextBand: '',
 		}		
 	},
   methods: {
@@ -164,6 +181,25 @@ export default {
 		remove(id) {
 			this.plants.splice(id,1);
 			this.getTotalPrice();
+		},
+		calculatePrice() {
+			if(this.selectedBatch != null) { //This method is called twice when using @input???
+				// this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.9).toFixed(2);
+				console.log("123")
+				for (let i = 0; i < this.pricingValues.length; i++) {
+					if(this.quantity >= this.pricingValues[i].quantityMin && this.quantity <= this.pricingValues[i].quantityMax) {
+						this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i].multiplier).toFixed(2);
+						this.nextCalculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i + 1].multiplier).toFixed(2);
+						this.untilNextBand = this.pricingValues[i + 1].quantityMin;
+					} else if (this.quantity == 0){
+						this.calculatedPrice = 0;
+					} else if (this.quantity > this.pricingValues[i].quantityMax) {
+						this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.6).toFixed(2)
+						this.nextCalculatedPrice = 0
+						this.untilNextBand = 0
+					}
+				}
+			}
 		},
 		sendEmail() {
 			var link = "mailto:me@example.com"
@@ -218,7 +254,7 @@ export default {
 				FormSize: this.selectedBatch.formSize,
 				Quantity: this.quantity,
 				Comment: this.comment,
-				Price: this.selectedBatch.batchPrice,
+				Price: parseFloat(this.calculatedPrice)*100,
 				Active: true,
 				_rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
 			});
@@ -227,6 +263,7 @@ export default {
 			this.selectedBatch = null
 			this.quantity = null
 			this.comment = null
+			this.calculatedPrice = ''
 			this.$validator.reset();
 		},
 		editItem(row, rowId) {
@@ -367,7 +404,7 @@ export default {
 	computed: {
     computedTotalPrice () { ///Whenever total value is shown this will format to look monitary
       return (this.totalPrice/100).toFixed(2);
-    },
+		},
 	},
 	mounted() {
 		this.getBatchList();

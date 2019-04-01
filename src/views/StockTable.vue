@@ -85,9 +85,10 @@
     <div>
       <!-- Picture Modal -->
      <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
-        <img v-if="imageLoaded" :src="imageURL" height="400" width="300">
+        <h4 v-if="!imageLoaded">Image Loading</h4>
         <h2 v-else-if="imgError" v>Sorry no picture exists for this batch</h2>
-        <h2 v-else>Image Loading</h2>
+        <!-- <div v-if="!imageLoaded" class="box"></div> -->
+        <img class="picture" @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
       </b-modal>
     </div>
   </b-container>
@@ -136,6 +137,9 @@ export default {
     },
   },
   methods: {
+    ree() {
+      console.log("loaded")
+    },
     info(item, button) {
       this.modalInfo.title = `Name: ${item.plantName}`
       // this.modalInfo.content = JSON.stringify(item, null, 2)
@@ -251,12 +255,15 @@ export default {
         firebase.storage().ref().child('batchImages/' + batchId + "-" + plantName).getDownloadURL().then( (url) => {
         document.querySelector('img').scr = url;
         this.imageURL = url;
-        this.imageLoaded = true;
       }).catch((error) => {
         this.imageLoaded = false;
         this.imgError = true;
         console.log(error);
       });
+    },
+    imageFinishedLoading() {
+      console.log("loaded")
+      this.imageLoaded = true;
     },
     reloadBatches() {
       sessionStorage.removeItem('batchInMemory');
@@ -354,6 +361,7 @@ export default {
   .myBtn {
   margin-top: 1px;
   }
+
 
 	.table-div {
 		float: left;
