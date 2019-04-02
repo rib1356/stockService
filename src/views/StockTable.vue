@@ -16,6 +16,7 @@
         <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add new batch</b-dropdown-item>
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
         <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item>
+        <b-dropdown-item @click="pricing" v-if="authenticated">Pricing</b-dropdown-item>
         <b-dropdown-item @click="signOut" v-if="authenticated">Signout</b-dropdown-item>
         <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
       </b-dropdown>
@@ -88,7 +89,7 @@
         <h4 v-if="!imageLoaded">Image Loading</h4>
         <h2 v-else-if="imgError" v>Sorry no picture exists for this batch</h2>
         <!-- <div v-if="!imageLoaded" class="box"></div> -->
-        <img class="picture" @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
+        <img @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
       </b-modal>
     </div>
   </b-container>
@@ -304,6 +305,9 @@ export default {
     },
     quote() {
       this.$router.push('QuoteNavigation');
+    },
+    pricing() {
+      this.$router.push('Pricing');
     },
     signOut() {
 			firebase.auth().signOut().then(() => {

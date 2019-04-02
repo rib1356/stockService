@@ -1,18 +1,20 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-//Components
-
 //Views
 import StartPage from '@/views/StartPage'
 import StockTable from '@/views/StockTable'
 import BatchInformation from '@/views/BatchInformation'
 import newBatch from '@/views/newBatch'
-import Login from '@/views/Login'
-import SignUp from '@/views/SignUp'
-import ResetPassword from '@/views/ResetPassword'
-import ContactPage from '@/views/ContactPage'
-// import QuoteNavigation from '@/views/QuoteNavigation'
+
+//User Pages
+import Login from '@/views/UserPages/Login'
+import SignUp from '@/views/UserPages/SignUp'
+import ResetPassword from '@/views/UserPages/ResetPassword'
+import ContactPage from '@/views/UserPages/ContactPage'
+
+//Pricing Pages
+import PricingSelection from '@/views/Pricing/PricingSelection'
 
 //Quote Pages
 import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'
@@ -110,6 +112,11 @@ const router = new Router({
       path: '/EditQuote',
       name: 'EditQuote',
       component: EditQuote
+    },
+    {
+      path: '/Pricing',
+      name: 'PricingSelection',
+      component: PricingSelection
     },
   ]
 })
