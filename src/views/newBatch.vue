@@ -158,7 +158,7 @@ export default {
         + " " + RootType
         + " " + data[i].Description
       this.formSizes.push({
-        "formSize": formSize,
+        "formSize": formSize.trim().replace(/  +/g, ' '),
       });
 		}
 	},

@@ -135,8 +135,8 @@ export default {
                         + " " + RootType
                         + " " + data[i].Description
             this.formSizes.push({
-              "text": formSize,
-              "value": formSize,
+              "text": formSize.trim().replace(/  +/g, ' '),
+              "value": formSize.trim().replace(/  +/g, ' '),
             });
         }
       } else {

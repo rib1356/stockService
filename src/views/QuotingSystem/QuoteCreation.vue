@@ -307,34 +307,36 @@ export default {
 				this.batches = JSON.parse(batchList);
 				this.isLoading = false;
 			} else {
-				alert("Loading batches from service");
-				this.getBatches();
+				if(confirm("Please go back to stock table to load batches")) {
+						this.$router.push('StockTable');
+					}
+				// this.getBatches();
 			}
 		},
-		getBatches() {
-		  this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
-      .then((response) => {
-        this.changeData(response.data);
-      }).catch((error) => {
-				alert("Sorry there was an error")
-				console.log(error)
-      });
-    },
-    changeData (response) {
-      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-				if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
-					this.batches.push({                 //This is then pushed into an array and used to populate the data table
-						"batchId": response[i].Id,
-						"Sku": response[i].Sku,
-						"plantName": response[i].Name,
-						"location": response[i].Location,
-						"quantity": response[i].Quantity,
-						"formSize": response[i].FormSize,
-						"active": response[i].Active,
-					});
-     	  }     
-      }
-    },
+		// getBatches() {
+		//   this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+    //   .then((response) => {
+    //     this.changeData(response.data);
+    //   }).catch((error) => {
+		// 		alert("Sorry there was an error")
+		// 		console.log(error)
+    //   });
+    // },
+    // changeData (response) {
+    //   for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+		// 		if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+		// 			this.batches.push({                 //This is then pushed into an array and used to populate the data table
+		// 				"batchId": response[i].Id,
+		// 				"Sku": response[i].Sku,
+		// 				"plantName": response[i].Name,
+		// 				"location": response[i].Location,
+		// 				"quantity": response[i].Quantity,
+		// 				"formSize": response[i].FormSize,
+		// 				"active": response[i].Active,
+		// 			});
+    //  	  }     
+    //   }
+    // },
 		customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
       return `${plantName} | ${formSize} | Qty: (${quantity})`
 		},

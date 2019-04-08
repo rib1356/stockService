@@ -138,9 +138,6 @@ export default {
     },
   },
   methods: {
-    ree() {
-      console.log("loaded")
-    },
     info(item, button) {
       this.modalInfo.title = `Name: ${item.plantName}`
       // this.modalInfo.content = JSON.stringify(item, null, 2)
