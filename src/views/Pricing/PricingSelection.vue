@@ -1,6 +1,8 @@
 <template>
     <div>
-			<p>Hello</p>
+			<router-link to="/StockTable" class="my-nav">
+    		<b-button variant="outline-primary" class="my-btn">Back to Stock Table</b-button>
+    	</router-link>
       <b-container>
 				<b-form-checkbox v-model="checked" name="check-button" @change="showPricedItems">
       		<p v-if="checked">Show all items</p>
@@ -53,15 +55,22 @@
 							</b-form-radio-group>
 						</b-form-group>
           </b-col>
-					<b-col class="col-md-6">
+					<b-col class="col-md-5">
 						<div class="batch-list">
 							<ul>
           			<li v-for="(data, index) in filterArray" :key='index'>
-            			{{ data.plantName }} {{data.formSize}}
+										<b-form-checkbox name="batch-check" @change="batchSelected(data)">
+											{{ data.plantName }} {{data.formSize}}
+    								</b-form-checkbox>	
           			</li>
       				</ul>
 						</div>			
-					</b-col>   
+					</b-col>
+					<b-col class="col-md-1">
+						<router-link :to="{name: 'BatchPricing', params: { selectedBatches: selectedBatches } }">
+							<b-button variant="outline-success">Price selected items</b-button>
+						</router-link>	
+					</b-col> 
         </b-row>
     	</b-container>
 			<!-- <div class="batch-list">
@@ -92,6 +101,7 @@
 				selectedFormSize: null,
 				batches: [],
 				checked: false,
+				selectedBatches: [],
 			}
 		},
 		computed: {
@@ -184,6 +194,17 @@
 				this.batches = filteredArr;
 				}
 			},
+			batchSelected(data) {
+				let selectedBatches = this.selectedBatches;
+				if(selectedBatches.includes(data)) { //If the batch includes the item it has been checked
+					var index = selectedBatches.indexOf(data); //Therefore it has been unchecked and needs to be removed from the array
+					selectedBatches.splice(index, 1);
+				} else {
+					let newPrice = (data.batchPrice/100).toFixed(2); //Formats the price to be in pounds
+					data.batchPrice = newPrice;
+					this.selectedBatches.push(data); //Doesnt exist in array so add batch
+				}
+			},
 			getBatchList() {
 				if(sessionStorage.getItem('batchList') != null) {
 					let batchList = sessionStorage.getItem('batchList');
@@ -213,4 +234,5 @@
 		overflow: auto;
     -webkit-overflow-scrolling: touch;
 	}
+
 </style>

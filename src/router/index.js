@@ -15,6 +15,7 @@ import ContactPage from '@/views/UserPages/ContactPage'
 
 //Pricing Pages
 import PricingSelection from '@/views/Pricing/PricingSelection'
+import BatchPricing from '@/views/Pricing/BatchPricing'
 
 //Quote Pages
 import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'
@@ -117,6 +118,11 @@ const router = new Router({
       path: '/Pricing',
       name: 'PricingSelection',
       component: PricingSelection
+    },
+    {
+      path: '/BatchPricing',
+      name: 'BatchPricing',
+      component: BatchPricing
     },
   ]
 })
