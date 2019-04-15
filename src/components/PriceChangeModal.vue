@@ -4,15 +4,17 @@
               Change Price</b-button>
     <b-modal ref="PriceModal" title="Change Batch Price" size="lg" centered hide-footer>
       <div class="modal-lg">
-        <p>Buying Price Minimum: £0.00</p>
-        <p>Buying Price Maximum: £0.00</p>
-        <p>Selling Price Minimum: £0.00</p>
-        <p>Selling Price Maximum: £0.00</p>
-        <p>Set new selling price: <input type="text" name="price" id="price"></p>
+        <p>Previous selling price £{{computedPrice}}</p>
+        <p>Set new selling price: £
+          <input name="batchPrice"
+                 v-model="batchPrice"
+                 v-validate="'required|decimal:2|min_value:0.01'">
+        </p>
+        <p class="text-danger" v-if="errors.has('batchPrice')">{{ errors.first('batchPrice') }}</p>
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" variant="outline-primary" @click="hideModal">Save Changes</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="validateBeforeSubmit">Save Changes</b-btn>
       </div>
     </b-modal>
   </div>
@@ -23,7 +25,9 @@ export default {
   name: 'PriceChangeModal',
   data () {
     return {
-      msg: ''
+      batchPrice: '',
+      previousPrice: '',
+      batchId: '',
     }
   },
   methods: {
@@ -32,7 +36,35 @@ export default {
     },
     hideModal () {
       this.$refs.PriceModal.hide()
-    }
+    },
+    validateBeforeSubmit(e) { //Check that all validation passes before adding
+			this.$validator.validateAll();
+      if (!this.errors.any()) { 
+          this.saveBatchPrice(); 
+      }
+		},
+    saveBatchPrice() {
+      let data = { "Id": this.batchId, "WholesalePrice": parseFloat(this.batchPrice)*100, "Active": true};
+      this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
+			  .then((response) => {
+          console.log(response);
+          this.$router.push('StockTable');
+			  })
+			.catch((error) => {
+				alert(error);
+			});
+    },
+  },
+   computed: {
+    computedPrice () { ///Whenever total value is shown this will format to look monitary
+      return (this.previousPrice/100).toFixed(2);
+		},
+  },
+  mounted() {
+    var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
+    this.batchPrice = selectedBatchInformation.batchPrice;
+    this.previousPrice = selectedBatchInformation.batchPrice;
+    this.batchId = selectedBatchInformation.batchId;
   }
 }
 </script>
@@ -45,21 +77,5 @@ export default {
 .modal.open {
    display: block;
 }
-/* .btn {
-  margin-left: 10%;
-  text-align: right;
-} */
-
-/* .modal-body {
-  max-width: 150vh;
-}
-
-.modal-dialog {
-  width: 40% !important;
-  height: 80% !important;
-}
- 
-.modal-content {
-    /* 80% of window height */
 
 </style>

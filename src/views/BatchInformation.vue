@@ -16,7 +16,7 @@
         <b-col cols="10"><quantity-change-modal></quantity-change-modal></b-col> 
       </b-row>
       <b-row>
-        <b-col cols="2"><label for="price">Price: £ </label></b-col> 
+        <b-col cols="2"><label for="price">Price: £  {{computedPrice}}</label></b-col> 
         <b-col cols="10"><price-change-modal></price-change-modal></b-col>
       </b-row>
       <b-row>
@@ -58,6 +58,7 @@ export default {
       location: '',
       quantity: '',
       formSize: '',
+      batchPrice: '',
       batchId: '',
     }
   },
@@ -75,15 +76,22 @@ export default {
       this.location = selectedBatchInformation.location;
       this.quantity = selectedBatchInformation.quantity;
       this.formSize = selectedBatchInformation.formSize;
+      this.batchPrice = selectedBatchInformation.batchPrice;
       this.batchId = selectedBatchInformation.batchId;
     },
     saveChanges(){
-      this.getDownloadUrl();
-      sessionStorage.removeItem('newLocation');
-      sessionStorage.removeItem('newQuantity');
-      sessionStorage.removeItem('newFormSize'); ///----------------------------------------------------THESE WERE CHANGED-------------------------------------------------
-      sessionStorage.removeItem('selectedBatchInformation');
-      this.$router.push('StockTable');
+      if(sessionStorage.getItem('imageSaved')) {
+        this.getDownloadUrl();
+        this.$router.push('StockTable');
+        sessionStorage.removeItem('imageSaved');
+      } else {
+        sessionStorage.removeItem('newLocation');
+        sessionStorage.removeItem('newQuantity');
+        sessionStorage.removeItem('newFormSize'); ///----------------------------------------------------THESE WERE CHANGED-------------------------------------------------
+        sessionStorage.removeItem('selectedBatchInformation');
+        sessionStorage.removeItem('imageSaved');
+        this.$router.push('StockTable');
+      }
     },
     updateLocation() { //This will change the current displayed location
       if(sessionStorage.hasOwnProperty('newLocation')) { //If new location exists show this value after called
@@ -119,6 +127,11 @@ export default {
       });
     },
   },
+  computed: {
+    computedPrice () {
+      return (this.batchPrice/100).toFixed(2);
+		},
+	},
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.displayBatchInformation(selectedBatchInformation);

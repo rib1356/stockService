@@ -158,6 +158,7 @@ export default {
       selectedBatch.location = item.location;
       selectedBatch.quantity = item.quantity;
       selectedBatch.formSize = item.formSize;
+      selectedBatch.batchPrice = item.batchPrice;
       selectedBatch.batchId = item.batchId;
       selectedBatch.active = item.active;
 
@@ -167,8 +168,8 @@ export default {
       }
       this.$router.push('BatchInformation'); //Move to next page
     },
-    selectedBatchInformation(sku, plantName, location, quantity, formSize, batchId){
-      var sku, plantName, loction, quantity, formSize, batchId;
+    selectedBatchInformation(sku, plantName, location, quantity, formSize, batchPrice, batchId){
+      var sku, plantName, loction, quantity, formSize, batchPrice, batchId;
     },
     retrieveData () {
       this.status = "loading stock information..."

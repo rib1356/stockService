@@ -25,7 +25,7 @@
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="hideModal">Save Image</b-btn>
+        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="saveChanges">Save Image</b-btn>
       </div>
     </b-modal>
   </div>
@@ -59,8 +59,12 @@ export default {
       this.$refs.PictureModal.show()
     },
     hideModal() {
+      this.$refs.PictureModal.hide();
+    },
+    saveChanges() {
       if(this.loadFromSelected) {
-        this.$refs.PictureModal.hide() //If the user has added an image to a previous batch go back to the batchInformation
+        this.$refs.PictureModal.hide(); //If the user has added an image to a previous batch go back to the batchInformation
+        sessionStorage.setItem('imageSaved', true);
       } else {
         this.$router.push('StockTable'); //Else they have added it from a new batch so go straight to the stockTable
       }
