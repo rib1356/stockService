@@ -1,8 +1,7 @@
 <template>
   <section>
-    <quote-navbar class="navbar-custom"></quote-navbar>
+    <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote Informatmion -->
-    <p>{{msg}}</p>
     <div class="left-div">
       <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -24,7 +23,7 @@
       </b-input-group>
       <b-input-group class="input-filter">
         <b-form-select v-model="sortBy" :options="sortOptions">
-          <option slot="first" :value="null"> Choose Sort Option</option>
+          <option slot="first" :value="null">Choose Sort Option</option>
         </b-form-select>
         <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
           <option :value="false">Asc</option>
@@ -87,7 +86,7 @@ export default {
 	},
   data () {
     return {
-			msg: 'Existing Quotes',
+			pageName: 'Existing Quotes',
 			fields: [
         { key: 'quoteId', label: 'QuoteId', sortable: true, sortDirection: 'desc'},
         { key: 'customerRef', label: 'Customer Ref'},

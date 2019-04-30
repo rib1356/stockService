@@ -158,7 +158,7 @@ export default {
         + " " + RootType
         + " " + data[i].Description
       this.formSizes.push({
-        "formSize": formSize.trim().replace(/  +/g, ' '),
+        "formSize": formSize.trim().replace(/  +/g, ' '), //Remove any whitespace in the form sizes
       });
 		}
 	},

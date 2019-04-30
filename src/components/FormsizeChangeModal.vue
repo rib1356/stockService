@@ -135,7 +135,7 @@ export default {
                         + " " + RootType
                         + " " + data[i].Description
             this.formSizes.push({
-              "text": formSize.trim().replace(/  +/g, ' '),
+              "text": formSize.trim().replace(/  +/g, ' '), //Remove any whitespace in the form sizes
               "value": formSize.trim().replace(/  +/g, ' '),
             });
         }

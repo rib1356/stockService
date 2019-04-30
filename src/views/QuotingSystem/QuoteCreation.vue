@@ -1,6 +1,6 @@
 <template>
 <section>
-	<quote-navbar class="navbar-custom"></quote-navbar>
+	<quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a plant to add to a quote</label>
 		<multiselect v-model="selectedBatch" 
@@ -8,9 +8,15 @@
 								placeholder="Select a batch" 
 								label="plantName"
 								:loading="isLoading"
-								:custom-label="customLabel"
 								:show-labels="false"
-								:allow-empty="false"></multiselect>
+								:allow-empty="false">
+		<template slot="option" slot-scope="props">
+      <div>
+				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
+				<br>
+				<span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
+			</div>
+    </template></multiselect>
 		<b-form-input v-model="quantity"
 									placeholder="Enter a quantity"
 									type="number"
@@ -33,9 +39,7 @@
 									style="margin-top: 10px;"
 									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
-		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>																
-		<!-- <br> -->
-		<!-- <b-button @click="boop" variant="outline-primary" style="margin-top: 5px;">create PDF</b-button>																 -->
+		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
 	</div>
 	<div class="right-div">
 		<div>
@@ -55,14 +59,7 @@
 			</p>
 			<strong>Quote Price: £{{computedTotalPrice}}</strong>
 		</div>
-		<!-- <p>Quote List</p> -->
-      <!-- <ul>
-          <li v-for="(data, index) in plants" :key='index' @input="getTotalPrice">
-            {{ data.PlantName }} | {{data.FormSize}} x ({{data.Quantity}}) @ £{{getPrice(data.Price)}} {{data.Comment}}
-						<i class="far fa-edit fa-lg" style="color:green"></i>
-            <i class="fas fa-trash-alt fa-lg" style="color:red;" @click="remove(index)"></i>
-          </li>
-      </ul> -->
+		<!-- Quote Table -->
 		    <b-table show-empty
 								 stacked="md"
 								 :items="plants"
@@ -70,9 +67,9 @@
 								 outlined>
       <div slot="empty">
         <strong>Add a plant to the quote</strong>
-      </div>   
+      </div>
       <template slot="Price" slot-scope="row">
-        £{{row.item.Price/100}}
+        £{{(row.item.Price/100).toFixed(2)}}
       </template> 
 			<template slot="actions" slot-scope="row">
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
@@ -132,6 +129,7 @@ export default {
 	},
   data () {
 		return {
+			pageName: 'Quote Creation',
 			plants: [],
 			fields: [
         { key: 'PlantName', label: 'Plant Name', sortable: true},
@@ -310,36 +308,11 @@ export default {
 				if(confirm("Please go back to stock table to load batches")) {
 						this.$router.push('StockTable');
 					}
-				// this.getBatches();
 			}
 		},
-		// getBatches() {
-		//   this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
-    //   .then((response) => {
-    //     this.changeData(response.data);
-    //   }).catch((error) => {
-		// 		alert("Sorry there was an error")
-		// 		console.log(error)
-    //   });
-    // },
-    // changeData (response) {
-    //   for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-		// 		if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
-		// 			this.batches.push({                 //This is then pushed into an array and used to populate the data table
-		// 				"batchId": response[i].Id,
-		// 				"Sku": response[i].Sku,
-		// 				"plantName": response[i].Name,
-		// 				"location": response[i].Location,
-		// 				"quantity": response[i].Quantity,
-		// 				"formSize": response[i].FormSize,
-		// 				"active": response[i].Active,
-		// 			});
-    //  	  }     
-    //   }
-    // },
-		customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
-      return `${plantName} | ${formSize} | Qty: (${quantity})`
-		},
+		// customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
+		// 	return `${plantName} | ${formSize} Qty: (${quantity})`
+		// },
 		formatPriceForPDF() {
       //This is done after the quote has been saved to the database so changes will only show on created PDF
       //Map through the list of plants changing the price from "250p to 2.50"
@@ -383,14 +356,25 @@ export default {
 			doc.setFontSize(10);
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
-			doc.text("Site Reference: " + this.siteRef, 420, 160);
-			doc.setFontSize(15);
-			doc.text("Quote Price: £" + (this.totalPrice/100).toFixed(2), 420, 185)
+			doc.text("Site Reference: " + this.siteRef, 400, 140);
 			doc.setLineWidth(1);
 			doc.line(0,125,700,125) 
 			doc.setFontSize(10);
 			doc.text(deliveryInfo, 40, 140)
-			doc.autoTable(columns, this.plants, {theme: 'striped', startY: 200});
+			doc.autoTable(columns, this.plants, {theme: 'striped', startY: 200, 
+																						styles: {
+																							overflow: 'linebreak',
+																							cellWidth: 100,
+																							},
+																					});
+			let finalY = doc.autoTable.previous.finalY;
+			let quotePrice = (this.totalPrice/100).toFixed(2);
+			let quoteVAT = (quotePrice/100*20).toFixed(2);
+			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
+			doc.setFontSize(12);
+			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
+			doc.text("VAT:                  £" + quoteVAT, 380, finalY+35);
+			doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
 			doc.save(pdfName + '.pdf');
 
 			this.$router.push('QuoteNavigation');
@@ -433,17 +417,16 @@ export default {
 
 	.left-div
 	{
-    width: 25%;
+    width: 30%;
 		height: 100%; 
     /* background: red; */
 		float:left;
-		/* overflow:hidden; */
-		/* background: green; */
+		white-space: normal;
 	}
 
 	.right-div {
 		float:left;
-		width:75%;
+		width:70%;
 		overflow:hidden;
 	}
 	

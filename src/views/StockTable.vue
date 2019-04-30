@@ -42,7 +42,7 @@
         <!-- <b-form-group horizontal label="Sort" class="mb-0"> -->
           <b-input-group>
             <b-form-select v-model="sortBy" :options="sortOptions">
-              <option slot="first" :value="null"> Choose Sort Option</option>
+              <option slot="first" :value="null">Choose Sort Option</option>
             </b-form-select>
             <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
               <option :value="false">Asc</option>
@@ -110,7 +110,7 @@ export default {
         { key: 'quantity', label: 'Quantity', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
-      sortBy: null,
+      sortBy: 'plantName',
       sortDesc: false,
       sortSearch: false,
       sortDirection: 'asc',

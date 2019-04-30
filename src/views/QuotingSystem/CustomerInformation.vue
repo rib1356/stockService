@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<quote-navbar class="navbar-custom"></quote-navbar>
+	<quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
 	<div class="left-div">
 		<label class="typo__label">Choose a customer</label>		 
 		<multiselect v-model="selectedCustomer"
@@ -48,6 +48,7 @@ export default {
 	},
   data () {
 		return {
+			pageName: 'Customer Selection',
 			selectedCustomer: '',
 			siteRef: '',
 			customers: [],

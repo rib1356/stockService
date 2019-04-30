@@ -3,7 +3,8 @@
 		<b-navbar class="navbar navbar-custom" >
       <b-navbar-brand >
         <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
-        <strong>Quote Navigation</strong>
+        <strong class="qn">Quote Navigation -</strong>
+        <strong> {{pageName}}</strong> 
       </b-navbar-brand>
       <!-- Right Aligned Menu Button -->
       <b-dropdown variant="outline" right class="m-2">
@@ -22,6 +23,7 @@
 
 <script>
   export default {
+    props: ['pageName'],
 		data() {
 			return {
 			}
@@ -50,4 +52,15 @@
   padding-bottom: 0rem;
 }
 
+.page-name { 
+  text-align: center;
+}
+
+	@media only screen and (max-width : 768px) {
+
+  .qn {
+  display: none;
+  }
+
+}
 </style>

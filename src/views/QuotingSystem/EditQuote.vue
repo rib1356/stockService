@@ -1,6 +1,6 @@
 <template>
   <div>
-    <quote-navbar class="navbar-custom"></quote-navbar>
+    <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
     <!-- <p>{{msg}}</p> -->
     <!-- Quote information -->  
     <div class="left-div">
@@ -72,7 +72,7 @@
         <strong>Loading quotes plants...</strong>
       </div>   
       <template slot="Price" slot-scope="row">
-        £{{row.item.Price/100}}
+        £{{(row.item.Price/100).toFixed(2)}}
       </template>      
       <template slot="actions" slot-scope="row">
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
@@ -132,7 +132,7 @@ export default {
   },
   data () {
     return {
-			msg: 'Quote Editing',
+			pageName: 'Quote Editing',
 			selectedQuote: '',
 			fields: [
         { key: 'PlantName', label: 'Plant Name', sortable: true},
@@ -384,14 +384,25 @@ export default {
 			doc.setFontSize(10);
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
-			doc.text("Site Reference: " + this.selectedQuote.siteRef, 420, 160);
-			doc.setFontSize(15);
-			doc.text("Quote Price: £" + (this.totalPrice/100).toFixed(2), 420, 185)
+			doc.text("Site Reference: " + this.selectedQuote.siteRef, 400, 140);
 			doc.setLineWidth(1);
 			doc.line(0,125,700,125) 
 			doc.setFontSize(10);
 			doc.text(deliveryInfo, 40, 140)
-			doc.autoTable(columns, this.quotePlants, {theme: 'striped', startY: 200});
+      doc.autoTable(columns, this.quotePlants, {theme: 'striped', startY: 200,
+                                                styles: {
+																							      overflow: 'linebreak',
+																							      cellWidth: 100,
+                                                    },
+                                                });
+      let finalY = doc.autoTable.previous.finalY;
+			let quotePrice = (this.totalPrice/100).toFixed(2);
+			let quoteVAT = (quotePrice/100*20).toFixed(2);
+			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
+			doc.setFontSize(12);
+			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
+			doc.text("VAT:                  £" + quoteVAT, 380, finalY+35);
+			doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
 			doc.save(pdfName + '.pdf');
 
 			this.$router.push('ExistingQuotes');

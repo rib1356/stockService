@@ -27,7 +27,7 @@
           </b-col>
           <b-col v-if="potSizes.length > 0" class="col-md-2">
 						<p>Pot Size</p>
-						<b-form-group>
+						<b-form-group class="pricing-buttons">
 							<b-form-radio-group id="potSizeButtons"
 																class="myRadioButton"
 																v-model="selectedPotSize"
@@ -42,8 +42,8 @@
           </b-col>
           <b-col v-if="potSizes.length > 0" class="col-md-2">
 						<p>Form Size</p>
-						<b-form-group>
-							<b-form-radio-group id="formSizwButtons"
+						<b-form-group class="pricing-buttons">
+							<b-form-radio-group id="formSizeButtons"
 																class="myRadioButton"
 																v-model="selectedFormSize"
 																buttons
@@ -51,7 +51,7 @@
 																:options="formSizes"
 																stacked
 																name="radioFormSize"
-																> <p>{{selectedFormSize}}</p>
+															  > <p>{{selectedFormSize}}</p>
 							</b-form-radio-group>
 						</b-form-group>
           </b-col>
@@ -146,10 +146,12 @@
 				this.formSizes = [];
 				this.selectedPotSize = null;
 				this.selectedFormSize = null;
+				this.selectedBatches = [];
 			},
 			potTypeChosen() {
 				this.formSizes = [];
 				this.selectedFormSize = null;
+				this.selectedBatches = [];
 			},
 			getNextPotButtons(filteredArray, potChosen) {
 				let arrOfFormSizes = filteredArray.map(a => a.formSize); //Get all the form sizes of the selected root type and put into an array
@@ -226,6 +228,11 @@
 
 	.myRadioButton {
 		width: 100px;
+	}
+
+	.pricing-buttons {
+		max-height: 50vh;
+		overflow: auto;
 	}
 
 	.batch-list{ 

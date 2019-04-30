@@ -37,7 +37,7 @@
 			<p>These batches have the current prices in the database</p>
 			<ul>
 				<li v-for="(data, index) in similarBatches" :key='index' class="price-list">
-						{{data.plantName}} | {{data.formSize}}. PRICED AT: {{data.batchPrice/100}}
+					BatchNo: {{data.batchId}} |	{{data.plantName}} {{data.formSize}} | PRICED AT: £{{data.batchPrice/100}}
 				</li>
 			</ul>
 		</div>
@@ -86,7 +86,7 @@
 					let plantName = this.selectedBatches[i].plantName; //Get the current name and formSize of the plant being checked
 					let formSize = this.selectedBatches[i].formSize;
 					//Create an array of objects where the plantName and formSize batch in all of the batches
-					let selectedPlant = batches.filter(batches => (batches.plantName === plantName && batches.formSize === formSize))
+					let selectedPlant = batches.filter(batches => (batches.plantName === plantName && batches.formSize === formSize));
 					if(selectedPlant.length > 1) {
 						selectedPlant.forEach(element => {
 							this.similarBatches.push(element);	//Loop through the new array and add these values to be displayed on the page
