@@ -40,9 +40,6 @@
                   bootstrap-styling
                   ></datepicker>
       </b-collapse>   
-      <!-- <b-form-checkbox 
-      @input="test"
-      switch></b-form-checkbox> -->
     </div>
     <!-- Quote Table -->
     <div class="right-div">

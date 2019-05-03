@@ -1,7 +1,6 @@
 <template>
   <div>
     <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
-    <!-- <p>{{msg}}</p> -->
     <!-- Quote information -->  
     <div class="left-div">
       <label class="typo__label">Quote Information</label>
@@ -35,7 +34,15 @@
                        :custom-label="customLabel"
                        :show-labels="false"
                        :allow-empty="false"
-                       style="margin-bottom: 5px;"></multiselect>
+                       style="margin-bottom: 5px;">
+            <template slot="option" slot-scope="props">
+              <div>
+				        <span>{{props.option.plantName }} {{props.option.formSize }}</span>
+				        <br>
+				        <span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.price/100).toFixed(2)}}</strong></span>
+			        </div>
+            </template>
+          </multiselect>
           <b-form-input v-model="batchQuantity"
                         placeholder="Enter a quantity"
                         type="number"

@@ -1,7 +1,7 @@
 <template>
-<section>
+<section id="flex">
 	<quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
-	<div class="left-div">
+	<div class="left-div" id="left">
 		<label class="typo__label">Choose a plant to add to a quote</label>
 		<multiselect v-model="selectedBatch" 
 								:options="batches"  
@@ -9,7 +9,8 @@
 								label="plantName"
 								:loading="isLoading"
 								:show-labels="false"
-								:allow-empty="false">
+								:allow-empty="false"
+								@input="calculatePrice">
 		<template slot="option" slot-scope="props">
       <div>
 				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
@@ -30,9 +31,11 @@
 		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
 		<strong>Calculated Price £{{calculatedPrice}}</strong>
 		<br>							
-		<strong>Qtn needed until next band {{untilNextBand}}</strong>
+		<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
+		<strong>Current GPM been used {{currentGPM}}%</strong>
 		<br>
-		<strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							
+		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
+		<button @click="getFirebase">Test</button>
 		<b-form-input v-model="comment"
 									placeholder="Enter a plant comment"
 									type="text"
@@ -41,26 +44,38 @@
 		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
 	</div>
-	<div class="right-div">
-		<div>
-			<p>
-				Customer Name: <strong>{{customerInfo.customerName}}</strong>
-			  Customer Reference: <strong>{{customerInfo.customerRef}}</strong>
-				Customer Telephone: <strong>{{customerInfo.customerTel}}</strong>
-			</p>
-			<p>	
-				Customer Address: <strong>{{customerInfo.customerAddress}}</strong>
-				Customer Email: <strong>{{customerInfo.customerEmail}}</strong>
-			</p>
-			<p>
-				Site reference: <strong>{{siteRef}}</strong>
-			  Quote Date: <strong>{{quoteDate}}</strong>
-			  Expiry Date: <strong>{{expiryDate}}</strong>
-			</p>
-			<strong>Quote Price: £{{computedTotalPrice}}</strong>
+		<div class="info-div" id="info">
+			<b-button @click="showCollapse = !showCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-plus plus"></i></p>
+        <p v-else>Show Customer Information<i class="fas fa-plus plus"></i></p>
+      </b-button>
+			<b-collapse v-model="showCollapse" id="collapse">
+				<p>
+					Customer Name: <strong>{{customerInfo.customerName}}</strong>
+					Customer Reference: <strong>{{customerInfo.customerRef}}</strong>
+					Customer Telephone: <strong>{{customerInfo.customerTel}}</strong>
+				</p>
+				<p>	
+					Customer Address: <strong>{{customerInfo.customerAddress}}</strong>
+					Customer Email: <strong>{{customerInfo.customerEmail}}</strong>
+				</p>
+				<p>
+					Site reference: <strong>{{siteRef}}</strong>
+					Quote Date: <strong>{{quoteDate}}</strong>
+					Expiry Date: <strong>{{expiryDate}}</strong>
+				</p>
+			</b-collapse>
 		</div>
-		<!-- Quote Table -->
-		    <b-table show-empty
+		<div class="right-div" id="right">
+			<strong>Quote Price: £{{computedTotalPrice}}</strong>
+			<!-- Quote Table -->
+		  <b-table show-empty
 								 stacked="md"
 								 :items="plants"
 								 :fields="fields"   
@@ -73,7 +88,7 @@
       </template> 
 			<template slot="actions" slot-scope="row">
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click="remove(index)"></i>
+				<i class="fas fa-trash-alt fa-lg" style="color:red" @click="remove(row.index)"></i>
         <!-- Editing modal -->
         <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateEdits">
           <div>
@@ -88,7 +103,7 @@
                             pattern="[0-9]*"
                             name="rowQuantity"
                             inputmode="numeric"
-                            v-validate="'required|numeric|min_value:1'"  />
+                            v-validate="'required|numeric|min_value:1'"/>
             </b-form-group>
             <p class="text-danger" v-if="errors.has('rowQuantity')">{{ errors.first('rowQuantity') }}</p>
             <b-form-group horizontal label="Price" >
@@ -120,9 +135,11 @@
 
 <script>
 import moment from 'moment'
+import firebase from 'firebase/app';
 import jsPDF from 'jspdf'
 import 'jspdf-autotable';
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
+
 export default {
 	components: {
 		QuoteNavbar,
@@ -148,7 +165,7 @@ export default {
 			comment: null,
 			customerInfo: '',
 			batches: [],
-			selectedBatch: '',
+			selectedBatch: null,
 			totalPrice: 0,
 			quoteId: '',
 			rowName: '',
@@ -167,6 +184,8 @@ export default {
 			calculatedPrice: '',
 			nextCalculatedPrice: '',
 			untilNextBand: '',
+			showCollapse: true,
+			currentGPM: '',
 		}		
 	},
   methods: {
@@ -183,20 +202,36 @@ export default {
 		calculatePrice() {
 			if(this.selectedBatch != null) { //This method is called twice when using @input???
 				// this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.9).toFixed(2);
-				console.log("123")
-				for (let i = 0; i < this.pricingValues.length; i++) {
-					if(this.quantity >= this.pricingValues[i].quantityMin && this.quantity <= this.pricingValues[i].quantityMax) {
-						this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i].multiplier).toFixed(2);
-						this.nextCalculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i + 1].multiplier).toFixed(2);
-						this.untilNextBand = this.pricingValues[i + 1].quantityMin;
-					} else if (this.quantity == 0){
-						this.calculatedPrice = 0;
-					} else if (this.quantity > this.pricingValues[i].quantityMax) {
-						this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.6).toFixed(2)
-						this.nextCalculatedPrice = 0
-						this.untilNextBand = 0
-					}
-				}
+				// console.log("in calc price");
+				// console.log(this.selectedBatch.batchPrice);
+				// for (let i = 0; i < this.pricingValues.length; i++) {
+				// 	if(this.quantity >= this.pricingValues[i].quantityMin && this.quantity <= this.pricingValues[i].quantityMax) {
+				// 		this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i].multiplier).toFixed(2);
+				// 		this.nextCalculatedPrice = ((this.selectedBatch.batchPrice/100)*this.pricingValues[i + 1].multiplier).toFixed(2);
+				// 		this.untilNextBand = this.pricingValues[i + 1].quantityMin;
+				// 	} else if (this.quantity == 0){
+				// 		this.calculatedPrice = 0;
+				// 	} else if (this.quantity > this.pricingValues[i].quantityMax) {
+				// 		this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.6).toFixed(2)
+				// 		this.nextCalculatedPrice = 0
+				// 		this.untilNextBand = 0
+				// 	}
+				// }
+				var ref = firebase.database().ref("GPM/").orderByKey();
+				let itemTotal = (this.selectedBatch.batchPrice/100)*this.quantity; //get the line total to work out what gpm to use
+				console.log(itemTotal);
+				ref.on("value", (snapshot) => {
+          snapshot.forEach((child) => { 
+							var obj = child.val();
+							if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) {
+								this.currentGPM = obj.gpm
+								this.calculatedPrice = ((this.selectedBatch.batchPrice/100)/((100-obj.gpm)/100)).toFixed(2)
+							}
+            });
+				}, 
+				function (error) {
+        	console.log("Error: " + error.code);
+      	});
 			}
 		},
 		sendEmail() {
@@ -310,9 +345,6 @@ export default {
 					}
 			}
 		},
-		// customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
-		// 	return `${plantName} | ${formSize} Qty: (${quantity})`
-		// },
 		formatPriceForPDF() {
       //This is done after the quote has been saved to the database so changes will only show on created PDF
       //Map through the list of plants changing the price from "250p to 2.50"
@@ -385,7 +417,22 @@ export default {
 		},
 		getPrice (price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);
-    },
+		},
+		getFirebase() {
+			var ref = firebase.database().ref("GPM/").orderByKey();
+			let itemTotal = (this.selectedBatch.batchPrice*this.quantity)/100;
+			ref.on("value", (snapshot) => {
+          snapshot.forEach((child) => { 
+							var obj = child.val();
+							if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) {
+								this.calculatedPrice = (this.selectedBatch.batchPrice/((100-obj.gpm)/100)).toFixed(2)
+							}
+            });
+			}, 
+			function (error) {
+        console.log("Error: " + error.code);
+      });
+		}
 	},
 	computed: {
     computedTotalPrice () { ///Whenever total value is shown this will format to look monitary
@@ -421,13 +468,17 @@ export default {
 		height: 100%; 
     /* background: red; */
 		float:left;
-		white-space: normal;
 	}
 
 	.right-div {
 		float:left;
 		width:70%;
 		overflow:hidden;
+	}
+
+	.info-div {
+		width: 70%;
+		float: left;
 	}
 	
 	/* starts here */
@@ -437,17 +488,11 @@ export default {
     list-style-type: none;
   }
   
-  ul li {
-    padding: 5px;
-    /* font-size: 1.3em; */
-    background-color: #E0EDF4;
-    border-left: 5px solid #3EB3F6;
-    margin-bottom: 2px;
-    color: #3E5252;
-  }
   p {
     text-align:center;
+		margin: 0px;
   }
+
   .container {
     box-shadow: 0px 0px 40px lightgray;
   }
@@ -485,6 +530,17 @@ export default {
 		position: relative;
 		/* visibility: hidden; */
 	}
+
+	.info-div {
+		width: 100%;
+		position: relative; 
+		top:0;
+	}
+
+	#flex { display: flex; flex-direction: column; }
+	#left { order: 2; }
+	#info { order: 1; }
+	#right { order: 3; } 
 
 }
 

@@ -8,23 +8,24 @@
 								 track-by="customerName"
    							 label="customerName"
 								 placeholder="Select a customer"
-								 :allow-empty="false"
+								 :allow-empty="true"
 								 deselect-label="Can't remove this value" 
 								 @close="customerSelected">
 		</multiselect>
 		<b-form-input v-model="siteRef"
 									type="text"
-									placeholder="Enter a site reference"></b-form-input>	
+									placeholder="Enter a site reference"></b-form-input>
+		<b-form-checkbox id="checkbox" v-model="status" @change="checkboxChange" v-if="!disabled">
+      Manually enter customer information
+    </b-form-checkbox>
+    <div>							
 			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, siteRef: siteRef } }">
 				<b-button :disabled="disabled == 1 ? true : false" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
-		<!-- <div style="margin-top: 10px;">
-			<b-button @click="cancel" variant="outline-danger">Back to stock</b-button>
-			<b-button @click="toQuoteNav" variant="outline-danger">Back to quote navigation</b-button>
-		</div> -->
+			</div>
 	</div>
 	<div class="right-div">
-			<p>
+			<!-- <p>
 				Customer Name: <strong>{{selectedCustomer.customerName}} ||</strong>
 				Customer Reference: <strong>{{selectedCustomer.customerRef}} ||</strong>
 				Customer Telephone: <strong>{{selectedCustomer.customerTel}}</strong>
@@ -32,10 +33,57 @@
 			<p>
 				Customer Address: <strong>{{selectedCustomer.customerAddress}} ||</strong>
 				Customer Email: <strong>{{selectedCustomer.customerEmail}} ||</strong>
-			</p>
+			</p> -->
 			<p>Site Reference: <strong>{{siteRef}}</strong></p>
+	<b-container>
+  <b-row class="my-1">
+    <b-col sm="2">
+      <label for="input-name">Customer Name:</label>
+    </b-col>
+    <b-col sm="10">
+      <b-form-input id="input-name" size="sm" placeholder="Enter customer name" v-if="status" v-model="selectedCustomer.customerName"></b-form-input>
+			<strong v-else>{{selectedCustomer.customerName}}</strong>
+    </b-col>
+  </b-row>
+  <b-row class="my-1">
+    <b-col sm="2">
+      <label for="input-ref">Customer Ref:</label>
+    </b-col>
+    <b-col sm="10">
+      <b-form-input id="input-ref" size="sm" placeholder="Enter customer ref" v-if="status" v-model="selectedCustomer.customerRef"></b-form-input>
+			<strong v-else>{{selectedCustomer.customerRef}}</strong>
+    </b-col>
+  </b-row>
+  <b-row class="my-1">
+    <b-col sm="2">
+      <label for="input-tel">Customer Telephone:</label>
+    </b-col>
+    <b-col sm="10">
+      <b-form-input id="input-tel" size="sm" placeholder="Enter customer telephone" v-if="status" v-model="selectedCustomer.customerTel"></b-form-input>
+			<strong v-else>{{selectedCustomer.customerTel}}</strong>
+    </b-col>
+  </b-row>
+  <b-row class="my-1">
+    <b-col sm="2">
+      <label for="input-address">Customer Address:</label>
+    </b-col>
+    <b-col sm="10">
+      <b-form-input id="input-address" size="sm" placeholder="Enter customer address" v-if="status" v-model="selectedCustomer.customerAddress"></b-form-input>
+			<strong v-else>{{selectedCustomer.customerAddress}}</strong>
+    </b-col>
+  </b-row>
+  <b-row class="my-1">
+    <b-col sm="2">
+      <label for="input-email">Customer Email:</label>
+    </b-col>
+    <b-col sm="10">
+      <b-form-input id="input-email" size="sm" placeholder="Enter customer email" v-if="status" v-model="selectedCustomer.customerEmail"></b-form-input>
+			<strong v-else>{{selectedCustomer.customerEmail}}</strong>
+    </b-col>
+  </b-row>
+
+	</b-container>
 	</div>
-	
 		<!-- <button @click="toQuote" >Click me</button> -->
 	</div>	
 </template>
@@ -53,9 +101,13 @@ export default {
 			siteRef: '',
 			customers: [],
 			disabled: 1,
+			status: false
 		}		
   },
   methods: {
+		checkboxChange() {
+			// this.selectedCustomer = '';
+		},
 		toQuote() {
 			this.$router.push('QuoteCreation');
 		},
@@ -125,6 +177,8 @@ export default {
 		position: relative;
 		/* visibility: hidden; */
 	}
+
+
 
 }
 
