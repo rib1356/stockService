@@ -2,48 +2,6 @@
 <section id="flex">
 	<quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
 	<div class="left-div" id="left">
-		<label class="typo__label">Choose a plant to add to a quote</label>
-		<multiselect v-model="selectedBatch" 
-								:options="batches"  
-								placeholder="Select a batch" 
-								label="plantName"
-								:loading="isLoading"
-								:show-labels="false"
-								:allow-empty="false"
-								@input="calculatePrice">
-		<template slot="option" slot-scope="props">
-      <div>
-				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
-				<br>
-				<span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
-			</div>
-    </template></multiselect>
-		<b-form-input v-model="quantity"
-									placeholder="Enter a quantity"
-									type="number"
-                  pattern="[0-9]*"
-									v-validate="'required|numeric|min_value:1'"
-									name="quantity"
-									inputmode="numeric"
-									@keyup.enter.native="validateBeforeSubmit"
-									@input="calculatePrice"></b-form-input>	
-									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
-		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
-		<strong>Calculated Price £{{calculatedPrice}}</strong>
-		<br>							
-		<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
-		<strong>Current GPM been used {{currentGPM}}%</strong>
-		<br>
-		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
-		<button @click="getFirebase">Test</button>
-		<b-form-input v-model="comment"
-									placeholder="Enter a plant comment"
-									type="text"
-									style="margin-top: 10px;"
-									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
-		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
-		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
-	</div>
 		<div class="info-div" id="info">
 			<b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -70,8 +28,53 @@
 					Quote Date: <strong>{{quoteDate}}</strong>
 					Expiry Date: <strong>{{expiryDate}}</strong>
 				</p>
+		<hr>
 			</b-collapse>
 		</div>
+		<label class="typo__label">Choose a plant to add to a quote</label>
+		<multiselect v-model="selectedBatch" 
+								:options="batches"  
+								placeholder="Select a batch" 
+								label="plantName"
+								:loading="isLoading"
+								:show-labels="false"
+								:allow-empty="false"
+								@input="calculatePrice">
+		<template slot="option" slot-scope="props">
+      <div>
+				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
+				<br>
+				<span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
+				<br>
+				<span>Sell Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
+			</div>
+    </template></multiselect>
+		<b-form-input v-model="quantity"
+									placeholder="Enter a quantity"
+									type="number"
+                  pattern="[0-9]*"
+									v-validate="'required|numeric|min_value:1'"
+									name="quantity"
+									inputmode="numeric"
+									@keyup.enter.native="validateBeforeSubmit"
+									@input="calculatePrice"></b-form-input>	
+									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
+		<strong>Calculated Price £{{calculatedPrice}}</strong>
+		<br>							
+		<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
+		<strong>Current GPM been used {{currentGPM}}%</strong>
+		<br>
+		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
+		<!-- <button @click="getFirebase">Test</button> -->
+		<b-form-input v-model="comment"
+									placeholder="Enter a plant comment"
+									type="text"
+									style="margin-top: 10px;"
+									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
+		<b-button @click="saveQuote" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>																
+		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
+	</div>
 		<div class="right-div" id="right">
 			<strong>Quote Price: £{{computedTotalPrice}}</strong>
 			<!-- Quote Table -->
@@ -219,13 +222,12 @@ export default {
 				// }
 				var ref = firebase.database().ref("GPM/").orderByKey();
 				let itemTotal = (this.selectedBatch.batchPrice/100)*this.quantity; //get the line total to work out what gpm to use
-				console.log(itemTotal);
 				ref.on("value", (snapshot) => {
           snapshot.forEach((child) => { 
 							var obj = child.val();
 							if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) {
 								this.currentGPM = obj.gpm
-								this.calculatedPrice = ((this.selectedBatch.batchPrice/100)/((100-obj.gpm)/100)).toFixed(2)
+								this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*((100-obj.gpm)/100)).toFixed(2)
 							}
             });
 				}, 
@@ -248,6 +250,8 @@ export default {
 				Date: this.quoteDate,
 				ExpiryDate: this.expiryDate,
 				SiteRef: this.siteRef,
+				SalesOrder: 0,
+				Retail: 0,
 				Active: true,
 				QuoteDetails: this.plants,
 			}) 
@@ -466,7 +470,6 @@ export default {
 	{
     width: 30%;
 		height: 100%; 
-    /* background: red; */
 		float:left;
 	}
 
@@ -476,10 +479,10 @@ export default {
 		overflow:hidden;
 	}
 
-	.info-div {
+	/* .info-div {
 		width: 70%;
 		float: left;
-	}
+	} */
 	
 	/* starts here */
 	  ul {

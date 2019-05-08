@@ -85,6 +85,7 @@ export default {
 			"Quantity": this.quantity,
 			"WholesalePrice": null,
 			"ImageExists": false,
+			"SalesOrder": 0,
 			"Active": true,
 		})
 		.then((response) => {

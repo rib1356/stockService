@@ -39,6 +39,9 @@
                   clear-button
                   bootstrap-styling
                   ></datepicker>
+        <b-button @click="toggleQuoteSales" style="margin-top: 5px;">
+          <p v-if="!showSaleOrders">Show sales orders</p>        
+          <p v-else>Show quotes</p> </b-button>          
       </b-collapse>   
     </div>
     <!-- Quote Table -->
@@ -65,6 +68,7 @@
 					<i class="far fa-edit fa-lg" style="color:green"></i>
 				</router-link>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteQuote(row.item)"></i>
+        <i class="fas fa-check fa-lg" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
       </template> 
     </b-table>
   </div>
@@ -94,7 +98,9 @@ export default {
         { key: 'totalPrice', label: 'Quote Price' , sortable: true},
         { key: 'actions', label: 'Actions' }
 			],
-			quotes: [],
+      quotes: [],
+      saleOrders: [],
+      originalQuotes: [],
       customers: [],
       showCollapse: true,
       filter: '',
@@ -103,7 +109,7 @@ export default {
       sortSearch: false,
       sortDirection: 'asc',
       selectedDate: '',
-      
+      showSaleOrders: false,
     }
   },
   computed: {
@@ -115,12 +121,6 @@ export default {
     },
   },
   methods: {
-    test() {
-      console.log("ree")
-      for (let i = 0; i < this.quotes.length; i++) {
-        this.quotes[i]._rowVariant = 'danger'
-      }
-    },
     clearDate(){ //When the clear button is pressed completely clear the filters
       this.filter = ''
     },
@@ -139,10 +139,10 @@ export default {
           alert(error);
       });
 		},
-    changeData (response) {
+    changeData(response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
         let customerName = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
-        if(response[i].Active === true) {
+        if(response[i].Active === true && response[i].SalesOrder === false) {
           this.quotes.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
@@ -151,11 +151,36 @@ export default {
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
             "totalPrice": this.getPrice(response[i].TotalPrice),
+            "SalesOrder": response[i].SalesOrder,
+          });
+        } else if (response[i].Active === true && response[i].SalesOrder === true) {
+            this.saleOrders.push({ //This is then pushed into an array and used to populate the data table
+            "quoteId": response[i].QuoteId,
+            "customerRef": response[i].CustomerRef,
+            "customerName": customerName,
+            "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
+            "expiryDate": this.convertDate(response[i].ExpiryDate),
+            "siteRef": response[i].SiteRef,
+            "totalPrice": this.getPrice(response[i].TotalPrice),
+            "SalesOrder": response[i].SalesOrder,
           });
         }
       }
+      this.originalQuotes = this.quotes;
     },
-    getPrice (price) { //Does the same as computed method but passed in a value
+    toggleQuoteSales() {
+      this.showSaleOrders = !this.showSaleOrders;
+      if(this.showSaleOrders == true) {
+        this.pageName = 'Sales Orders'
+        this.quotes = null;
+        this.quotes = this.saleOrders;
+      } else {
+        this.pageName = 'Existing Quotes'
+        this.quotes = null;
+        this.quotes = this.originalQuotes;
+      }
+    },
+    getPrice(price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);
     },
     convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"
@@ -177,11 +202,27 @@ export default {
         alert("Customers need to be loaded into storage. Please go to the stock table")
       }
     },
-    deleteQuote (row){
+    deleteQuote(row){
       var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
       let data = { "QuoteId": row.quoteId, "Active": false} ;
       if(confirm("Delete Quote?")) { //Bring up confirm dialog before deleting
         this.axios.put(url, data)
+          .then((response) => {
+            console.log(response);
+            location.reload();
+          })
+          .catch((error) => {
+            alert(error);
+        });
+      } else {
+        //do nothing?
+      }
+    },
+    turnToSalesOrder(row) {
+      //var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
+      let data = { "QuoteId": row.quoteId, "SalesOrder": true} ;
+      if(confirm("Turn Quote to sales order?")) { //Bring up confirm dialog before deleting
+        this.axios.put('https://ahillsquoteservice.azurewebsites.net/api/quote/salesOrder?id=' + row.quoteId, data)
           .then((response) => {
             console.log(response);
             location.reload();

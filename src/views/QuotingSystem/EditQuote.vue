@@ -3,26 +3,45 @@
     <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote information -->  
     <div class="left-div">
-      <label class="typo__label">Quote Information</label>
-      	<p>
-          Customer Ref: {{selectedQuote.customerRef}} ||
-          Customer Name: {{selectedQuote.customerName}} ||
-          Quote Start Date: {{selectedQuote.startDate}} ||
-          Quote Expiry Date: {{selectedQuote.expiryDate}}
-        </p>
-      <strong>Total Price: £{{computedTotalPrice}}</strong>  
-      <!-- Collapsible area to edit SiteRef and add plants to quote -->
-      <b-button @click="showCollapse = !showCollapse"
+      			<b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
                 style="margin-bottom: 5px;"
                 block
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
+        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-plus plus"></i></p>
+        <p v-else>Show Customer Information<i class="fas fa-plus plus"></i></p>
+      </b-button>
+			<b-collapse v-model="showCollapse" id="collapse">
+				<p>
+					Customer Name: <strong>{{currentCustomer.customerName}}</strong>
+					Customer Reference: <strong>{{currentCustomer.customerRef}}</strong>
+					Customer Telephone: <strong>{{currentCustomer.customerTel}}</strong>
+				</p>
+				<p>	
+					Customer Address: <strong>{{currentCustomer.customerAddress}}</strong>
+					Customer Email: <strong>{{currentCustomer.customerEmail}}</strong>
+				</p>
+				<p>
+					Site reference: <strong>{{selectedQuote.siteRef}}</strong>
+					Quote Date: <strong>{{selectedQuote.startDate}}</strong>
+					Expiry Date: <strong>{{selectedQuote.expiryDate}}</strong>
+				</p>
+        <hr>
+			</b-collapse>
+      <!-- Collapsible area to edit SiteRef and add plants to quote -->
+      <b-button @click="showCollapse2 = !showCollapse2"
+                :class="showCollapse2 ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse2 ? 'true' : 'false'">
         Edit SiteRef / Add Plants
         <i class="fas fa-plus plus"></i>
       </b-button>
-      <b-collapse v-model="showCollapse" id="collapse">
+      <b-collapse v-model="showCollapse2" id="collapse">
         <b-form-group class="site-input" horizontal label="Site Ref: " >
           <b-form-input v-model="selectedQuote.siteRef"/>
         </b-form-group>
@@ -39,7 +58,9 @@
               <div>
 				        <span>{{props.option.plantName }} {{props.option.formSize }}</span>
 				        <br>
-				        <span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.price/100).toFixed(2)}}</strong></span>
+				        <span> Quantity: {{props.option.quantity}}
+                       Price: <strong>£{{(props.option.price/100).toFixed(2)}}</strong>
+                </span>
 			        </div>
             </template>
           </multiselect>
@@ -69,6 +90,7 @@
     </div>
     <!-- EditQuote table -->
     <div class="right-div">
+    <strong>Quote Price: £{{computedTotalPrice}}</strong>  
     <b-table show-empty
              stacked="md"
              :items="quotePlants"
@@ -160,6 +182,7 @@ export default {
       totalPrice: 0,
       currentCustomer: null,
       showCollapse: false,
+      showCollapse2: false,
       batches: [],
       selectedBatch: null,
       comment: null,
@@ -443,18 +466,14 @@ export default {
 
   .left-div
 	{
-    width: 25%;
+    width: 30%;
 		height: 100%; 
-    /* background: red; */
-    
 		float:left;
-		/* overflow:hidden; */
-		/* background: green; */
 	}
 
 	.right-div {
 		float:left;
-		width:75%;
+		width:70%;
 		overflow:hidden;
 	}
 
