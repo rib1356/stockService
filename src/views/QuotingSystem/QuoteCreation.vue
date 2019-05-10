@@ -45,8 +45,8 @@
 				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
 				<br>
 				<span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
-				<br>
-				<span>Sell Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
+				<!-- <br> -->
+				<!-- <span>Sell Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span> -->
 			</div>
     </template></multiselect>
 		<b-form-input v-model="quantity"
@@ -448,7 +448,16 @@ export default {
 		this.getQuoteDate();
 	},
 	created() {
-		this.customerInfo = this.$route.params.selectedCustomer;
+		if(this.$route.params.singleCustomer === null) {
+			this.customerInfo = this.$route.params.selectedCustomer;
+		} else {
+			this.customerInfo = this.$route.params.singleCustomer;
+			if(this.$route.params.retail) {
+				this.customerInfo.customerRef = this.$route.params.retCustomer;
+			} else {
+				this.customerInfo.customerRef = this.$route.params.trdCustomer;
+			}
+		}
 		this.siteRef = this.$route.params.siteRef;
 	}
 }

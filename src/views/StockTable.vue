@@ -235,7 +235,8 @@ export default {
 					"customerRef": data[i].CustomerReference,
 					"customerTel": data[i].CustomerTel,
 					"customerAddress": data[i].CustomerAddress,
-					"customerEmail": data[i].CustomerEmail,
+          "customerEmail": data[i].CustomerEmail,
+          "sageCustomer": data[i].SageCustomer,
 				});
       }
       localStorage.setItem("customers", JSON.stringify(this.customers));

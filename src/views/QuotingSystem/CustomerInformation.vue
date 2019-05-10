@@ -7,84 +7,84 @@
 							   :options="customers"
 								 track-by="customerName"
    							 label="customerName"
-								 placeholder="Select a customer"
 								 :allow-empty="true"
-								 deselect-label="Can't remove this value" 
-								 @close="customerSelected">
+								 placeholder="Select a customer"
+								 @close="customerSelected"
+								 @open="selectOpened">
 		</multiselect>
 		<b-form-input v-model="siteRef"
 									type="text"
 									placeholder="Enter a site reference"></b-form-input>
-		<b-form-checkbox id="checkbox" v-model="status" @change="checkboxChange" v-if="!disabled">
-      Manually enter customer information
+		<b-form-checkbox id="checkbox" v-model="trade" @change="checkboxChange" style="margin-top: 10px;" v-if="selectedCustomer == ''">
+      Quote for a none existing customer?
+    </b-form-checkbox>
+		<b-form-checkbox id="checkbox2" v-model="retail" style="margin-top: 10px;" v-if="trade">
+      Check if customer is retail
     </b-form-checkbox>
     <div>							
-			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, siteRef: siteRef } }">
-				<b-button :disabled="disabled == 1 ? true : false" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
+			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, 
+																													singleCustomer: singleCustomer,
+																													siteRef: siteRef,
+																													retail: retail,
+																													trdCustomer: nextTRD,
+																													retCustomer: nextRET, } }">
+				<b-button :disabled="disabled == 1 ? true : false" @click="saveCustomer" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
 			</div>
 	</div>
 	<div class="right-div">
-			<!-- <p>
-				Customer Name: <strong>{{selectedCustomer.customerName}} ||</strong>
-				Customer Reference: <strong>{{selectedCustomer.customerRef}} ||</strong>
-				Customer Telephone: <strong>{{selectedCustomer.customerTel}}</strong>
-			</p>
-			<p>
-				Customer Address: <strong>{{selectedCustomer.customerAddress}} ||</strong>
-				Customer Email: <strong>{{selectedCustomer.customerEmail}} ||</strong>
-			</p> -->
 			<p>Site Reference: <strong>{{siteRef}}</strong></p>
-	<b-container>
-  <b-row class="my-1">
-    <b-col sm="2">
-      <label for="input-name">Customer Name:</label>
-    </b-col>
-    <b-col sm="10">
-      <b-form-input id="input-name" size="sm" placeholder="Enter customer name" v-if="status" v-model="selectedCustomer.customerName"></b-form-input>
-			<strong v-else>{{selectedCustomer.customerName}}</strong>
-    </b-col>
-  </b-row>
-  <b-row class="my-1">
-    <b-col sm="2">
-      <label for="input-ref">Customer Ref:</label>
-    </b-col>
-    <b-col sm="10">
-      <b-form-input id="input-ref" size="sm" placeholder="Enter customer ref" v-if="status" v-model="selectedCustomer.customerRef"></b-form-input>
-			<strong v-else>{{selectedCustomer.customerRef}}</strong>
-    </b-col>
-  </b-row>
-  <b-row class="my-1">
-    <b-col sm="2">
-      <label for="input-tel">Customer Telephone:</label>
-    </b-col>
-    <b-col sm="10">
-      <b-form-input id="input-tel" size="sm" placeholder="Enter customer telephone" v-if="status" v-model="selectedCustomer.customerTel"></b-form-input>
-			<strong v-else>{{selectedCustomer.customerTel}}</strong>
-    </b-col>
-  </b-row>
-  <b-row class="my-1">
-    <b-col sm="2">
-      <label for="input-address">Customer Address:</label>
-    </b-col>
-    <b-col sm="10">
-      <b-form-input id="input-address" size="sm" placeholder="Enter customer address" v-if="status" v-model="selectedCustomer.customerAddress"></b-form-input>
-			<strong v-else>{{selectedCustomer.customerAddress}}</strong>
-    </b-col>
-  </b-row>
-  <b-row class="my-1">
-    <b-col sm="2">
-      <label for="input-email">Customer Email:</label>
-    </b-col>
-    <b-col sm="10">
-      <b-form-input id="input-email" size="sm" placeholder="Enter customer email" v-if="status" v-model="selectedCustomer.customerEmail"></b-form-input>
-			<strong v-else>{{selectedCustomer.customerEmail}}</strong>
-    </b-col>
-  </b-row>
+		<b-container>
+		<b-row class="my-1">
+			<b-col sm="2">
+				<label for="input-ref">Customer Ref:</label>
+			</b-col>
+			<b-col sm="10">
+				<strong v-if="trade && !retail">{{nextTRD}}</strong>
+				<strong v-else-if="trade && retail">{{nextRET}}</strong>
+				<strong v-else>{{selectedCustomer.customerRef}}</strong>
+				<!-- <b-form-input id="input-ref" size="sm" placeholder="Enter customer ref" v-if="trade" v-model="selectedCustomer.customerRef"></b-form-input> -->
+			</b-col>
+		</b-row>
+		<b-row class="my-1">
+			<b-col sm="2">
+				<label for="input-name">Customer Name:</label>
+			</b-col>
+			<b-col sm="10">
+				<b-form-input id="input-name" size="sm" placeholder="Enter customer name" v-if="trade" v-model="singleCustomer.customerName"></b-form-input>
+				<strong v-else>{{selectedCustomer.customerName}}</strong>
+			</b-col>
+		</b-row>
+		<b-row class="my-1">
+			<b-col sm="2">
+				<label for="input-tel">Customer Telephone:</label>
+			</b-col>
+			<b-col sm="10">
+				<b-form-input id="input-tel" size="sm" placeholder="Enter customer telephone" v-if="trade" v-model="singleCustomer.customerTel"></b-form-input>
+				<strong v-else>{{selectedCustomer.customerTel}}</strong>
+			</b-col>
+		</b-row>
+		<b-row class="my-1">
+			<b-col sm="2">
+				<label for="input-address">Customer Address:</label>
+			</b-col>
+			<b-col sm="10">
+				<b-form-input id="input-address" size="sm" placeholder="Enter customer address" v-if="trade" v-model="singleCustomer.customerAddress"></b-form-input>
+				<strong v-else>{{selectedCustomer.customerAddress}}</strong>
+			</b-col>
+		</b-row>
+		<b-row class="my-1">
+			<b-col sm="2">
+				<label for="input-email">Customer Email:</label>
+			</b-col>
+			<b-col sm="10">
+				<b-form-input id="input-email" size="sm" placeholder="Enter customer email" v-if="trade" v-model="singleCustomer.customerEmail"></b-form-input>
+				<strong v-else>{{selectedCustomer.customerEmail}}</strong>
+			</b-col>
+		</b-row>
 
-	</b-container>
+		</b-container>
 	</div>
-		<!-- <button @click="toQuote" >Click me</button> -->
 	</div>	
 </template>
 
@@ -98,35 +98,119 @@ export default {
 		return {
 			pageName: 'Customer Selection',
 			selectedCustomer: '',
+			singleCustomer: {
+				customerRef: '',
+				customerName: '',
+				customerTel: '',
+				customerAddress: '',
+				customerEmail: ''
+			},
 			siteRef: '',
 			customers: [],
 			disabled: 1,
-			status: false
+			trade: false,
+			retail: false,
+			nextTRD: null,
+			nextRET: null,
 		}		
   },
   methods: {
 		checkboxChange() {
-			// this.selectedCustomer = '';
+			this.disabled = 0;
 		},
-		toQuote() {
-			this.$router.push('QuoteCreation');
+		selectOpened() {
+			this.trade = false;
 		},
 		cancel() {
 			this.$router.push('StockTable');
 		},
 		customerSelected() {
 			this.disabled = 0;
+			this.singleCustomer = null;
 		},
 		toQuoteNav() {
 			this.$router.push('QuoteNavigation');
 		},
+		saveCustomer() {
+			var custRef;
+			if(this.retail){
+				custRef = this.nextRET;
+			} else {
+				custRef = this.nextTRD;
+			}
+			if(this.trade || this.retail) {
+				this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/Customer', {
+					CustomerReference: custRef,
+					CustomerName: this.singleCustomer.customerName,
+					CustomerTel: this.singleCustomer.customerTel,
+					CustomerAddress: this.singleCustomer.customerAddress,
+					CustomerEmail: this.singleCustomer.customerEmail,
+					SageCustomer: false //not a sage customer so value will always be false
+				}) 
+				.then((response) => {
+					console.log(response);
+					this.saveNewCustomerToStorage();
+				})
+				.catch((error) => {
+					// alert("Please check values before submitting")
+					console.log(error);
+				});
+			}
+		},
+		saveNewCustomerToStorage(){
+			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
+				.then((response) => {
+					this.parseCustomers(response.data);
+				})
+				.catch((error) => {
+						alert(error);
+			});
+		},
+		parseCustomers(data) { //Push customers into an array of objects then save to local storage
+			for(var i = 0; i < data.length; i++){
+				this.customers.push({ //Create an array of objects
+					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
+					"customerRef": data[i].CustomerReference,
+					"customerTel": data[i].CustomerTel,
+					"customerAddress": data[i].CustomerAddress,
+          "customerEmail": data[i].CustomerEmail,
+          "sageCustomer": data[i].SageCustomer,
+				});
+      }
+      localStorage.setItem("customers", JSON.stringify(this.customers)); //Save the new customers to storage
+		},
 		getAllCustomers() {
       if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
-        this.customers = JSON.parse(localStorage.getItem("customers"));
+				let cust = JSON.parse(localStorage.getItem("customers"));
+				this.displaySageCustomers(cust);
+				this.getRetailTradeReferences(cust);
       } else {
         alert("Customers need to be loaded into storage. Please go to the stock table")
       }
-    },
+		},
+		displaySageCustomers(customers) {
+			customers.forEach(element => {
+				if(element.sageCustomer) {
+					this.customers.push(element);
+				}
+			});	
+		},
+		getRetailTradeReferences(customers) {
+			var tradeArr = [];
+			var retailArr = [];
+			customers.forEach(element => {
+				if(!element.sageCustomer) {
+					if(element.customerRef.includes("TRD")) { //Loop through all of the none Sage Customers
+						tradeArr.push(element.customerRef.slice(3)); //Create an array of the current customerReferences
+					} else if (element.customerRef.includes("RET")) {
+						retailArr.push(element.customerRef.slice(3))
+					}
+				}
+			}); 
+			//Get the last number used for the reference to increment the value and create a new reference
+			this.nextTRD = "TRD"+(parseInt(tradeArr.slice(-1).pop())+1);
+			this.nextRET = "RET"+(parseInt(retailArr.slice(-1).pop())+1);
+		},
 	},
 	mounted() {
 		this.getAllCustomers();
