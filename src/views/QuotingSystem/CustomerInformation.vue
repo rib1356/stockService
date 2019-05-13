@@ -119,26 +119,32 @@ export default {
 			this.disabled = 0;
 		},
 		selectOpened() {
-			this.trade = false;
+			if(this.trade){
+				this.trade = false;
+			}
 		},
 		cancel() {
 			this.$router.push('StockTable');
 		},
 		customerSelected() {
 			this.disabled = 0;
-			this.singleCustomer = null;
+			if(this.selectedCustomer != '') {
+				this.singleCustomer = null;
+				this.trade = false;
+				this.retail = false;
+			}
 		},
 		toQuoteNav() {
 			this.$router.push('QuoteNavigation');
 		},
 		saveCustomer() {
 			var custRef;
-			if(this.retail){
+			if(this.retail){ //Get the customer reference based upon what value has been selected
 				custRef = this.nextRET;
 			} else {
 				custRef = this.nextTRD;
 			}
-			if(this.trade || this.retail) {
+			if(this.trade) { //If the customer isnt chosen from dropdown save to database so it can be referenced on the quote
 				this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/Customer', {
 					CustomerReference: custRef,
 					CustomerName: this.singleCustomer.customerName,
@@ -166,9 +172,10 @@ export default {
 						alert(error);
 			});
 		},
-		parseCustomers(data) { //Push customers into an array of objects then save to local storage
+		parseCustomers(data) { //Push customers into an array of objects then save to local storage#
+			var cust = [];
 			for(var i = 0; i < data.length; i++){
-				this.customers.push({ //Create an array of objects
+				cust.push({ //Create an array of objects
 					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
 					"customerRef": data[i].CustomerReference,
 					"customerTel": data[i].CustomerTel,
@@ -176,8 +183,9 @@ export default {
           "customerEmail": data[i].CustomerEmail,
           "sageCustomer": data[i].SageCustomer,
 				});
-      }
-      localStorage.setItem("customers", JSON.stringify(this.customers)); //Save the new customers to storage
+			}
+			localStorage.removeItem("customers"); //Remove the previous list of customers
+      localStorage.setItem("customers", JSON.stringify(cust)); //Save the new customers to storage
 		},
 		getAllCustomers() {
       if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects

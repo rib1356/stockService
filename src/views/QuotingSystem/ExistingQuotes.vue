@@ -92,6 +92,7 @@ export default {
         { key: 'quoteId', label: 'QuoteId', sortable: true, sortDirection: 'desc'},
         { key: 'customerRef', label: 'Customer Ref'},
         { key: 'customerName', label: 'Customer Name'},
+        { key: 'customerAddress', label: 'Customer Address', thClass: 'd-none', tdClass: 'd-none', sortable: true},
         { key: 'startDate', label: 'Start Date'},
         { key: 'expiryDate', label: 'Expiry Date'},
         { key: 'siteRef', label: 'Site Reference'},
@@ -136,17 +137,18 @@ export default {
         this.changeData(response.data);
       })
       .catch((error) => {
-          alert(error);
+          alert("Error from getExistingQuotes: "+error);
       });
 		},
     changeData(response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-        let customerName = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
+        let customerDetails = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
         if(response[i].Active === true && response[i].SalesOrder === false) {
           this.quotes.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
-            "customerName": customerName,
+            "customerName": customerDetails[0],
+            "customerAddress": customerDetails[1],
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
@@ -157,7 +159,8 @@ export default {
             this.saleOrders.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
-            "customerName": customerName,
+            "customerName": customerDetails[0],
+            "customerAddress": customerDetails[1],
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
@@ -191,7 +194,7 @@ export default {
       let customer = this.customers;
       for (var i = 0; i < customer.length; i++) { //Loops through the customers to find where the references match to get their name
         if(customerRef == customer[i].customerRef) {
-          return customer[i].customerName;
+          return [customer[i].customerName, customer[i].customerAddress];
         }
       }
     },
