@@ -39,16 +39,19 @@
 								:loading="isLoading"
 								:show-labels="false"
 								:allow-empty="false"
-								@input="calculatePrice">
-		<template slot="option" slot-scope="props">
-      <div>
-				<span>{{props.option.plantName }} {{props.option.formSize }}</span>
-				<br>
-				<span> Quantity: {{props.option.quantity}} Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
-				<!-- <br> -->
-				<!-- <span>Sell Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span> -->
-			</div>
-    </template></multiselect>
+								open-direction="bottom"
+								>
+			<template slot="option" slot-scope="props">
+				<div>
+					<span>{{props.option.plantName }} {{props.option.formSize }}</span>
+					<br>
+					<span> Quantity: {{props.option.quantity}} 
+								<span v-if="!retail">Wholesale Price: <strong>£{{(props.option.batchPrice/100).toFixed(2)}}</strong></span>
+								<span v-else>Retail Price: <strong>£{{((props.option.batchPrice/100)*1.5).toFixed(2)}}</strong></span>
+					</span>
+				</div>
+			</template>
+		</multiselect>
 		<b-form-input v-model="quantity"
 									placeholder="Enter a quantity"
 									type="number"
@@ -60,10 +63,11 @@
 									@input="calculatePrice"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
 		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
-		<strong>Calculated Price £{{calculatedPrice}}</strong>
+		<strong v-if="!retail">Calculated Price £{{calculatedPrice}}</strong>
+		<strong v-else>Retail Price £{{calculatedPrice}}</strong>
 		<br>							
 		<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
-		<strong>Current GPM been used {{currentGPM}}%</strong>
+		<strong v-if="!retail">Current discount: {{(currentGPM)}}%</strong>
 		<br>
 		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
 		<!-- <button @click="getFirebase">Test</button> -->
@@ -189,6 +193,7 @@ export default {
 			untilNextBand: '',
 			showCollapse: true,
 			currentGPM: '',
+			retail: '',
 		}		
 	},
   methods: {
@@ -220,20 +225,25 @@ export default {
 				// 		this.untilNextBand = 0
 				// 	}
 				// }
-				var ref = firebase.database().ref("GPM/").orderByKey();
-				let itemTotal = (this.selectedBatch.batchPrice/100)*this.quantity; //get the line total to work out what gpm to use
-				ref.on("value", (snapshot) => {
-          snapshot.forEach((child) => { 
-							var obj = child.val();
-							if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) {
-								this.currentGPM = obj.gpm
-								this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*((100-obj.gpm)/100)).toFixed(2)
-							}
-            });
-				}, 
-				function (error) {
-        	console.log("Error: " + error.code);
-      	});
+				if(this.retail) { //If a retail user has been selected use this price for the items on the quote
+					this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*1.5).toFixed(2);
+				} else {
+					var ref = firebase.database().ref("GPM/").orderByKey();
+					let itemTotal = (this.selectedBatch.batchPrice/100)*this.quantity; //get the line total to work out what gpm to use
+					ref.on("value", (snapshot) => {
+						snapshot.forEach((child) => { //Loop through each of the different bands held within firebase
+								var obj = child.val();
+								if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) { //If the itemTotal falls between these values a GPM value is used
+									this.currentGPM = ((1-obj.gpm)*100).toFixed(2);
+									//Apply the calculation to work out the price and add it onto the quote
+									this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*obj.gpm).toFixed(2)
+								}
+							});
+					}, 
+					function (error) {
+						console.log("Error: " + error.code);
+					});
+				}
 			}
 		},
 		sendEmail() {
@@ -251,7 +261,7 @@ export default {
 				ExpiryDate: this.expiryDate,
 				SiteRef: this.siteRef,
 				SalesOrder: 0,
-				Retail: 0,
+				Retail: this.retail,
 				Active: true,
 				QuoteDetails: this.plants,
 			}) 
@@ -388,7 +398,7 @@ export default {
 			var doc = new jsPDF('p', 'pt');
 			doc.addImage(companyLogo.src, 'PNG', 30, 30, 100, 75);
 			doc.setFontSize(20);
-			doc.text("Quotation", 450, 35)
+			doc.text("Quotation", 443, 35)
 			doc.setFontSize(10);
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
@@ -448,17 +458,18 @@ export default {
 		this.getQuoteDate();
 	},
 	created() {
-		if(this.$route.params.singleCustomer === null) {
+		if(this.$route.params.singleCustomer === null) { //If singleCustomer is null then a customer from dropdown has been passed through
 			this.customerInfo = this.$route.params.selectedCustomer;
 		} else {
 			this.customerInfo = this.$route.params.singleCustomer;
-			if(this.$route.params.retail) {
+			if(this.$route.params.retail) { //When manually entered customer is used, choose the referenced based on if trade or retail is chosen
 				this.customerInfo.customerRef = this.$route.params.retCustomer;
 			} else {
 				this.customerInfo.customerRef = this.$route.params.trdCustomer;
 			}
 		}
 		this.siteRef = this.$route.params.siteRef;
+		this.retail = this.$route.params.retail;
 	}
 }
 </script>

@@ -83,6 +83,8 @@
       </b-collapse>
       <hr>
       <!-- Buttons to exit or save -->
+      <b-button variant="outline-primary" v-if="selectedQuote.SalesOrder" @click="createPDF('Sales Order')" style="margin-bottom: 7px;">Create Sales Order PDF</b-button>
+      <br>
     	<router-link to="/ExistingQuotes">
         <b-button variant="outline-danger">Back to quotes</b-button>
       </router-link>
@@ -139,12 +141,13 @@
       </template>
     </b-table>
     </div>
-    <b-modal ref="createPDFModal" size="sm" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
+    <b-modal ref="createPDFModal" size="md" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
 		  <div class="modal__footer">
         <router-link to="/ExistingQuotes">
         	<b-button variant="outline-danger">Back to quotes</b-button>
       	</router-link>
-        <b-btn variant="outline-primary" @click="createPDF">Create PDF</b-btn>
+        <b-btn variant="outline-primary" v-if="!selectedQuote.SalesOrder" @click="createPDF('Quotation')">Create Quote PDF</b-btn>
+        <b-btn variant="outline-primary" v-else @click="createPDF('Sales Order')">Create Sales Order PDF</b-btn>
       </div>
     </b-modal>
   </div>
@@ -161,7 +164,7 @@ export default {
   },
   data () {
     return {
-			pageName: 'Quote Editing',
+			pageName: '',
 			selectedQuote: '',
 			fields: [
         { key: 'PlantName', label: 'Plant Name', sortable: true},
@@ -375,7 +378,7 @@ export default {
         }
       }
     },
-    createPDF () {
+    createPDF (pdfType) {
       this.formatPriceForPDF();
       this.formatTableForPDF();
 			let pdfName = this.selectedQuote.quoteId  + "-" + this.selectedQuote.customerName + "-" + this.selectedQuote.startDate;
@@ -397,7 +400,7 @@ export default {
 												"Email: enquiries@hillandsons.co.uk\n" +
 												"Web: hillandsons.co.uk\n" +
 												"Stock: hillsstock.co.uk"
-			var quoteInfo =	"Quote Id: " + this.selectedQuote.quoteId + "\n" +
+			var quoteInfo =	pdfType + " Id: " + this.selectedQuote.quoteId + "\n" +
 			 								"Customer Name: " + this.selectedQuote.customerName + "\n" +
 											"Customer Ref: " + this.selectedQuote.customerRef + "\n" +
 											"Start Date: " + this.selectedQuote.startDate + "\n" +
@@ -410,7 +413,7 @@ export default {
 			var doc = new jsPDF('p', 'pt');
 			doc.addImage(companyLogo.src, 'PNG', 30, 30, 100, 75);
 			doc.setFontSize(20);
-			doc.text("Quotation", 450, 35)
+			doc.text(pdfType, 443, 35)
 			doc.setFontSize(10);
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
@@ -440,6 +443,11 @@ export default {
 	},
 	created() {
     this.selectedQuote = this.$route.params.selectedQuote;
+    if(this.selectedQuote.SalesOrder) {
+      this.pageName = 'Sales Order Editing';
+    } else {
+      this.pageName = 'Quote Editing';
+    }
     this.getQuotePlants();
     this.getCustomerInfo();
     this.getBatches();
