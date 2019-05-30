@@ -1,6 +1,6 @@
 <template>
   <div>
-		<p>This is an admin page</p>
+		<p>This is an admin page changed</p>
 		<b-form-input v-model="plantName"
                 placeholder="Enter a plant Name"
 								name="plantName"
