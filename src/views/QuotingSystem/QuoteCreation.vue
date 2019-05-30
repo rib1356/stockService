@@ -97,7 +97,7 @@
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click="remove(row.index)"></i>
         <!-- Editing modal -->
-        <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateEdits">
+        <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateEdits">
           <div>
             <b-form-group horizontal label="Comment:" >
               <b-form-input v-model="rowComment"
@@ -123,7 +123,7 @@
             <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
           </div>
             <b-button class="mt-3" variant="outline-primary" block @click.stop="validateEdits">Save Edits</b-button>
-            <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-button>
+            <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
         </b-modal>
       </template>     
     </b-table>	
@@ -301,7 +301,7 @@ export default {
 				FormSize: this.selectedBatch.formSize,
 				Quantity: this.quantity,
 				Comment: this.comment,
-				Price: parseFloat(this.calculatedPrice)*100,
+				Price: Math.trunc((this.calculatedPrice)*100), //Remove any trailing decimals so that it can be saved as an integer
 				Active: true,
 				_rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
 			});
@@ -314,7 +314,7 @@ export default {
 			this.$validator.reset();
 		},
 		editItem(row, rowId) {
-    	this.$refs.editModal.show(); //Open editing modal
+    	this.$refs['editModal'+rowId].show(); //Open editing modal
       this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
       this.rowPlantForQuoteId = row.PlantForQuoteId;
       this.rowName = row.PlantName;
@@ -335,11 +335,11 @@ export default {
         _rowVariant: '',
       });
       this.getTotalPrice();
-      this.hideModal();
+      this.hideModal(this.currentRowId);
       this.$validator.reset();
     },
-		hideModal() {
-			this.$refs.editModal.hide();
+		hideModal(rowId) {
+			this.$refs['editModal'+rowId].hide();
 		},
 		checkIfBatchHasPrice(price) { //This method will determine if the batch has a price or not
 			if(price <= 0) {

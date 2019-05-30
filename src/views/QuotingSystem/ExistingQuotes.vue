@@ -1,6 +1,6 @@
 <template>
   <section>
-    <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
+    <quote-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote Informatmion -->
     <div class="left-div">
       <b-button @click="showCollapse = !showCollapse"
@@ -68,7 +68,7 @@
 					<i class="far fa-edit fa-lg" style="color:green"></i>
 				</router-link>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteQuote(row.item)"></i>
-        <i class="fas fa-check fa-lg" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
+        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
       </template> 
     </b-table>
   </div>
@@ -89,7 +89,7 @@ export default {
     return {
 			pageName: 'Existing Quotes',
 			fields: [
-        { key: 'quoteId', label: 'QuoteId', sortable: true, sortDirection: 'desc'},
+        { key: 'quoteId', label: 'Id', sortable: true, sortDirection: 'desc'},
         { key: 'customerRef', label: 'Customer Ref'},
         { key: 'customerName', label: 'Customer Name'},
         { key: 'customerAddress', label: 'Customer Address', thClass: 'd-none', tdClass: 'd-none', sortable: true},
@@ -98,7 +98,7 @@ export default {
         { key: 'siteRef', label: 'Site Reference'},
         { key: 'totalPrice', label: 'Quote Price' , sortable: true},
         { key: 'actions', label: 'Actions' }
-			],
+      ],
       quotes: [],
       saleOrders: [],
       originalQuotes: [],
@@ -171,13 +171,15 @@ export default {
       }
       this.originalQuotes = this.quotes;
     },
-    toggleQuoteSales() {
+    toggleQuoteSales() { //Changes text and values when swapping between quotes/salesorders
       this.showSaleOrders = !this.showSaleOrders;
       if(this.showSaleOrders == true) {
+        document.getElementById("navbar").style.backgroundColor = "blue";
         this.pageName = 'Sales Orders'
         this.quotes = null;
         this.quotes = this.saleOrders;
       } else {
+        document.getElementById("navbar").style.backgroundColor = "#49aa09b0";
         this.pageName = 'Existing Quotes'
         this.quotes = null;
         this.quotes = this.originalQuotes;

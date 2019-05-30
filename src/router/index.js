@@ -6,6 +6,7 @@ import StartPage from '@/views/StartPage'
 import StockTable from '@/views/StockTable'
 import BatchInformation from '@/views/BatchInformation'
 import newBatch from '@/views/newBatch'
+import Admin from '@/views/Admin'
 
 //User Pages
 import Login from '@/views/UserPages/Login'
@@ -123,6 +124,14 @@ const router = new Router({
       path: '/BatchPricing',
       name: 'BatchPricing',
       component: BatchPricing
+    },
+    {
+      path: '/Admin',
+      name: 'Admin',
+      component: Admin,
+      meta: {
+        requiresAuth: true
+      }
     },
   ]
 })

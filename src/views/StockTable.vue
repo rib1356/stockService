@@ -17,6 +17,7 @@
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
         <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item>
         <b-dropdown-item @click="pricing" v-if="authenticated">Pricing</b-dropdown-item>
+        <b-dropdown-item @click="admin" v-if="authenticated">Admin Page</b-dropdown-item>
         <b-dropdown-item @click="signOut" v-if="authenticated">Signout</b-dropdown-item>
         <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
       </b-dropdown>
@@ -307,6 +308,9 @@ export default {
     },
     pricing() {
       this.$router.push('Pricing');
+    },
+    admin() {
+      this.$router.push('Admin');
     },
     signOut() {
 			firebase.auth().signOut().then(() => {

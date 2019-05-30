@@ -109,8 +109,9 @@
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
 				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
+        <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i>
         <!-- Editing modal -->
-        <b-modal ref="editModal" no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateBeforeSubmit">
+        <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowName">
           <div>
             <b-form-group horizontal label="Comment:" >
               <b-form-input v-model="rowComment"
@@ -136,7 +137,28 @@
             <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
           </div>
             <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
-            <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Close Me</b-button>
+            <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
+        </b-modal>
+        <b-modal :ref='"pickListModal"+row.index' size="lg" no-close-on-backdrop hide-footer @close="emptySelectedArr" title="Select a batch to add to pick list">
+          <div v-if="batchesToPick != null">
+            <p>Row quantity needed: {{quantityNeeded-quantityTyped}}</p>
+            <br>
+            <p>Selected {{selected}}</p>
+            <b-table striped hover :items="batchesToPick" :fields="pickListFields">
+              <template slot="actions" slot-scope="row">
+                <b-form-checkbox :ref='"checkbox"+row.index' @change="selectedItem(row.item, row.item.batchId)" >
+                  Use Batch:
+                </b-form-checkbox>
+                <b-form-group v-if="selected.includes(row.item)" horizontal label="Qty:" >
+                  <b-form-input v-model="row.item.quantityUse"
+                                placeholder="Enter a quantity"
+                                @input="calculateQuantity" />
+                </b-form-group>
+              </template>
+            </b-table>
+          </div>
+            <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button>
+            <b-button variant="outline-danger" block @click="hidePickListModal(row.index)">Close Me</b-button>
         </b-modal>
       </template>
     </b-table>
@@ -173,7 +195,7 @@ export default {
         { key: 'Quantity', label: 'Quantity', sortable: true},
         { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
         { key: 'actions', label: 'Actions' }
-			],
+      ],
       quotePlants: [],
       rowPlantForQuoteId: '',
       rowName: '',
@@ -191,6 +213,18 @@ export default {
       comment: null,
       batchQuantity: null,
       isLoading: true,
+      batchesToPick: null,
+      pickListFields: [
+        {key: 'plantName', label: 'PlantName'},
+        {key: 'formSize', label: 'Form Size'},
+        {key: 'location', label: 'Location'},
+        {key: 'quantity', label: 'Quantity'},
+        {key: 'actions', label: 'Actions'},
+      ],
+      selected: [],
+      checkboxIds: [],
+      quantityNeeded: null,
+      quantityTyped: 0,
     }
   },
   computed: {
@@ -263,7 +297,7 @@ export default {
         Quantity: parseInt(this.batchQuantity),
         Price: this.selectedBatch.price,
         Active: true,
-        _rowVariant: '',
+        _rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.price),
       });
       this.getTotalPrice(); //Once a plant is added recalculate the current quote price
 			this.selectedBatch = null
@@ -271,9 +305,16 @@ export default {
 			this.comment = null
 			this.$validator.reset();
     },
+    checkIfBatchHasPrice(price) { //This method will determine if the batch has a price or not
+			if(price <= 0) {
+				return 'danger' //If it doesnt change the _rowVariant which will then highlight the row red
+			} else {
+				return '' //Else it has a price so dont highlight the row
+			}
+		},
     editItem(row, rowId) {
       if(row.Active == true){ //If the row hasnt been "deleted" open the edit modal
-        this.$refs.editModal.show(); //Open editing modal
+        this.$refs['editModal'+rowId].show(); //Open editing modal
         this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
         this.rowPlantForQuoteId = row.PlantForQuoteId;
         this.rowName = row.PlantName;
@@ -284,8 +325,65 @@ export default {
         this.rowActive = row.Active;
       }
     },
-    hideModal() {
-      this.$refs.editModal.hide();
+    hideModal(rowId) {
+      this.$refs['editModal'+rowId].hide();
+    },
+    pickingList(row, rowId) {
+      this.$refs['pickListModal'+rowId].show();
+      // this.$refs['checkbox'+rowId].is_checked = false;
+      this.selected = [];
+      this.quantityNeeded = row.Quantity
+      let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
+      let selectedPlants = stockBatches.filter(stockBatches => //Loop through batches to find which match the one selected for picking
+          (stockBatches.plantName === row.PlantName && stockBatches.formSize === row.FormSize));  
+      var counter = 0;    
+      selectedPlants.forEach(element => {
+        element.quantityUse = element.quantity; //Add a new element to the object for the quantity thats going to be use on picklist
+        this.checkboxIds.push("checkbox"+counter);
+        counter++;
+      });  
+      this.batchesToPick = selectedPlants;
+      // this.batchesToPick.forEach(element => {
+      //   var counter = 0;
+      //   this.checkboxIds.push("checkbox"+counter);
+      //   counter++;
+      // });
+    },
+    hidePickListModal(rowId) {
+      this.$refs['pickListModal'+rowId].hide();
+    },
+    selectedItem(row, batchId) {
+      if(this.selected.includes(row)) {
+        const index = this.selected.indexOf(row);
+        this.selected.splice(index,1);
+      } else {
+        this.selected.push(row);
+        this.calculateQuantity();
+      }
+      this.calculateQuantity();
+    },
+    emptySelectedArr() {
+      console.log("close")
+    },
+    calculateQuantity() {
+      this.quantityTyped = 0;
+      this.selected.forEach(element => {
+        if(element.quantityUse != 0) {
+          this.quantityTyped += parseInt(element.quantityUse);
+        }
+      });
+      // let newQty = this.quantityNeeded-quantityTyped;
+      // console.log(this.quantityNeeded);
+      // this.quantityNeeded = newQty;
+    },
+    boop() {
+      console.log("here")
+      if(this.quantityNeeded == 0) {
+        this.quotePlants.forEach(element => {
+          element._rowVariant = 'danger';
+        });
+      }
+      this.hidePickListModal(0);
     },
     deleteItem(row) { //This will make the row not Active so will delete when sent to database
       row.Active = !row.Active; //Allow for the boolean to be flipped each time the button is pressed
@@ -307,12 +405,12 @@ export default {
         FormSize: this.rowForm,
         Comment: this.rowComment,
         Quantity: parseInt(this.rowQuantity),
-        Price:  parseFloat(this.rowPrice)*100, //Parsing edited value eg: "1.55" = 155 so it can be saved to db
+        Price:  Math.trunc(parseFloat(this.rowPrice)*100), //Parsing edited value eg: "1.55" = 155 so it can be saved to db
         Active: this.rowActive,
         _rowVariant: '',
       });
       this.getTotalPrice();
-      this.hideModal();
+      this.hideModal(this.currentRowId);
       this.$validator.reset();
     },
     validateBeforeSubmit(e) { //Check that all validation passes before saving
