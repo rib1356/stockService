@@ -35,6 +35,7 @@ export default {
 		getGroups() {
 			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/groups')
       .then((response) => {
+				console.log(response);
 				this.groups = response.data;
       })
       .catch((error) => {
@@ -42,26 +43,29 @@ export default {
       });
 		},
 		savePlant() {
-			let plant = this.plantName;
-			var splitPlant = plant.split(" ");
-			console.log(splitPlant);
-			let A = splitPlant[0].slice(0,2);
-			let B = splitPlant[1].slice(0,1);
-			let C = splitPlant[2].slice(0,5);
-
-			console.log((A+B+C).toUpperCase());
-			// let D = splitPlant[0].slice(0,2);
-			// let E = splitPlant[0].slice(0,2);
-			// alert("The plants you are going to save is: " + this.plantName + 
-			// 			"\n" +" Groups:" + this.selectedGroups.forEach(element => {
-			// 				element
-			// 			})
-			// 			)
+			console.log(this.getPlantCode());
+			//save the plant name and code
+			//plus the array of groups
 		},
 		getPlantCode() {
+			let plant = this.plantName;
+			var res = plant.replace(/'/g, ""); //Remove any ' from plant so that theyre not string
+			var splitPlant = res.split(" "); //Split the plant name into an array
+			//Horribly inefficient way
 			
-
-			
+			if(splitPlant.length <= 2){ 
+				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,6)).toUpperCase();
+			} else if(splitPlant.length == 3) {
+				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,1) + splitPlant[2].slice(0,5)).toUpperCase();
+			} else if(splitPlant.length == 4) {
+				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,1) + splitPlant[2].slice(0,1) + splitPlant[3].slice(0,4)).toUpperCase();
+			} else if(splitPlant.length == 5) {
+				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,1) + splitPlant[2].slice(0,1) + splitPlant[3].slice(0,1) + splitPlant[4].slice(0,3)).toUpperCase();
+			} else if(splitPlant.length == 6) {
+				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,1) + splitPlant[2].slice(0,1) + splitPlant[3].slice(0,1) + splitPlant[4].slice(0,1) + splitPlant[5].slice(0,2)).toUpperCase();
+			} else {
+				alert("Name too long?")
+			}
 		},
 	},
 	created() {
