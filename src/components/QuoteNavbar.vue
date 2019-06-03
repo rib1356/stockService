@@ -12,8 +12,8 @@
           <span class="navbar-toggler-icon"></span>
         </template>
         <!-- <b-dropdown-item @click="sendHome">Home</b-dropdown-item> -->
+        <b-dropdown-item @click="home">Home</b-dropdown-item>
         <b-dropdown-item @click="stockTable">Stock Table</b-dropdown-item>
-        <b-dropdown-item @click="quoteNav">Quote Navigation</b-dropdown-item>
         <b-dropdown-item @click="existingQuote">Existing Quotes</b-dropdown-item>
         <b-dropdown-item @click="newQuote">Create New Quote</b-dropdown-item>
       </b-dropdown>
@@ -32,8 +32,8 @@
 			stockTable() {
 				this.$router.push('StockTable');
 			},
-			quoteNav() {
-				this.$router.push('QuoteNavigation');
+			home() {
+				this.$router.push('HomePage');
 			},
 			existingQuote() {
 				this.$router.push('ExistingQuotes');

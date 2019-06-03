@@ -1,8 +1,8 @@
 <template>
   <div>
 		<div class="left-div">
-		<router-link to="/Pricing" class="my-nav">
-    	<b-button variant="outline-primary" class="my-btn" style="margin-bottom:5px; ">Back to batch list</b-button>
+		<router-link to="/HomePage" class="my-nav">
+    	<b-button variant="outline-primary" class="my-btn" style="margin-bottom:5px; ">Home</b-button>
     </router-link>
 		
 		<ul>

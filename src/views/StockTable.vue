@@ -12,12 +12,12 @@
           <span class="navbar-toggler-icon"></span>
         </template>
         <!-- <b-dropdown-item @click="sendHome">Home</b-dropdown-item> -->
+        <b-dropdown-item @click="sendHome" v-if="authenticated">Home</b-dropdown-item>
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
-        <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add new batch</b-dropdown-item>
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
-        <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item>
-        <b-dropdown-item @click="pricing" v-if="authenticated">Pricing</b-dropdown-item>
-        <b-dropdown-item @click="admin" v-if="authenticated">Admin Page</b-dropdown-item>
+        <!-- <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item> -->
+        <!-- <b-dropdown-item @click="pricing" v-if="authenticated">Pricing</b-dropdown-item> -->
+        <!-- <b-dropdown-item @click="admin" v-if="authenticated">Admin Page</b-dropdown-item> -->
         <b-dropdown-item @click="signOut" v-if="authenticated">Signout</b-dropdown-item>
         <b-dropdown-item @click="login" v-else>Login</b-dropdown-item>
       </b-dropdown>
@@ -248,6 +248,9 @@ export default {
       if (this.authenticated || user) { //If user is logged in show the available buttons
         this.authenticated = true;
         this.getAllCustomers(); //If logged in get all customers and save to storage
+        if(sessionStorage.getItem('timesLoaded') == 0) {
+          this.$router.push('HomePage'); //Move the user to the home page
+        }
       } else { //Hide any buttons
         this.authenticated = false;
       }
@@ -292,7 +295,7 @@ export default {
       sessionStorage.removeItem('filerValue');
     },
     sendHome() {
-      this.$router.push('StartPage');
+      this.$router.push('HomePage');
     }, 
     addNewBatch() {
       this.$router.push('newBatch');

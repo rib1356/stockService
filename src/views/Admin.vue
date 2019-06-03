@@ -1,6 +1,6 @@
 <template>
   <div>
-		<p>This is an admin page changed2</p>
+		<p>This is an admin page</p>
 		<b-form-input v-model="plantName"
                 placeholder="Enter a plant Name"
 								name="plantName"
@@ -12,12 +12,14 @@
 								 :clear-on-select="false"
 								 :preserve-search="true"
 								 placeholder="Pick a group or groups"
-								 label="groupDescription"
-								 track-by="groupId"
+								 label="GroupDescription"
+								 track-by="GroupId"
 								 >
 		</multiselect>
 		<p>Check spelling as this cant be changed</p>
-		<p>Need to generate a plant key but how??</p>
+		<router-link :to="{name: 'HomePage'}">
+			<b-button variant="outline-danger">Home</b-button>
+			</router-link>
 		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
   </div>
 </template>
@@ -35,7 +37,6 @@ export default {
 		getGroups() {
 			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/groups')
       .then((response) => {
-				console.log(response);
 				this.groups = response.data;
       })
       .catch((error) => {
@@ -43,16 +44,28 @@ export default {
       });
 		},
 		savePlant() {
-			console.log(this.getPlantCode());
-			//save the plant name and code
-			//plus the array of groups
+			// console.log(this.getPlantCode());
+			this.axios.post('https://ahillsplantservice.azurewebsites.net/api/groups', {
+				Name: this.plantName,
+				Sku: this.getPlantCode(),
+				GroupDetails: this.selectedGroups
+			}) 
+			.then((response) => {
+				console.log(response);
+				alert("Plant and groups have been saved");
+				this.plantName = '';
+				this.selectedGroups = [];
+			})
+			.catch((error) => {
+				alert("Please check values before submitting: " + error);
+				console.log(error);
+			});
 		},
 		getPlantCode() {
 			let plant = this.plantName;
 			var res = plant.replace(/'/g, ""); //Remove any ' from plant so that theyre not string
 			var splitPlant = res.split(" "); //Split the plant name into an array
 			//Horribly inefficient way
-			
 			if(splitPlant.length <= 2){ 
 				return (splitPlant[0].slice(0,2) + splitPlant[1].slice(0,6)).toUpperCase();
 			} else if(splitPlant.length == 3) {

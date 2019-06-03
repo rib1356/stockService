@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 //Views
-import StartPage from '@/views/StartPage'
+import HomePage from '@/views/HomePage'
 import StockTable from '@/views/StockTable'
 import BatchInformation from '@/views/BatchInformation'
 import newBatch from '@/views/newBatch'
@@ -45,9 +45,12 @@ const router = new Router({
       redirect: 'StockTable' 
     },
     {
-      path: '/StartPage',
-      name: 'StartPage',
-      component: StartPage
+      path: '/HomePage',
+      name: 'HomePage',
+      component: HomePage,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/StockTable',

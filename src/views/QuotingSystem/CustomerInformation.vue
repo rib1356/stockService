@@ -21,7 +21,10 @@
 		<b-form-checkbox id="checkbox2" v-model="retail" style="margin-top: 10px;" v-if="trade">
       Check if customer is retail
     </b-form-checkbox>
-    <div>							
+    <div>					
+			<router-link :to="{name: 'HomePage'}">
+        <b-button class="myBtn" variant="outline-danger" style="margin-top: 5px;">Home</b-button>
+			</router-link>		
 			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, 
 																													singleCustomer: singleCustomer,
 																													siteRef: siteRef,

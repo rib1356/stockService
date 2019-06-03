@@ -68,7 +68,7 @@ export default {
 	},
   methods: {
 	cancel() {
-		this.$router.push('StockTable');
+		this.$router.push('HomePage');
 	},
 	noImage() {
 		this.$router.push('StockTable');

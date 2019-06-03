@@ -1,7 +1,7 @@
 <template>
     <div>
-			<router-link to="/StockTable" class="my-nav">
-    		<b-button variant="outline-primary" class="my-btn">Back to Stock Table</b-button>
+			<router-link to="/HomePage" class="my-nav">
+    		<b-button variant="outline-primary" class="my-btn">Home</b-button>
     	</router-link>
       <b-container>
 				<b-form-checkbox v-model="checked" name="check-button" @change="showPricedItems">
