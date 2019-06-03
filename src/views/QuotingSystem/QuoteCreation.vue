@@ -538,7 +538,7 @@ export default {
 	}
 
 	.navbar-custom {
-			background-color: #2a6105;
+			background-color: #15c015;
 	}
 
 	@media only screen and (max-width : 768px) {

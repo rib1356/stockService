@@ -1,55 +1,59 @@
 <template>
-<div class="center-div">
-  <label class="typo__label">Create a new batch</label>
-  <multiselect v-model="selectedPlantName" 
-							 :options="plantNames"  
-							 placeholder="Select a plant" 
-							 label="name" 
-							 track-by="name"
-							 :loading="isLoading"
-							 :show-labels="false"
-							 @input="getPlantFormSizes"
-							 @open="clearFormSizes"
-							 class="multiselect"></multiselect>			 
-	<multiselect v-model="selectedFormSize" 
-							 :options="formSizes"  
-							 placeholder="Select a form size" 
-							 label="formSize"
-							 :loading="isLoading2"
-							 :searchable="false" 
-							 :show-labels="false"></multiselect>
-	<multiselect v-model="selectedLocation" 
-							 :options="locations"  
-							 placeholder="Select a location" 
-							 label="location" 
-							 track-by="location"
-							 :show-labels="false"></multiselect>		
-	<b-form-input v-model="quantity"
-                placeholder="Enter a quantity"
-								type="number"
-                pattern="[0-9]*"
-								name="quantity"
-								inputmode="numeric"></b-form-input>	
-	<b-modal ref="imageAskModal" size="sm" title="Add a batch image?" centered hide-footer hide-header-close no-close-on-backdrop>
-		<div class="modal__footer">
-      <b-btn class="mt-3" variant="outline-danger" @click="noImage">No Image</b-btn>
-      <b-btn class="mt-3" variant="outline-primary" @click="addImage">Add Image</b-btn>
-    </div>
-  </b-modal>							
-	<picture-modal style=""></picture-modal>											 					 	 
-	<div style="margin-top: 30px;">
-		<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
-		<b-button @click="saveBatch" variant="outline-primary">Submit</b-button>
+<div>
+	<misc-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></misc-navbar>
+	<div class="center-div">
+		<label class="typo__label">Create a new batch</label>
+		<multiselect v-model="selectedPlantName" 
+								:options="plantNames"  
+								placeholder="Select a plant" 
+								label="name" 
+								track-by="name"
+								:loading="isLoading"
+								:show-labels="false"
+								@input="getPlantFormSizes"
+								@open="clearFormSizes"
+								class="multiselect"></multiselect>			 
+		<multiselect v-model="selectedFormSize" 
+								:options="formSizes"  
+								placeholder="Select a form size" 
+								label="formSize"
+								:loading="isLoading2"
+								:searchable="false" 
+								:show-labels="false"></multiselect>
+		<multiselect v-model="selectedLocation" 
+								:options="locations"  
+								placeholder="Select a location" 
+								label="location" 
+								track-by="location"
+								:show-labels="false"></multiselect>		
+		<b-form-input v-model="quantity"
+									placeholder="Enter a quantity"
+									type="number"
+									pattern="[0-9]*"
+									name="quantity"
+									inputmode="numeric"></b-form-input>	
+		<b-modal ref="imageAskModal" size="sm" title="Add a batch image?" centered hide-footer hide-header-close no-close-on-backdrop>
+			<div class="modal__footer">
+				<b-btn class="mt-3" variant="outline-danger" @click="noImage">No Image</b-btn>
+				<b-btn class="mt-3" variant="outline-primary" @click="addImage">Add Image</b-btn>
+			</div>
+		</b-modal>							
+		<picture-modal style=""></picture-modal>											 					 	 
+		<div style="margin-top: 30px;">
+			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
+			<b-button @click="saveBatch" variant="outline-primary">Submit</b-button>
+		</div>
 	</div>
 </div>
 </template>
 
 <script>
 import PictureModal from '@/components/PictureModal';
-
+import MiscNavbar from '@/components/MiscNavbar.vue'
 export default {
   data () {
 		return {
+			pageName: 'New Batch',
 			plantNames: [],
 			formSizes: [],
 			locations: [],
@@ -64,7 +68,8 @@ export default {
 		}		
   },
 	components: {
-		PictureModal
+		PictureModal,
+		MiscNavbar
 	},
   methods: {
 	cancel() {
@@ -206,6 +211,10 @@ export default {
 
 	.multiselect {
 		margin-bottom: 10px;
+	}
+
+	.navbar-custom {
+			background-color: #17a2b8;
 	}
 
 

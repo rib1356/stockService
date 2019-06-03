@@ -1,5 +1,6 @@
 <template>
   <div>
+		<misc-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></misc-navbar>
 		<p>This is an admin page</p>
 		<b-form-input v-model="plantName"
                 placeholder="Enter a plant Name"
@@ -17,17 +18,22 @@
 								 >
 		</multiselect>
 		<p>Check spelling as this cant be changed</p>
-		<router-link :to="{name: 'HomePage'}">
+		<!-- <router-link :to="{name: 'HomePage'}">
 			<b-button variant="outline-danger">Home</b-button>
-			</router-link>
+			</router-link> -->
 		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
   </div>
 </template>
 
 <script>
+import MiscNavbar from '@/components/MiscNavbar.vue'
 export default {
+	components: {
+    MiscNavbar,
+	},
   data () {
 		return {
+			pageName: 'Admin',
 			groups: [],	
 			selectedGroups: [],
 			plantName: '',
@@ -90,5 +96,9 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style scoped>
+
+	.navbar-custom {
+			background-color: lightslategray;
+	}
 
 </style>

@@ -4,25 +4,25 @@
     <div class="navigation">
       <h5>Choose a place to naviage within the system</h5>
       <router-link :to="{name: 'StockTable'}">
-        <b-button class="myBtn" variant="outline-primary">Stock Table</b-button>
+        <b-button class="myBtn" variant="primary">Stock Table</b-button>
 			</router-link>
       <router-link :to="{name: 'CustomerInformation'}">
-        <b-button class="myBtn" variant="outline-success">Create New Quote</b-button>
+        <b-button class="myBtn q-btn" variant="success">Create New Quote</b-button>
       </router-link> 
-      <router-link :to="{name: 'ExistingQuotes'}"> <!-- PASS IN PARAMS TO DECIDE WHAT TO SHOW -->
-        <b-button class="myBtn" variant="outline-success">View Existing Quotes</b-button>
+      <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: false } }"> <!-- PASS IN PARAMS TO DECIDE WHAT TO SHOW -->
+        <b-button class="myBtn eq-btn" variant="success">View Existing Quotes</b-button>
       </router-link>
-      <router-link :to="{name: 'ExistingQuotes'}">
-        <b-button class="myBtn" variant="outline-success">View Existing Sales Orders</b-button>
+      <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+        <b-button class="myBtn so-btn" variant="secondary">View Existing Sales Orders</b-button>
       </router-link>
       <router-link :to="{name: 'PricingSelection'}">
-        <b-button class="myBtn" variant="outline-info">Pricing</b-button>
+        <b-button class="myBtn misc-btn" variant="secondary">Pricing</b-button>
       </router-link>
       <router-link :to="{name: 'newBatch'}">
-        <b-button class="myBtn" variant="outline-info">Add New Batch</b-button>
+        <b-button class="myBtn misc-btn" variant="secondary">Add New Batch</b-button>
       </router-link>
       <router-link :to="{name: 'Admin'}">
-        <b-button class="myBtn" variant="outline-info">Admin Page</b-button>
+        <b-button class="myBtn misc-btn" variant="secondary">Admin Page</b-button>
       </router-link>  
     </div>
     <div class="dashboard">
@@ -61,6 +61,30 @@ export default {
   .myBtn{
     width: 100%;
     margin-bottom: 5px;
+  }
+
+  .q-btn {
+    border-color: #15c015;
+    background: #15c015;
+  }
+
+  .eq-btn {
+    border-color: #0b720b;
+    background: #0b720b;
+  }
+
+  .so-btn {
+    border-color: #11979e;
+    background: #11979e;
+  }
+
+  .misc-btn{
+    border-color: lightslategray;
+    background: lightslategray;
+  }
+
+  .misc-btn > :hover {
+    background: blue;
   }
 
   @media only screen and (max-width : 768px) {

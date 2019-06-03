@@ -1,8 +1,6 @@
 <template>
     <div>
-			<router-link to="/HomePage" class="my-nav">
-    		<b-button variant="outline-primary" class="my-btn">Home</b-button>
-    	</router-link>
+			<misc-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></misc-navbar>
       <b-container>
 				<b-form-checkbox v-model="checked" name="check-button" @change="showPricedItems">
       		<p v-if="checked">Show all items</p>
@@ -84,9 +82,14 @@
 </template>
 
 <script>
+import MiscNavbar from '@/components/MiscNavbar.vue'
   export default {
+		components: {
+    	MiscNavbar,
+		},
 		data() {
 			return {
+				pageName: 'Pricing',
 				selectedRootType: '',
 				filteredRootTypeArr: [],
 				rootTypes: [
@@ -240,6 +243,10 @@
 		width: 100%;
 		overflow: auto;
     -webkit-overflow-scrolling: touch;
+	}
+
+	.navbar-custom {
+			background-color: lightslategray;
 	}
 
 </style>

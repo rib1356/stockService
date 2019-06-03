@@ -174,12 +174,12 @@ export default {
     toggleQuoteSales() { //Changes text and values when swapping between quotes/salesorders
       this.showSaleOrders = !this.showSaleOrders;
       if(this.showSaleOrders == true) {
-        document.getElementById("navbar").style.backgroundColor = "blue";
+        document.getElementById("navbar").style.backgroundColor = "#11979e";
         this.pageName = 'Sales Orders'
         this.quotes = null;
         this.quotes = this.saleOrders;
       } else {
-        document.getElementById("navbar").style.backgroundColor = "#49aa09b0";
+        document.getElementById("navbar").style.backgroundColor = "#0b720b";
         this.pageName = 'Existing Quotes'
         this.quotes = null;
         this.quotes = this.originalQuotes;
@@ -242,7 +242,11 @@ export default {
   },
 	mounted() {
     this.getAllCustomers();
-		this.getExistingQuotes();
+    this.getExistingQuotes();
+    if(this.$route.params.salesOrder) {
+      this.toggleQuoteSales();
+    }
+    // this.showSaleOrders = this.$route.params.salesOrder;
 	}
 }
 </script>
@@ -276,7 +280,7 @@ export default {
 	}
 
   .navbar-custom {
-			background-color: #49aa09b0;
+			background-color: #0b720b;
 	}
 
   .input-filter{
