@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>A Hills Nursery Management</p>
     <div class="navigation">
       <h5>Choose a place to naviage within the system</h5>
       <router-link :to="{name: 'StockTable'}">
@@ -26,7 +25,27 @@
       </router-link>  
     </div>
     <div class="dashboard">
-      <h5>Dashboard</h5>
+      <h3>Dashboard</h3>
+      <div class="grid-container">
+        <div class="grid-item">
+          <h4>Number of batches</h4>
+          <p>{{batches}}</p>
+        </div>
+        <div class="grid-item">
+          <h4>Number of Quotes</h4>
+          <p>{{quotes}}</p>
+        </div>
+        <div class="grid-item">
+          <h4>Number of Sales Orders</h4>
+          <p>{{salesOrders}}</p>
+        </div>  
+        <!-- <div class="grid-item">4</div>
+        <div class="grid-item">5</div>
+        <div class="grid-item">6</div>  
+        <div class="grid-item">7</div>
+        <div class="grid-item">8</div>
+        <div class="grid-item">9</div>   -->
+      </div>
     </div>
   </div>
 </template>
@@ -36,9 +55,36 @@ export default {
   name: 'StartPage',
   data () {
     return {
+      batches: null,
+      quotes: null,
+      salesOrders: null,
 
     }
   },
+  methods: {
+    getNoBatches() {
+      let b = JSON.parse(sessionStorage.getItem('batchList'))
+      this.batches = b.length;
+    },
+    getQuotes() {
+      this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')
+      .then((response) => {
+        this.reduceQuotes(response.data);
+      })
+      .catch((error) => {
+          this.quotes = 'Err get quotes'
+      });
+    },
+    reduceQuotes(quoteArray) {
+      var reducedQuotes = quoteArray.filter((obj) => obj.Active === true); //Reduce the quotes to only the ones that are active (both Quotes and SalesOrder)
+      this.salesOrders = reducedQuotes.filter((obj) => obj.SalesOrder === true).length; //Number of SalesOrders is where SalesOrder == true
+      this.quotes = reducedQuotes.length - this.salesOrders;
+    },
+  },
+  created() {
+    this.getNoBatches();
+    this.getQuotes();
+  }
 }
 </script>
 
@@ -57,6 +103,20 @@ export default {
 		width: 80%;
     background-color: lightslategray;
 	}
+
+  .grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    background-color: lightslategray;
+    padding: 10px;
+  }
+  .grid-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    font-size: 20px;
+    text-align: center;
+  }
 
   .myBtn{
     width: 100%;
