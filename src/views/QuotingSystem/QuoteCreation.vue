@@ -423,7 +423,7 @@ export default {
 			doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
 			doc.save(pdfName + '.pdf');
 
-			this.$router.push('QuoteNavigation');
+			this.$router.push('ExistingQuotes');
   	},
 		getQuoteDate() {
 			this.quoteDate = moment(new Date).format('DD/MM/YYYY');

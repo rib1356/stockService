@@ -55,9 +55,9 @@ export default {
   name: 'StartPage',
   data () {
     return {
-      batches: null,
-      quotes: null,
-      salesOrders: null,
+      batches: 'loading',
+      quotes: 'loading',
+      salesOrders: 'loading',
 
     }
   },
@@ -72,7 +72,7 @@ export default {
         this.reduceQuotes(response.data);
       })
       .catch((error) => {
-          this.quotes = 'Err get quotes'
+          this.quotes = 'Err getting quotes'
       });
     },
     reduceQuotes(quoteArray) {
@@ -80,10 +80,15 @@ export default {
       this.salesOrders = reducedQuotes.filter((obj) => obj.SalesOrder === true).length; //Number of SalesOrders is where SalesOrder == true
       this.quotes = reducedQuotes.length - this.salesOrders;
     },
+    loadItems() {
+      
+    }
   },
-  created() {
-    this.getNoBatches();
-    this.getQuotes();
+  mounted() {
+    // this.getNoBatches();
+    setTimeout(this.getNoBatches, 1500);
+    setTimeout(this.getQuotes,1500);
+    console.log(this.batches);
   }
 }
 </script>

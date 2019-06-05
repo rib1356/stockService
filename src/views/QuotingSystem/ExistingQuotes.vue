@@ -137,7 +137,7 @@ export default {
         this.changeData(response.data);
       })
       .catch((error) => {
-          alert("Error from getExistingQuotes: "+error);
+          alert("Error from getExistingQuotes: "+error + "\n" + "Please try closing the page and coming back in?");
       });
 		},
     changeData(response) {
@@ -155,6 +155,7 @@ export default {
             "totalPrice": this.getPrice(response[i].TotalPrice),
             "SalesOrder": response[i].SalesOrder,
           });
+          this.originalQuotes = this.quotes;
         } else if (response[i].Active === true && response[i].SalesOrder === true) {
             this.saleOrders.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
@@ -169,7 +170,9 @@ export default {
           });
         }
       }
-      this.originalQuotes = this.quotes;
+      if(this.$route.params.salesOrder) {
+        this.toggleQuoteSales();
+      }
     },
     toggleQuoteSales() { //Changes text and values when swapping between quotes/salesorders
       this.showSaleOrders = !this.showSaleOrders;
@@ -243,10 +246,6 @@ export default {
 	mounted() {
     this.getAllCustomers();
     this.getExistingQuotes();
-    if(this.$route.params.salesOrder) {
-      this.toggleQuoteSales();
-    }
-    // this.showSaleOrders = this.$route.params.salesOrder;
 	}
 }
 </script>

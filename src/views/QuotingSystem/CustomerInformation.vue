@@ -137,9 +137,6 @@ export default {
 				this.retail = false;
 			}
 		},
-		toQuoteNav() {
-			this.$router.push('QuoteNavigation');
-		},
 		saveCustomer() {
 			var custRef;
 			if(this.retail){ //Get the customer reference based upon what value has been selected
