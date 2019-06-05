@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
+  <section>
+    <quote-navbar class="navbar-custom" id="navbar2" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote information -->  
     <div class="left-div">
       			<b-button @click="showCollapse = !showCollapse"
@@ -85,7 +85,10 @@
       <!-- Buttons to exit or save -->
       <b-button variant="outline-primary" v-if="selectedQuote.SalesOrder" @click="createPDF('Sales Order')" style="margin-bottom: 7px;">Create Sales Order PDF</b-button>
       <br>
-    	<router-link to="/ExistingQuotes">
+    	<router-link v-if="selectedQuote.SalesOrder" :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+        <b-button variant="outline-danger">Back to Sales Order</b-button>
+      </router-link>
+    	<router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
         <b-button variant="outline-danger">Back to quotes</b-button>
       </router-link>
         <b-button @click="saveQuote" variant="outline-success">Save Edits</b-button>
@@ -172,7 +175,7 @@
         <b-btn variant="outline-primary" v-else @click="createPDF('Sales Order')">Create Sales Order PDF</b-btn>
       </div>
     </b-modal>
-  </div>
+  </section>
 </template>
 
 <script>
@@ -546,20 +549,24 @@ export default {
 			doc.save(pdfName + '.pdf');
 
 			this.$router.push('ExistingQuotes');
-  	},
+    },
 	},
 	created() {
     this.selectedQuote = this.$route.params.selectedQuote;
-    if(this.selectedQuote.SalesOrder) {
-      this.pageName = 'Sales Order Editing';
-    } else {
-      this.pageName = 'Quote Editing';
-    }
     this.getQuotePlants();
     this.getCustomerInfo();
     this.getBatches();
     this.getFirebase();
-	}
+    
+  },
+  mounted() {
+    if(this.selectedQuote.SalesOrder) {
+      this.pageName = 'Sales Order Editing';
+      document.getElementById("navbar2").style.backgroundColor = "#11979e";
+    } else {
+      this.pageName = 'Quote Editing';
+    }
+  }
 }
 </script>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -594,8 +601,8 @@ export default {
 	}
 
   .navbar-custom {
-			background-color: #49aa09b0;
-	}
+    background-color: #0b720b
+  }
 
   @media only screen and (max-width : 768px) {
 
