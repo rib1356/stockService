@@ -157,7 +157,7 @@
               </template>
             </b-table>
           </div>
-            <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button>
+            <!-- <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button> -->
             <b-button variant="outline-danger" block @click="hidePickListModal(row.index)">Close Me</b-button>
         </b-modal>
       </template>
@@ -179,6 +179,7 @@
 import jsPDF from 'jspdf'
 import 'jspdf-autotable';
 import QuoteNavbar from '@/components/QuoteNavbar.vue';
+import firebase from 'firebase/app';
 export default {
   name: 'EditQuote',
   components: {
@@ -225,6 +226,7 @@ export default {
       checkboxIds: [],
       quantityNeeded: null,
       quantityTyped: 0,
+      VAT: 0,
     }
   },
   computed: {
@@ -376,14 +378,21 @@ export default {
       // console.log(this.quantityNeeded);
       // this.quantityNeeded = newQty;
     },
-    boop() {
-      console.log("here")
-      if(this.quantityNeeded == 0) {
-        this.quotePlants.forEach(element => {
-          element._rowVariant = 'danger';
-        });
-      }
-      this.hidePickListModal(0);
+    getFirebase() {
+			var ref = firebase.database().ref("GPM/").orderByKey();
+			// console.log(ref);
+			ref.on("value", (snapshot) => {
+          snapshot.forEach((child) => { 
+							var obj = child.val();
+							if(child.key == "VAT"){
+								this.VAT = obj.value;
+								console.log(this.VAT);
+							}
+            });
+			}, 
+			function (error) {
+        console.log("Error: " + error.code);
+      });
     },
     deleteItem(row) { //This will make the row not Active so will delete when sent to database
       row.Active = !row.Active; //Allow for the boolean to be flipped each time the button is pressed
@@ -528,7 +537,7 @@ export default {
                                                 });
       let finalY = doc.autoTable.previous.finalY;
 			let quotePrice = (this.totalPrice/100).toFixed(2);
-			let quoteVAT = (quotePrice/100*20).toFixed(2);
+			let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
 			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
 			doc.setFontSize(12);
 			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
@@ -549,6 +558,7 @@ export default {
     this.getQuotePlants();
     this.getCustomerInfo();
     this.getBatches();
+    this.getFirebase();
 	}
 }
 </script>

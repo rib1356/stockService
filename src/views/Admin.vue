@@ -1,7 +1,7 @@
 <template>
   <div>
 		<misc-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></misc-navbar>
-		<p>This is an admin page</p>
+		<h3>Add a new plant</h3>
 		<b-form-input v-model="plantName"
                 placeholder="Enter a plant Name"
 								name="plantName"
@@ -18,15 +18,23 @@
 								 >
 		</multiselect>
 		<p>Check spelling as this cant be changed</p>
+		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
+		<hr>
+		<h3>Pricing values and VAT</h3>
+		<p>Current VAT: {{VAT}} % <b-form-input v-model="VATtoChange"
+                placeholder="Enter VAT"
+								name="VAT"
+								style="margin-bottom: 10px;"></b-form-input></p>
+		<b-button variant="outline-primary" @click="saveVat">Save VAT</b-button>
 		<!-- <router-link :to="{name: 'HomePage'}">
 			<b-button variant="outline-danger">Home</b-button>
 			</router-link> -->
-		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
   </div>
 </template>
 
 <script>
 import MiscNavbar from '@/components/MiscNavbar.vue'
+import firebase from 'firebase/app';
 export default {
 	components: {
     MiscNavbar,
@@ -37,6 +45,8 @@ export default {
 			groups: [],	
 			selectedGroups: [],
 			plantName: '',
+			VAT: 0,
+			VATtoChange: 0
 		}
 	},
 	methods: {
@@ -67,6 +77,30 @@ export default {
 				console.log(error);
 			});
 		},
+		saveVat() { 
+			firebase.database().ref('/GPM/' + "VAT").update({value: this.VATtoChange},
+			function(error) {
+				if(error) {
+					alert("There was an error: " + error)
+				} else {
+					alert("VAT saved successfully");
+				}
+			});
+		},
+		getFirebase() {
+			var ref = firebase.database().ref("GPM/").orderByKey();
+			ref.on("value", (snapshot) => {
+          snapshot.forEach((child) => { 
+							var obj = child.val();
+							if(child.key == "VAT"){
+								this.VAT = obj.value;
+							}
+            });
+			}, 
+			function (error) {
+        console.log("Error: " + error.code);
+      });
+		},
 		getPlantCode() {
 			let plant = this.plantName;
 			var res = plant.replace(/'/g, ""); //Remove any ' from plant so that theyre not string
@@ -89,6 +123,7 @@ export default {
 	},
 	created() {
 		this.getGroups();
+		this.getFirebase();
 	}
 }
 </script>

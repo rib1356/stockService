@@ -96,7 +96,7 @@ export default {
         { key: 'startDate', label: 'Start Date'},
         { key: 'expiryDate', label: 'Expiry Date'},
         { key: 'siteRef', label: 'Site Reference'},
-        { key: 'totalPrice', label: 'Quote Price' , sortable: true},
+        { key: 'totalPrice', label: 'Quote Price (exVAT)' , sortable: true},
         { key: 'actions', label: 'Actions' }
       ],
       quotes: [],

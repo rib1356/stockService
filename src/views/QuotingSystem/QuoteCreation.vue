@@ -70,7 +70,6 @@
 		<strong v-if="!retail">Current discount: {{(currentGPM)}}%</strong>
 		<br>
 		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
-		<!-- <button @click="getFirebase">Test</button> -->
 		<b-form-input v-model="comment"
 									placeholder="Enter a plant comment"
 									type="text"
@@ -264,6 +263,7 @@ export default {
 				Retail: this.retail,
 				Active: true,
 				QuoteDetails: this.plants,
+				VAT: 0,
 			}) 
 			.then((response) => {
 				console.log(response);
@@ -359,6 +359,22 @@ export default {
 					}
 			}
 		},
+		getFirebase() {
+			var ref = firebase.database().ref("GPM/").orderByKey();
+			// console.log(ref);
+			ref.on("value", (snapshot) => {
+          snapshot.forEach((child) => { 
+							var obj = child.val();
+							if(child.key == "VAT"){
+								this.VAT = obj.value;
+								console.log(this.VAT);
+							}
+            });
+			}, 
+			function (error) {
+        console.log("Error: " + error.code);
+      });
+		},
 		formatPriceForPDF() {
       //This is done after the quote has been saved to the database so changes will only show on created PDF
       //Map through the list of plants changing the price from "250p to 2.50"
@@ -415,7 +431,7 @@ export default {
 																					});
 			let finalY = doc.autoTable.previous.finalY;
 			let quotePrice = (this.totalPrice/100).toFixed(2);
-			let quoteVAT = (quotePrice/100*20).toFixed(2);
+			let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
 			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
 			doc.setFontSize(12);
 			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
@@ -432,21 +448,6 @@ export default {
 		getPrice (price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);
 		},
-		getFirebase() {
-			var ref = firebase.database().ref("GPM/").orderByKey();
-			let itemTotal = (this.selectedBatch.batchPrice*this.quantity)/100;
-			ref.on("value", (snapshot) => {
-          snapshot.forEach((child) => { 
-							var obj = child.val();
-							if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) {
-								this.calculatedPrice = (this.selectedBatch.batchPrice/((100-obj.gpm)/100)).toFixed(2)
-							}
-            });
-			}, 
-			function (error) {
-        console.log("Error: " + error.code);
-      });
-		}
 	},
 	computed: {
     computedTotalPrice () { ///Whenever total value is shown this will format to look monitary
@@ -456,6 +457,7 @@ export default {
 	mounted() {
 		this.getBatchList();
 		this.getQuoteDate();
+		this.getFirebase();
 	},
 	created() {
 		if(this.$route.params.singleCustomer === null) { //If singleCustomer is null then a customer from dropdown has been passed through
