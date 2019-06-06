@@ -25,6 +25,8 @@ import QuoteNavigation from '@/views/QuotingSystem/QuoteNavigation'
 import ExistingQuotes from '@/views/QuotingSystem/ExistingQuotes'
 import EditQuote from '@/views/QuotingSystem/EditQuote'
 
+//Picking List Pages 
+import PickList from '@/views/PickingList/PickList'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -127,6 +129,11 @@ const router = new Router({
       path: '/BatchPricing',
       name: 'BatchPricing',
       component: BatchPricing
+    },
+    {
+      path: '/PickList',
+      name: 'PickList',
+      component: PickList
     },
     {
       path: '/Admin',

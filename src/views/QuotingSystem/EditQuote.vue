@@ -114,7 +114,7 @@
 				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
         <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i>
         <!-- Editing modal -->
-        <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowName">
+        <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
           <div>
             <b-form-group horizontal label="Comment:" >
               <b-form-input v-model="rowComment"
@@ -202,6 +202,7 @@ export default {
       ],
       quotePlants: [],
       rowPlantForQuoteId: '',
+      rowTitle: '',
       rowName: '',
       rowForm: '',
       rowComment: '',
@@ -322,6 +323,7 @@ export default {
         this.$refs['editModal'+rowId].show(); //Open editing modal
         this.currentRowId = rowId; //Set the current values of the row so they can be edited then spliced into array
         this.rowPlantForQuoteId = row.PlantForQuoteId;
+        this.rowTitle = row.PlantName + " " + row.FormSize;
         this.rowName = row.PlantName;
         this.rowForm = row.FormSize
         this.rowComment = row.Comment;

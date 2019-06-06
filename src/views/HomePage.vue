@@ -14,6 +14,9 @@
       <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
         <b-button class="myBtn so-btn" variant="secondary">View Existing Sales Orders</b-button>
       </router-link>
+      <router-link :to="{name: 'PickList' }">
+        <b-button class="myBtn p-btn" variant="secondary">View Picking Lists</b-button>
+      </router-link>
       <router-link :to="{name: 'PricingSelection'}">
         <b-button class="myBtn misc-btn" variant="secondary">Pricing</b-button>
       </router-link>
@@ -85,10 +88,8 @@ export default {
     }
   },
   mounted() {
-    // this.getNoBatches();
     setTimeout(this.getNoBatches, 1500);
     setTimeout(this.getQuotes,1500);
-    console.log(this.batches);
   }
 }
 </script>
@@ -102,6 +103,10 @@ export default {
 		float:left;
     /* background-color: lightgreen; */
 	}
+  
+  h3 {
+    color: black;
+  }
   
 	.dashboard {
 		float: left;
@@ -141,6 +146,11 @@ export default {
   .so-btn {
     border-color: #11979e;
     background: #11979e;
+  }
+
+  .p-btn {
+    border-color: #0f6368;
+    background: #0f6368;
   }
 
   .misc-btn{

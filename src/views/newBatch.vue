@@ -214,7 +214,7 @@ export default {
 	}
 
 	.navbar-custom {
-			background-color: #17a2b8;
+			background-color: lightslategray;
 	}
 
 

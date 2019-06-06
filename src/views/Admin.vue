@@ -20,12 +20,14 @@
 		<p>Check spelling as this cant be changed</p>
 		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
 		<hr>
-		<h3>Pricing values and VAT</h3>
+		<h3>VAT</h3>
 		<p>Current VAT: {{VAT}} % <b-form-input v-model="VATtoChange"
                 placeholder="Enter VAT"
 								name="VAT"
 								style="margin-bottom: 10px;"></b-form-input></p>
 		<b-button variant="outline-primary" @click="saveVat">Save VAT</b-button>
+		<hr>
+		<h3>Pricing bands and GPM</h3>
 		<!-- <router-link :to="{name: 'HomePage'}">
 			<b-button variant="outline-danger">Home</b-button>
 			</router-link> -->
@@ -134,6 +136,10 @@ export default {
 
 	.navbar-custom {
 			background-color: lightslategray;
+	}
+
+	hr{
+		border-top: 2px solid black;
 	}
 
 </style>
