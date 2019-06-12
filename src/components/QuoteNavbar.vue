@@ -3,7 +3,7 @@
 		<b-navbar class="navbar navbar-custom" >
       <b-navbar-brand >
         <img src="@/assets/AHillsLogo.png" class="d-inline-block align-top" alt="BV">
-        <strong class="qn">Quote Navigation -</strong>
+        <!-- <strong class="qn">Quote Navigation -</strong> -->
         <strong> {{pageName}}</strong> 
       </b-navbar-brand>
       <!-- Right Aligned Menu Button -->

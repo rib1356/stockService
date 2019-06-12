@@ -91,7 +91,8 @@
     	<router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
         <b-button variant="outline-danger">Back to quotes</b-button>
       </router-link>
-        <b-button @click="saveQuote" variant="outline-success">Save Edits</b-button>
+        <b-button @click="saveQuote" variant="outline-success" v-if="totalPrice == 0">Save Edits</b-button>
+        <p v-else>Before you can save a quote it needs some items</p>
     </div>
     <!-- EditQuote table -->
     <div class="right-div">
@@ -405,6 +406,8 @@ export default {
         row._rowVariant = '' //If true take the red row highlight away
       } else {
         row._rowVariant = 'danger'; //Otherwise it wants to be deleted so highlight the row red
+        console.log(this.quotePlants.length);
+        this.quotePlants.length - 1;
       }
       this.getTotalPrice();
     },

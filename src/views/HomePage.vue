@@ -26,6 +26,7 @@
       <router-link :to="{name: 'Admin'}">
         <b-button class="myBtn misc-btn" variant="secondary">Admin Page</b-button>
       </router-link>  
+      <b-button class="myBtn misc-btn" variant="secondary" @click="reloadBatches">Refresh values</b-button>
     </div>
     <div class="dashboard">
       <h3>Dashboard</h3>
@@ -41,6 +42,10 @@
         <div class="grid-item">
           <h4>Number of Sales Orders</h4>
           <p>{{salesOrders}}</p>
+        </div>  
+        <div class="grid-item">
+          <h4>Number of Customers</h4>
+          <p>{{customers}}</p>
         </div>  
         <!-- <div class="grid-item">4</div>
         <div class="grid-item">5</div>
@@ -61,7 +66,8 @@ export default {
       batches: 'loading',
       quotes: 'loading',
       salesOrders: 'loading',
-
+      customers: 'loading',
+      batchData: [],
     }
   },
   methods: {
@@ -83,14 +89,66 @@ export default {
       this.salesOrders = reducedQuotes.filter((obj) => obj.SalesOrder === true).length; //Number of SalesOrders is where SalesOrder == true
       this.quotes = reducedQuotes.length - this.salesOrders;
     },
-    loadItems() {
-      
-    }
-  },
+    reloadBatches() {
+      sessionStorage.removeItem('batchInMemory');
+      sessionStorage.removeItem('batchList');
+      sessionStorage.removeItem('timesLoaded');
+      localStorage.removeItem('customers');
+      location.reload();
+    },
+    retrieveData () {
+      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+        .then((response) => {
+          console.log(response);
+          this.changeData(response.data);
+      }).catch((error) => {
+        //DO SOME ERROR HANDLING HERE
+      });
+    },
+    changeData (response) {
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+        if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+          this.batchData.push({                 //This is then pushed into an array and used to populate the data table
+            "batchId": response[i].Id,
+            "Sku": response[i].Sku,
+            "plantName": response[i].Name,
+            "location": response[i].Location,
+            "quantity": response[i].Quantity,
+            "formSize": response[i].FormSize,
+            "batchPrice": response[i].WholesalePrice, 
+            "imageExists": response[i].ImageExists,
+            "active": response[i].Active,
+          });
+        }
+      }   
+      console.log("saved?");
+      //Save the data into session storage
+      sessionStorage.setItem('batchList', JSON.stringify(this.batchData));
+      sessionStorage.setItem('batchInMemory', true);
+      this.batches = this.batchData.length;
+    },
+    getCustomers() {
+      if(localStorage.getItem('customers') == null) {
+        console.log("getting customers from db")
+        //get customers
+      } else {
+        this.customers = JSON.parse(localStorage.getItem('customers')).length;
+      }
+    },
+  },  
   mounted() {
-    setTimeout(this.getNoBatches, 1500);
+    if(sessionStorage.getItem('batchList') == null) {
+      console.log("getting data from db");
+      this.retrieveData();
+    } else {
+      console.log("getting length from session");
+      setTimeout(this.getNoBatches, 1500);
+    }
+    setTimeout(this.getCustomers,1500);
     setTimeout(this.getQuotes,1500);
+    sessionStorage.setItem('timesLoaded', 0);
   }
+  
 }
 </script>
 
@@ -101,7 +159,8 @@ export default {
     width: 20%;
 		height: 100%; 
 		float:left;
-    /* background-color: lightgreen; */
+    background-color: lightslategray;
+    color: black;
 	}
   
   h3 {
@@ -118,12 +177,13 @@ export default {
     display: grid;
     grid-template-columns: auto auto auto;
     background-color: lightslategray;
-    padding: 10px;
+    margin-top: 20px;
+    padding: 5px;
   }
   .grid-item {
     background-color: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.8);
-    padding: 10px;
+    padding: 5px;
     font-size: 20px;
     text-align: center;
   }
@@ -154,8 +214,8 @@ export default {
   }
 
   .misc-btn{
-    border-color: lightslategray;
-    background: lightslategray;
+    border-color: #B22222;
+    background: #B22222;
   }
 
   .misc-btn > :hover {

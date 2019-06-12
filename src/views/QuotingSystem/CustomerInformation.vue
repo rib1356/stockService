@@ -54,7 +54,7 @@
 				<label for="input-name">Customer Name:</label>
 			</b-col>
 			<b-col sm="10">
-				<b-form-input id="input-name" size="sm" placeholder="Enter customer name" v-if="trade" v-model="singleCustomer.customerName"></b-form-input>
+				<b-form-input id="input-name" @input="wew" size="sm" placeholder="Enter customer name" v-if="trade" v-model="singleCustomer.customerName"></b-form-input>
 				<strong v-else>{{selectedCustomer.customerName}}</strong>
 			</b-col>
 		</b-row>
@@ -99,7 +99,7 @@ export default {
 	},
   data () {
 		return {
-			pageName: 'Customer Selection',
+			pageName: 'New Quote',
 			selectedCustomer: '',
 			singleCustomer: {
 				customerRef: '',
@@ -119,7 +119,17 @@ export default {
   },
   methods: {
 		checkboxChange() {
-			this.disabled = 0;
+			if(this.trade) {
+				this.disabled = 1;
+				this.retail = false;
+				}
+		},
+		wew() {
+			if(this.singleCustomer.customerName === null || this.singleCustomer.customerName === '') {
+				this.disabled = 1;
+			} else {
+				this.disabled = 0;
+			}
 		},
 		selectOpened() {
 			if(this.trade){
@@ -193,7 +203,7 @@ export default {
 				this.displaySageCustomers(cust);
 				this.getRetailTradeReferences(cust);
       } else {
-        alert("Customers need to be loaded into storage. Please go to the stock table")
+        alert("Customers need to be loaded into storage. Please go to the home page")
       }
 		},
 		displaySageCustomers(customers) {
