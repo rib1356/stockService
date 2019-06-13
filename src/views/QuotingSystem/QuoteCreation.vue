@@ -75,7 +75,7 @@
 									type="text"
 									style="margin-top: 10px;"
 									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
-		<b-button @click="saveQuote" v-if="plants.length != 0" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>	
+		<b-button @click="saveQuote" v-if="totalPrice != 0" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>	
 		<p v-else>Please add plants to the quote to save</p>															
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
 	</div>

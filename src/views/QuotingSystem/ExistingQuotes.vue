@@ -138,7 +138,7 @@ export default {
         console.log(response.data);
       })
       .catch((error) => {
-          alert("Error from getExistingQuotes: "+error + "\n" + "Please try closing the page and coming back in?");
+          alert("Error from getExistingQuotes: "+error + "\n" + "Please try going to home page and refreshing?");
       });
 		},
     changeData(response) {
@@ -287,6 +287,7 @@ export default {
   
 	.right-div {
 		float: left;
+    height: fit-content;
     max-height: 85vh;
 		width: 80%;
 		overflow: auto;

@@ -141,11 +141,13 @@ export default {
 		},
 		customerSelected() {
 			this.disabled = 0;
-			if(this.selectedCustomer != '') {
-				this.singleCustomer = null;
+				console.log("ehere")
+			if(this.selectedCustomer == '') {
+				// this.singleCustomer = null;
 				this.trade = false;
 				this.retail = false;
-			}
+				this.disabled = 1;
+			} 
 		},
 		saveCustomer() {
 			var custRef;
@@ -165,7 +167,7 @@ export default {
 				}) 
 				.then((response) => {
 					console.log(response);
-					this.saveNewCustomerToStorage();
+					this.getCustomers();
 				})
 				.catch((error) => {
 					// alert("Please check values before submitting")
@@ -173,7 +175,7 @@ export default {
 				});
 			}
 		},
-		saveNewCustomerToStorage(){
+		getCustomers(){
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
 				.then((response) => {
 					this.parseCustomers(response.data);
@@ -195,7 +197,10 @@ export default {
 				});
 			}
 			localStorage.removeItem("customers"); //Remove the previous list of customers
-      localStorage.setItem("customers", JSON.stringify(cust)); //Save the new customers to storage
+			localStorage.setItem("customers", JSON.stringify(cust)); //Save the new customers to storage
+			
+			this.displaySageCustomers(cust);
+			this.getRetailTradeReferences(cust);
 		},
 		getAllCustomers() {
       if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
@@ -203,7 +208,9 @@ export default {
 				this.displaySageCustomers(cust);
 				this.getRetailTradeReferences(cust);
       } else {
-        alert("Customers need to be loaded into storage. Please go to the home page")
+				alert("Customers being loaded from database")
+				this.getCustomers();
+				
       }
 		},
 		displaySageCustomers(customers) {
