@@ -135,7 +135,7 @@ export default {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')
       .then((response) => {
         this.changeData(response.data);
-        console.log(response.data);
+        // console.log(response.data);
       })
       .catch((error) => {
           alert("Error from getExistingQuotes: "+error + "\n" + "Please try going to home page and refreshing?");
@@ -201,7 +201,7 @@ export default {
       // console.log(customer);
       //Filter the array to find the customer for each quote
       var singleCustomer = customer.filter((obj) => obj.customerRef === customerRef);
-      console.log(singleCustomer)
+      // console.log(singleCustomer)
       return singleCustomer[0]
     },
     getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--

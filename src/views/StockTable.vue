@@ -73,10 +73,11 @@
       <template slot="actions" slot-scope="row">
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <!-- <p >{{ row.item.imageExists ? 'Yes :)' : 'No :(' }}</p> -->
+        
         <b-button size="sm" variant="outline-primary" v-if="row.item.imageExists" class="image-btn" @click.stop="info(row.item, $event.target)" >
           View Image
         </b-button>
-        <p v-else>No image yet</p>
+        <p style="display:inline-block;" v-else>No image yet</p>
         <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
