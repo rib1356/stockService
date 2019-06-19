@@ -159,6 +159,8 @@ export default {
       selectedBatch.plantName = item.plantName;
       selectedBatch.location = item.location;
       selectedBatch.quantity = item.quantity;
+      selectedBatch.growingQuantity = item.growingQuantity;
+      selectedBatch.allocatedQuantity = item.allocatedQuantity;
       selectedBatch.formSize = item.formSize;
       selectedBatch.batchPrice = item.batchPrice;
       selectedBatch.batchId = item.batchId;
@@ -211,6 +213,9 @@ export default {
           "formSize": response[i].FormSize,
           "batchPrice": response[i].WholesalePrice, 
           "imageExists": response[i].ImageExists,
+          "growingQuantity": response[i].GrowingQuantity,
+          "allocatedQuantity": response[i].AllocatedQuantity,
+          "dateStamp": response[i].DateStamp,
           "active": response[i].Active,
         });
       }
@@ -248,7 +253,7 @@ export default {
       var user = firebase.auth().currentUser; 
       if (this.authenticated || user) { //If user is logged in show the available buttons
         this.authenticated = true;
-        this.getAllCustomers(); //If logged in get all customers and save to storage
+        // this.getAllCustomers(); //If logged in get all customers and save to storage
         if(sessionStorage.getItem('timesLoaded') == 0) {
           this.$router.push('HomePage'); //Move the user to the home page
         }

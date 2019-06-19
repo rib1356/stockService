@@ -12,7 +12,8 @@
         <b-col cols="10"><form-size-change-modal></form-size-change-modal></b-col>
       </b-row>
       <b-row>
-        <b-col cols="2"><label for="quantity">Quantity: {{quantity}} </label></b-col> 
+        <b-col cols="2"><label for="quantity">Saleable Quantity: {{quantity}} 
+          Growing Quantity: {{growingQuantity}}  Allocated Quantity: {{allocatedQuantity}} </label></b-col> 
         <b-col cols="10"><quantity-change-modal></quantity-change-modal></b-col> 
       </b-row>
       <b-row>
@@ -57,6 +58,8 @@ export default {
       plantName: '',
       location: '',
       quantity: '',
+      growingQuantity: '',
+      allocatedQuantity: '',
       formSize: '',
       batchPrice: '',
       batchId: '',
@@ -75,6 +78,9 @@ export default {
       this.plantName = selectedBatchInformation.plantName;
       this.location = selectedBatchInformation.location;
       this.quantity = selectedBatchInformation.quantity;
+      this.growingQuantity = selectedBatchInformation.growingQuantity;
+      console.log(selectedBatchInformation.growingQuantity);
+      this.allocatedQuantity = selectedBatchInformation.allocatedQuantity;
       this.formSize = selectedBatchInformation.formSize;
       this.batchPrice = selectedBatchInformation.batchPrice;
       this.batchId = selectedBatchInformation.batchId;

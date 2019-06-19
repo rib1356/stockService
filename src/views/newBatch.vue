@@ -31,7 +31,16 @@
 									type="number"
 									pattern="[0-9]*"
 									name="quantity"
+									inputmode="numeric"
+									style="margin-bottom: 10px;"></b-form-input>	
+		<b-form-input v-model="wholesalePrice"
+									placeholder="Enter a price in PENCE"
+									type="number"
+									name="wholesalePrice"
 									inputmode="numeric"></b-form-input>	
+		<b-form-checkbox id="checkbox" v-model="salable" style="margin-top: 10px;">
+      Add batch as saleable
+    </b-form-checkbox>
 		<b-modal ref="imageAskModal" size="sm" title="Add a batch image?" centered hide-footer hide-header-close no-close-on-backdrop>
 			<div class="modal__footer">
 				<b-btn class="mt-3" variant="outline-danger" @click="noImage">No Image</b-btn>
@@ -48,6 +57,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import PictureModal from '@/components/PictureModal';
 import MiscNavbar from '@/components/MiscNavbar.vue'
 export default {
@@ -60,11 +70,15 @@ export default {
 			selectedPlantName: '',
 			selectedFormSize: '',
 			selectedLocation: '',
-			quantity: '',
+			saleableQuantity: '',
+			growingQuantity: '',
 			wholesalePrice: '',
 			isLoading: false,
 			isLoading2: false,
 			value: false,
+			batchDate: '',
+			salable: false,
+			quantity: '',
 		}		
   },
 	components: {
@@ -82,14 +96,18 @@ export default {
 		this.$root.$emit('PictureModal'); //Display the picture modal when button pressed
 	},
 	saveBatch() {
+		this.getQty();
 		this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
 			"Sku": this.selectedPlantName.sku,
 			"Name": this.selectedPlantName.name,
 			"FormSize": this.selectedFormSize.formSize,
 			"Location":  this.selectedLocation.location,
-			"Quantity": this.quantity,
+			"Quantity": this.saleableQuantity,
 			"WholesalePrice": null,
 			"ImageExists": false,
+			"GrowingQuantity": this.growingQuantity,
+			"AllocatedQuantity": 0,
+			"DateStamp": this.getDate(),
 			"SalesOrder": 0,
 			"Active": true,
 		})
@@ -107,6 +125,17 @@ export default {
 			alert("Please check values before submitting")
 			console.log(error);
 		});
+	},
+	getQty(){
+		if(this.salable) {
+			this.saleableQuantity = this.quantity;
+			this.growingQuantity = 0;
+			console.log(this.saleableQuantity);
+		} else {
+			this.growingQuantity = this.quantity;
+			this.saleableQuantity = 0;
+			console.log(this.growingQuantity);
+		}
 	},
 	newBatchInformation(batchId, plantName) {
 		var batchId, plantName
@@ -184,6 +213,11 @@ export default {
     });
     }
 	},
+	getDate() {
+		// console.log(moment(new Date).format('DD/MM/YYYY'));
+		// console.log(moment(new Date));
+		return moment(new Date);
+	},
 	clearFormSizes() { //When selecting a new plant from the dropdown clear the selected form size
 		this.selectedFormSize = '';
 	}
@@ -193,6 +227,7 @@ export default {
 		sessionStorage.removeItem('newBatchInformation');
 		this.getPlantNames(); //Retrieve the data on load of the page
 		this.getLocations();
+		this.getDate();
 	}
 }
 </script>

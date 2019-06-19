@@ -117,11 +117,14 @@ export default {
             "formSize": response[i].FormSize,
             "batchPrice": response[i].WholesalePrice, 
             "imageExists": response[i].ImageExists,
+            "growingQuantity": response[i].GrowingQuantity,
+            "allocatedQuantity": response[i].AllocatedQuantity,
+            "dateStamp": response[i].DateStamp,
             "active": response[i].Active,
           });
         }
       }   
-      console.log("saved?");
+      // console.log("saved?");
       //Save the data into session storage
       sessionStorage.setItem('batchList', JSON.stringify(this.batchData));
       sessionStorage.setItem('batchInMemory', true);
@@ -130,11 +133,35 @@ export default {
     getCustomers() {
       if(localStorage.getItem('customers') == null) {
         console.log("getting customers from db")
-        //get customers
+        this.getAllCustomers();
       } else {
         this.customers = JSON.parse(localStorage.getItem('customers')).length;
       }
     },
+    getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
+			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
+				.then((response) => {
+          this.parseCustomers(response.data);
+				})
+				.catch((error) => {
+						alert("Error getting customers: " + error);
+				});
+		},
+    parseCustomers(data) { //Push customers into an array of objects then save to local storage
+    var cust = [];
+			for(var i = 0; i < data.length; i++){
+				cust.push({ //Create an array of objects
+					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
+					"customerRef": data[i].CustomerReference,
+					"customerTel": data[i].CustomerTel,
+					"customerAddress": data[i].CustomerAddress,
+          "customerEmail": data[i].CustomerEmail,
+          "sageCustomer": data[i].SageCustomer,
+				});
+      }
+      localStorage.setItem("customers", JSON.stringify(cust));
+      this.customers = cust.length
+		},
   },  
   mounted() {
     if(sessionStorage.getItem('batchList') == null) {

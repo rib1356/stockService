@@ -288,6 +288,9 @@ export default {
 						"formSize": response[i].FormSize,
             "price": response[i].WholesalePrice,
             "active": response[i].Active,
+            "growingQuantity": response[i].GrowingQuantity,
+            "allocatedQuantity": response[i].AllocatedQuantity,
+            "dateStamp": response[i].DateStamp,
 					});
      	  }     
       }
