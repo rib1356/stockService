@@ -128,6 +128,7 @@ export default {
         "Id": this.batchId,
         "ImageExists": true,
         "Active": true,
+        "DateStamp": null
       })
 			.then((response) => {
           console.log(response);

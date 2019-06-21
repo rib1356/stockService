@@ -44,7 +44,7 @@ export default {
       }
 		},
     saveBatchPrice() {
-      let data = { "Id": this.batchId, "WholesalePrice": parseFloat(this.batchPrice)*100, "Active": true};
+      let data = { "Id": this.batchId, "WholesalePrice": parseFloat(this.batchPrice)*100, "Active": true, "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
@@ -62,7 +62,7 @@ export default {
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
-    this.batchPrice = selectedBatchInformation.batchPrice;
+    // this.batchPrice = selectedBatchInformation.batchPrice;
     this.previousPrice = selectedBatchInformation.batchPrice;
     this.batchId = selectedBatchInformation.batchId;
   }

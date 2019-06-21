@@ -34,13 +34,15 @@
 									inputmode="numeric"
 									style="margin-bottom: 10px;"></b-form-input>	
 		<b-form-input v-model="wholesalePrice"
-									placeholder="Enter a price in PENCE"
+									placeholder="Enter a selling price"
 									type="number"
 									name="wholesalePrice"
-									inputmode="numeric"></b-form-input>	
+									inputmode="numeric"
+									v-validate="'decimal:2|min_value:0.01'"></b-form-input>	
 		<b-form-checkbox id="checkbox" v-model="salable" style="margin-top: 10px;">
       Add batch as saleable
     </b-form-checkbox>
+		<p class="text-danger" v-if="errors.has('wholesalePrice')">{{ errors.first('wholesalePrice') }}</p>
 		<b-modal ref="imageAskModal" size="sm" title="Add a batch image?" centered hide-footer hide-header-close no-close-on-backdrop>
 			<div class="modal__footer">
 				<b-btn class="mt-3" variant="outline-danger" @click="noImage">No Image</b-btn>
@@ -103,7 +105,7 @@ export default {
 			"FormSize": this.selectedFormSize.formSize,
 			"Location":  this.selectedLocation.location,
 			"Quantity": this.saleableQuantity,
-			"WholesalePrice": null,
+			"WholesalePrice": Math.trunc(parseFloat(this.wholesalePrice)*100),
 			"ImageExists": false,
 			"GrowingQuantity": this.growingQuantity,
 			"AllocatedQuantity": 0,

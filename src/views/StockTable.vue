@@ -74,11 +74,11 @@
         <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
         <!-- <p >{{ row.item.imageExists ? 'Yes :)' : 'No :(' }}</p> -->
         
-        <b-button size="sm" variant="outline-primary" v-if="row.item.imageExists" class="image-btn" @click.stop="info(row.item, $event.target)" >
+        <b-button size="sm" variant="outline-primary" v-if="row.item.imageExists" @click.stop="info(row.item, $event.target)" >
           View Image
         </b-button>
         <p style="display:inline-block;" v-else>No image yet</p>
-        <b-button size="sm" variant="outline-primary" v-if="authenticated" class="myBtn" @click.stop="selectBatch(row.item, row.index)">
+        <b-button size="sm" variant="outline-primary" v-if="authenticated" @click.stop="selectBatch(row.item, row.index)">
           Select Batch
         </b-button>
         
@@ -161,6 +161,7 @@ export default {
       selectedBatch.quantity = item.quantity;
       selectedBatch.growingQuantity = item.growingQuantity;
       selectedBatch.allocatedQuantity = item.allocatedQuantity;
+      selectedBatch.dateStamp = item.dateStamp;
       selectedBatch.formSize = item.formSize;
       selectedBatch.batchPrice = item.batchPrice;
       selectedBatch.batchId = item.batchId;
@@ -368,16 +369,6 @@ export default {
     top: 50%; /* Needs to be changed so that its centered on mobile devices */  
     right: 50%;
   }
-
-  /* .image-btn {
-    color: green;
-    border-color: green;
-  } */
-  
-  .myBtn {
-  margin-top: 1px;
-  }
-
 
 	.table-div {
 		float: left;

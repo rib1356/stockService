@@ -85,9 +85,8 @@
 </template>
 
 <script>
-
-  import DeleteBatchModal from '@/components/DeleteBatchModal';
-
+import DeleteBatchModal from '@/components/DeleteBatchModal';
+import moment from 'moment';
 export default {
   name: 'LocationChangeModal',
   data () {
@@ -107,6 +106,9 @@ export default {
       status: '',
       newBatchNeeded: false,
       formSizeChanged: false,
+      growingQuantity: '',
+      allocatedQuantity: '',
+      wholesalePrice: '',
     }
   },
   components: {
@@ -191,7 +193,7 @@ export default {
         }
     },
     saveDbLocation(newLocation) { //Save the new location of the batch in the database
-      let data = { "Id": this.batchId, "Location": newLocation, "Active": true};
+      let data = { "Id": this.batchId, "Location": newLocation, "Active": true , "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
@@ -207,8 +209,11 @@ export default {
 				"FormSize": this.formSize,
 				"Location": newLocation,
 				"Quantity": this.quantity,
-				"WholesalePrice": '',
-				"Image": null,
+				"WholesalePrice": this.wholesalePrice,
+        "ImageExists": false,
+        "GrowingQuantity": this.growingQuantity,
+        "AllocatedQuantity": this.allocatedQuantity,
+        "DateStamp": moment(new Date),
 				"Active": true,
 			})
 			.then((response) => {
@@ -223,6 +228,7 @@ export default {
         "Id": this.batchId,
         "Quantity": parseInt(newQuantity),
         "Active": true,
+        "DateStamp": null
       })
 			.then((response) => {
         console.log(response);
@@ -252,6 +258,9 @@ export default {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.originalQuantity = selectedBatchInformation.quantity;
     this.quantity = selectedBatchInformation.quantity;
+    this.wholesalePrice = selectedBatchInformation.batchPrice;
+    this.growingQuantity = selectedBatchInformation.growingQuantity;
+    this.allocatedQuantity = selectedBatchInformation.allocatedQuantity;
     this.oldLocation = selectedBatchInformation.location;
     this.batchId = selectedBatchInformation.batchId;
     this.Sku = selectedBatchInformation.Sku;

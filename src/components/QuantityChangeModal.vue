@@ -71,7 +71,7 @@ export default {
       this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
     },
     saveDbQuantity() {
-      let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity), "Active": true};
+      let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity), "Active": true , "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
