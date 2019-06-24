@@ -113,7 +113,7 @@
 				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
 				<i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
 				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
-        <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i>
+        <!-- <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i> -->
         <!-- Editing modal -->
         <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
           <div>
@@ -143,7 +143,7 @@
             <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
             <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
         </b-modal>
-        <b-modal :ref='"pickListModal"+row.index' size="lg" no-close-on-backdrop hide-footer @close="emptySelectedArr" title="Select a batch to add to pick list">
+        <!-- <b-modal :ref='"pickListModal"+row.index' size="lg" no-close-on-backdrop hide-footer @close="emptySelectedArr" title="Select a batch to add to pick list">
           <div v-if="batchesToPick != null">
             <p>Row quantity needed: {{quantityNeeded-quantityTyped}}</p>
             <br>
@@ -161,9 +161,9 @@
               </template>
             </b-table>
           </div>
-            <!-- <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button> -->
+            <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button>
             <b-button variant="outline-danger" block @click="hidePickListModal(row.index)">Close Me</b-button>
-        </b-modal>
+        </b-modal> -->
       </template>
     </b-table>
     </div>
@@ -372,9 +372,6 @@ export default {
         this.calculateQuantity();
       }
       this.calculateQuantity();
-    },
-    emptySelectedArr() {
-      console.log("close")
     },
     calculateQuantity() {
       this.quantityTyped = 0;

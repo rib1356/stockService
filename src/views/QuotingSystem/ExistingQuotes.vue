@@ -65,12 +65,34 @@
       </template>    
       <template slot="actions" slot-scope="row">
 				<router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
-					<i class="far fa-edit fa-lg" style="color:green"></i>
+					<i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:green"></i>
 				</router-link>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click.stop="deleteQuote(row.item)"></i>
-        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
+				<i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete Item" style="color:red" @click.stop="deleteQuote(row.item)"></i>
+        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" style="color:#0b720b" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
+        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Pick List" @click="openPickList" style="color:#11979e" v-else></i>
       </template> 
     </b-table>
+    <b-modal ref="pickListModel" size="lg" no-close-on-backdrop hide-footer title="Create Pick List for Sales Order">
+      <b-form-group horizontal label="Address:" >
+        <b-form-input v-model="pickListInfo.address"
+                      placeholder="Enter an address" />
+      </b-form-group>                            
+      <b-form-group horizontal label="Estimated Date:" >
+        <b-form-input v-model="pickListInfo.estimatedDate"
+                      placeholder="Enter an estimated date" />
+      </b-form-group>                            
+      <b-form-group horizontal label="Exact Date:" >
+        <b-form-input v-model="pickListInfo.exactDate"
+                      placeholder="Enter an exact date" />
+      </b-form-group>                            
+      <b-form-group horizontal label="Delivery Needed:" >
+        <b-form-checkbox v-model="pickListInfo.deliveryNeeded" style="align: left;">
+          {{pickListInfo.deliveryNeeded}}
+        </b-form-checkbox>
+      </b-form-group>                            
+      <b-button variant="outline-primary" block>Allocate Plants</b-button>
+      <b-button variant="outline-danger" block @click="hidePickListModal()">Cancel</b-button>
+    </b-modal>
   </div>
   </section>
 </template>
@@ -99,6 +121,12 @@ export default {
         { key: 'totalPrice', label: 'Quote Price (exVAT)' , sortable: true},
         { key: 'actions', label: 'Actions' }
       ],
+      pickListInfo: {
+        address: null,
+        estimatedDate: null,
+        exactDate: null,
+        deliveryNeeded: false,
+      },
       quotes: [],
       saleOrders: [],
       originalQuotes: [],
@@ -130,6 +158,12 @@ export default {
     },
     setFilter(date) {
       this.filter = this.customFormatter(date)
+    },
+    openPickList() {
+      this.$refs['pickListModel'].show()
+    },
+    hidePickListModal() {
+      this.$refs['pickListModel'].hide()
     },
     getExistingQuotes() {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')

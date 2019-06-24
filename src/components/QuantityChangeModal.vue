@@ -6,18 +6,40 @@
       <div class="modal-lg">
           <div>
             <!-- Form Validation -->
-            <label class="control-label" for="quantity">Quantity: {{originalQuantity}}</label>
+            <label class="control-label" for="quantity">Saleable Quantity: {{originalQuantities.saleable}}</label>
             <input  v-validate="'required|numeric|min_value:1'" 
                     name="quantity"
                     id="quantity" 
                     v-model="quantity" 
                     class="form-control" 
-                    placeholder="Edit Quantity"
+                    placeholder="Edit Saleable Quantity"
                     type="number"
                     pattern="[0-9]*"
                     inputmode="numeric"
-                    @keyup="validationCheck">
+                    @change="validationCheck">
             <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+            <label class="control-label" for="quantity">Growing Quantity: {{originalQuantities.growing}}</label>
+            <input  v-validate="'required|numeric|min_value:1'" 
+                    name="quantity"
+                    id="quantity" 
+                    v-model="growingQuantity" 
+                    class="form-control" 
+                    placeholder="Edit Growing Quantity"
+                    type="number"
+                    pattern="[0-9]*"
+                    inputmode="numeric"
+                    @change="validationCheck">
+            <label class="control-label" for="quantity">Allocated Quantity: {{originalQuantities.allocated}}</label>
+            <input  v-validate="'required|numeric|min_value:1'" 
+                    name="quantity"
+                    id="quantity" 
+                    v-model="allocatedQuantity" 
+                    class="form-control" 
+                    placeholder="Edit Allocated Quantity"
+                    type="number"
+                    pattern="[0-9]*"
+                    inputmode="numeric"
+                    @change="validationCheck">
           </div>
       </div>
       <div>
@@ -34,8 +56,14 @@ export default {
   name: 'QuantityChangeModal',
   data () {
     return {
-      originalQuantity: '',
+      originalQuantities: {
+        saleable: '',
+        growing: '',
+        allocated: ''
+      },
       quantity: '',
+      growingQuantity: '',
+      allocatedQuantity: '',
       batchId: '',
       disabled: 1,
     }
@@ -71,7 +99,7 @@ export default {
       this.$root.$emit('BatchInformation'); //Call the update location method to change the visible location of that batch
     },
     saveDbQuantity() {
-      let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity), "Active": true , "DateStamp": null};
+      let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity), "GrowingQuantity": parseInt(this.growingQuantity), "AllocatedQuantity": parseInt(this.allocatedQuantity), "Active": true , "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
@@ -83,8 +111,13 @@ export default {
   },
   mounted() {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
-    this.originalQuantity = selectedBatchInformation.quantity;
+    console.log(selectedBatchInformation);
+    this.originalQuantities.saleable = selectedBatchInformation.quantity;
+    this.originalQuantities.growing = selectedBatchInformation.growingQuantity;
+    this.originalQuantities.allocated = selectedBatchInformation.allocatedQuantity;
     this.quantity = selectedBatchInformation.quantity;
+    this.growingQuantity = selectedBatchInformation.growingQuantity;
+    this.allocatedQuantity = selectedBatchInformation.allocatedQuantity;
     this.batchId = selectedBatchInformation.batchId;
   }
 }
