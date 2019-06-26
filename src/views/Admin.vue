@@ -16,7 +16,7 @@
 									placeholder="Pick a group or groups"
 									label="GroupDescription"
 									track-by="GroupId"
-									>
+									@input="getGroupFormSize">
 					<template slot="option" slot-scope="props">
 					<div>
 						<span>{{props.option.GroupId }} - {{props.option.GroupDescription }}</span>
@@ -25,6 +25,20 @@
 			</multiselect>
 			<p>Check spelling as this cant be changed</p>
 			<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
+			<b-button @click="showCollapse = !showCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px; height: 35px;"
+                block
+                
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+        <p v-if="showCollapse">Hide Form Size Groups<i class="fas fa-plus plus"></i></p>
+        <p v-else>Show Form Size Groups<i class="fas fa-plus plus"></i></p>
+      </b-button>  
+      <!-- Collapsible area to show the filters for the table -->
+      <b-collapse v-model="showCollapse" id="collapse">
+				<p>Current Form Sizes {{groupFormSizes}}</p>
+			</b-collapse>
 		</div>
 		<hr>
 		<div>
@@ -89,6 +103,9 @@ export default {
 			VAT: 0,
 			VATtoChange: 0,
 			currentPlantGroups: '',
+			showCollapse: '',
+			groupFormSizes: [],
+			formSizes: [],
 		}
 	},
 	methods: {
@@ -163,6 +180,20 @@ export default {
         alert(error);
       });
 		},
+		getGroupFormSize() {
+			console.log(this.selectedGroups);
+			let filtered = this.formSizes.filter((obj) => obj.id === this.selectedGroups[0].GroupId);
+			this.groupFormSizes = filtered;
+		},
+		getFormSizes() {
+			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes')
+      .then((response) => {
+				this.formSizes = response.data;
+      })
+      .catch((error) => {
+        alert(error);
+      });
+		},
 		saveVat() { 
 			firebase.database().ref('/GPM/' + "VAT").update({value: this.VATtoChange},
 			function(error) {
@@ -211,6 +242,7 @@ export default {
 		this.getGroups();
 		this.getPlantNames();
 		this.getFirebase();
+		this.getFormSizes();
 	}
 }
 </script>
@@ -226,5 +258,10 @@ export default {
 	hr{
 		border-top: 2px solid black;
 	}
+
+	.plus{
+    float: right;
+    text-align: center;
+  }
 
 </style>

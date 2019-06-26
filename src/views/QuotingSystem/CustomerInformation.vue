@@ -16,14 +16,14 @@
 									type="text"
 									placeholder="Enter a site reference"></b-form-input>
 		<b-form-checkbox id="checkbox" v-model="trade" @change="checkboxChange" style="margin-top: 10px;" v-if="selectedCustomer == ''">
-      Quote for a none existing customer?
-    </b-form-checkbox>
+	  Quote for a none existing customer?
+	</b-form-checkbox>
 		<b-form-checkbox id="checkbox2" v-model="retail" style="margin-top: 10px;" v-if="trade">
-      Check if customer is retail
-    </b-form-checkbox>
-    <div>					
+	  Check if customer is retail
+	</b-form-checkbox>
+	<div>					
 			<router-link :to="{name: 'HomePage'}">
-        <b-button class="myBtn" variant="outline-danger" style="margin-top: 5px;">Home</b-button>
+		<b-button class="myBtn" variant="outline-danger" style="margin-top: 5px;">Home</b-button>
 			</router-link>		
 			<router-link :to="{name: 'QuoteCreation', params: { selectedCustomer: selectedCustomer, 
 																													singleCustomer: singleCustomer,
@@ -168,9 +168,10 @@ export default {
 				.then((response) => {
 					console.log(response);
 					this.getCustomers();
+					this.$router.push('QuoteCreation')
 				})
 				.catch((error) => {
-					// alert("Please check values before submitting")
+					alert("Error saving customer");
 					console.log(error);
 				});
 			}
@@ -192,8 +193,8 @@ export default {
 					"customerRef": data[i].CustomerReference,
 					"customerTel": data[i].CustomerTel,
 					"customerAddress": data[i].CustomerAddress,
-          "customerEmail": data[i].CustomerEmail,
-          "sageCustomer": data[i].SageCustomer,
+		  "customerEmail": data[i].CustomerEmail,
+		  "sageCustomer": data[i].SageCustomer,
 				});
 			}
 			localStorage.removeItem("customers"); //Remove the previous list of customers
@@ -203,15 +204,15 @@ export default {
 			this.getRetailTradeReferences(cust);
 		},
 		getAllCustomers() {
-      if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
+	  if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
 				let cust = JSON.parse(localStorage.getItem("customers"));
 				this.displaySageCustomers(cust);
 				this.getRetailTradeReferences(cust);
-      } else {
+	  } else {
 				alert("Customers being loaded from database")
 				this.getCustomers();
 				
-      }
+	  }
 		},
 		displaySageCustomers(customers) {
 			customers.forEach(element => {
@@ -249,7 +250,7 @@ export default {
 
 	.left-div
 	{
-    width: 25%;
+	width: 25%;
 		float:left;
 	}
 
@@ -261,7 +262,7 @@ export default {
 	}
 
   input {
-    border: 1px solid #e8e8e8;
+	border: 1px solid #e8e8e8;
 		font-size: 16px;
 		min-height: 40px;
   }
