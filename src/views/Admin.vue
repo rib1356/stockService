@@ -1,36 +1,72 @@
 <template>
   <div>
 		<misc-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></misc-navbar>
-		<h3>Add a new plant</h3>
-		<b-form-input v-model="plantName"
-                placeholder="Enter a plant Name"
-								name="plantName"
-								style="margin-bottom: 10px;"></b-form-input>	
-		<multiselect v-model="selectedGroups" 
-								 :options="groups"
-								 :multiple="true"
-								 :close-on-select="false"
-								 :clear-on-select="false"
-								 :preserve-search="true"
-								 placeholder="Pick a group or groups"
-								 label="GroupDescription"
-								 track-by="GroupId"
-								 >
-		</multiselect>
-		<p>Check spelling as this cant be changed</p>
-		<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
+		<div>
+			<h3>Add a new plant</h3>
+			<b-form-input v-model="plantName"
+									placeholder="Enter a plant Name"
+									name="plantName"
+									style="margin-bottom: 10px;"></b-form-input>	
+			<multiselect v-model="selectedGroups" 
+									:options="groups"
+									:multiple="true"
+									:close-on-select="false"
+									:clear-on-select="false"
+									:preserve-search="true"
+									placeholder="Pick a group or groups"
+									label="GroupDescription"
+									track-by="GroupId"
+									>
+					<template slot="option" slot-scope="props">
+					<div>
+						<span>{{props.option.GroupId }} - {{props.option.GroupDescription }}</span>
+					</div>
+				</template>
+			</multiselect>
+			<p>Check spelling as this cant be changed</p>
+			<b-button variant="outline-primary" @click="savePlant">Save plant with groups</b-button>
+		</div>
 		<hr>
-		<h3>VAT</h3>
-		<p>Current VAT: {{VAT}} % <b-form-input v-model="VATtoChange"
-                placeholder="Enter VAT"
-								name="VAT"
-								style="margin-bottom: 10px;"></b-form-input></p>
-		<b-button variant="outline-primary" @click="saveVat">Save VAT</b-button>
+		<div>
+			<h4>Add more groups to existing plant</h4>
+			<multiselect v-model="selectedPlantName" 
+			   					:options="plantNames"  
+									placeholder="Select a plant" 
+									label="name" 
+									track-by="name"
+									:show-labels="false"
+									@input="getPlantsGroups">
+			</multiselect>		
+			<p>Plant is in the current group(s): {{currentPlantGroups}}</p>
+			<multiselect v-model="selectedGroups2" 
+									:options="groups"
+									:multiple="true"
+									:close-on-select="false"
+									:clear-on-select="false"
+									:preserve-search="true"
+									placeholder="Pick a group or groups"
+									label="GroupDescription"
+									track-by="GroupId"
+									style="margin-bottom: 5px;">
+				<template slot="option" slot-scope="props">
+					<div>
+						<span>{{props.option.GroupId }} - {{props.option.GroupDescription }}</span>
+					</div>
+				</template>						
+			</multiselect>
+			<b-button variant="outline-primary" @click="editPlant">Save plant group edits</b-button>
+		</div>
 		<hr>
+		<div>
+			<h3>VAT</h3>
+			<p>Current VAT: {{VAT}} % <b-form-input v-model="VATtoChange"
+									placeholder="Enter VAT"
+									name="VAT"
+									style="margin-bottom: 10px;"></b-form-input></p>
+			<b-button variant="outline-primary" @click="saveVat">Save VAT</b-button>
+			<hr>
+		</div>
 		<h3>Pricing bands and GPM</h3>
-		<!-- <router-link :to="{name: 'HomePage'}">
-			<b-button variant="outline-danger">Home</b-button>
-			</router-link> -->
   </div>
 </template>
 
@@ -46,9 +82,13 @@ export default {
 			pageName: 'Admin',
 			groups: [],	
 			selectedGroups: [],
+			selectedGroups2: [],
+			plantNames: [],
+			selectedPlantName: '',
 			plantName: '',
 			VAT: 0,
-			VATtoChange: 0
+			VATtoChange: 0,
+			currentPlantGroups: '',
 		}
 	},
 	methods: {
@@ -62,7 +102,6 @@ export default {
       });
 		},
 		savePlant() {
-			// console.log(this.getPlantCode());
 			this.axios.post('https://ahillsplantservice.azurewebsites.net/api/groups', {
 				Name: this.plantName,
 				Sku: this.getPlantCode(),
@@ -78,6 +117,51 @@ export default {
 				alert("Please check values before submitting: " + error);
 				console.log(error);
 			});
+		},
+		editPlant() {
+			this.axios.post('https://ahillsplantservice.azurewebsites.net/api/Groups/edit', {
+				PlantId: this.selectedPlantName.plantId,
+				GroupDetails: this.selectedGroups2
+			}) 
+			.then((response) => {
+				console.log(response);
+				alert("Plant has been edited and new groups added");
+				this.selectedPlantName = '';
+				this.selectedGroups2 = [];
+			})
+			.catch((error) => {
+				alert("Please check values before submitting: " + error);
+				console.log(error);
+			});
+		},
+		getPlantNames() {
+			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/plant')
+				.then((response) => {
+					this.transformPlantNames(response.data);
+				})
+				.catch((error) => {
+						alert(error);
+				});
+		},
+		transformPlantNames(data) { //Create an object with each of the plant names and their skus and add to an array
+			for(var i = 0; i < data.length; i++){ //These will be displayed in the dropdown
+				this.plantNames.push({ 
+					"plantId": data[i].plantId,
+					"name": data[i].plantName, 
+					"sku": data[i].Sku
+				});
+			}
+		},
+		getPlantsGroups() {
+			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
+      .then((response) => {
+				let arr1 = response.data.map(a => a.GroupId)
+				let unique = [...new Set(arr1)];
+				this.currentPlantGroups = unique;
+      })
+      .catch((error) => {
+        alert(error);
+      });
 		},
 		saveVat() { 
 			firebase.database().ref('/GPM/' + "VAT").update({value: this.VATtoChange},
@@ -125,6 +209,7 @@ export default {
 	},
 	created() {
 		this.getGroups();
+		this.getPlantNames();
 		this.getFirebase();
 	}
 }
