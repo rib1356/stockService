@@ -37,7 +37,23 @@
       </b-button>  
       <!-- Collapsible area to show the filters for the table -->
       <b-collapse v-model="showCollapse" id="collapse">
-				<p>Current Form Sizes {{groupFormSizes}}</p>
+				<!-- <p>Current Form Sizes {{groupFormSizes}}</p> -->
+				<ul>
+					<li v-for="group in groupFormSizes" v-bind:key="group">
+						<ul>
+							<li v-for="forms in group" v-bind:key="forms">
+								RootType:{{ forms.RootType }} - PotSize:{{ forms.PotSize }} - HeightSpread:{{forms.HeightSpread}} 
+						    - Girth:{{forms.Girth}} - Age:{{forms.Age}} - Description:{{forms.Description}}
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<!-- <ul>
+					<li v-for="forms in groupFormSizes" v-bind:key="forms.id">
+						RootType:{{ forms.RootType }} - PotSize:{{ forms.PotSize }} - HeightSpread:{{forms.HeightSpread}} 
+						- Girth:{{forms.Girth}} - Age:{{forms.Age}} - Description:{{forms.Description}}
+					</li>
+				</ul> -->
 			</b-collapse>
 		</div>
 		<hr>
@@ -103,8 +119,8 @@ export default {
 			VAT: 0,
 			VATtoChange: 0,
 			currentPlantGroups: '',
-			showCollapse: '',
-			groupFormSizes: [],
+			showCollapse: false,
+			groupFormSizes: '',
 			formSizes: [],
 		}
 	},
@@ -172,8 +188,8 @@ export default {
 		getPlantsGroups() {
 			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes?sku=' + this.selectedPlantName.sku)
       .then((response) => {
-				let arr1 = response.data.map(a => a.GroupId)
-				let unique = [...new Set(arr1)];
+				let arr1 = response.data.map(a => a.GroupId) //Create an array of the different form sizes that belong to plant
+				let unique = [...new Set(arr1)]; //Remove any duplicates so only single GroupIds exist
 				this.currentPlantGroups = unique;
       })
       .catch((error) => {
@@ -181,9 +197,14 @@ export default {
       });
 		},
 		getGroupFormSize() {
-			console.log(this.selectedGroups);
-			let filtered = this.formSizes.filter((obj) => obj.id === this.selectedGroups[0].GroupId);
-			this.groupFormSizes = filtered;
+			this.groupFormSizes = []; //Clear the group of form sizes in case something 
+			this.selectedGroups.forEach(element => { //Loop through the current selected groups
+				let filtered = this.formSizes.filter((obj) => obj.GroupId === element.GroupId); //filter the form sizes based on what groupIds are selected
+				this.groupFormSizes.push(filtered);
+			});
+			// filtered.forEach(element => { //Loop through each element in the array to then
+			// 		this.groupFormSizes.push(element); //Push these into an array to be shown on screen
+			// 	});
 		},
 		getFormSizes() {
 			this.axios.get('https://ahillsplantservice.azurewebsites.net/api/FormSizes')

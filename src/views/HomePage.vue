@@ -47,12 +47,6 @@
           <h4>Number of Customers</h4>
           <p>{{customers}}</p>
         </div>  
-        <!-- <div class="grid-item">4</div>
-        <div class="grid-item">5</div>
-        <div class="grid-item">6</div>  
-        <div class="grid-item">7</div>
-        <div class="grid-item">8</div>
-        <div class="grid-item">9</div>   -->
       </div>
     </div>
   </div>
@@ -164,6 +158,7 @@ export default {
 		},
   },  
   mounted() {
+    console.log(this.$parent.baseUrl)
     if(sessionStorage.getItem('batchList') == null) {
       console.log("getting data from db");
       this.retrieveData();

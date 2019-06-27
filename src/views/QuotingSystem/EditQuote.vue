@@ -478,7 +478,12 @@ export default {
           }
         }
       } else {
-        alert("Customers need to be loaded into storage. Please go to the stock table")
+        if(confirm("Customers need to be loaded into storage. Please go to the home page")) {
+          this.$router.push('HomePage');
+        } else {
+          //do nothing
+        }
+
       }
     },
     formatPriceForPDF() {

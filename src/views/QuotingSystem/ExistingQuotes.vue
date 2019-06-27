@@ -169,21 +169,19 @@ export default {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')
       .then((response) => {
         this.changeData(response.data);
-        // console.log(response.data);
       })
       .catch((error) => {
-          alert("Error from getExistingQuotes: "+error + "\n" + "Please try going to home page and refreshing?");
+          alert("Error from getExistingQuotes: "+error + "\n" + "Please try going to home page");
       });
 		},
     changeData(response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
-        let customerDetails = this.getCustomerName(response[i].CustomerRef); //Get the customer name from the method
         if(response[i].Active === true && response[i].SalesOrder === false) {
           this.quotes.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
-            "customerName": customerDetails.customerName,
-            "customerAddress": customerDetails.customerAddress,
+            "customerName": response[i].CustomerName,
+            "customerAddress": response[i].CustomerAddress,
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
@@ -195,8 +193,8 @@ export default {
             this.saleOrders.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
-            "customerName": customerDetails.customerName,
-            "customerAddress": customerDetails.customerAddress,
+            "customerName": response[i].CustomerName,
+            "customerAddress": response[i].CustomerAddress,
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
@@ -230,36 +228,36 @@ export default {
         var p = dateString.split(/\D/g)
         return [p[2],p[1],p[0] ].join("/")
     },
-    getCustomerName(customerRef){
-      let customer = this.customers;
-      // console.log(customer);
-      //Filter the array to find the customer for each quote
-      var singleCustomer = customer.filter((obj) => obj.customerRef === customerRef);
-      // console.log(singleCustomer)
-      return singleCustomer[0]
-    },
-    getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
-			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
-				.then((response) => {
-					this.parseCustomers(response.data);
-				})
-				.catch((error) => {
-						alert("Error getting customers: " + error);
-				});
-		},
-		parseCustomers(data) { //Push customers into an array of objects then save to local storage
-			for(var i = 0; i < data.length; i++){
-				this.customers.push({ //Create an array of objects
-					"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
-					"customerRef": data[i].CustomerReference,
-					"customerTel": data[i].CustomerTel,
-					"customerAddress": data[i].CustomerAddress,
-          "customerEmail": data[i].CustomerEmail,
-          "sageCustomer": data[i].SageCustomer,
-				});
-      }
-      localStorage.setItem("customers", JSON.stringify(this.customers));
-		},
+    // getCustomerName(customerRef){
+    //   let customer = this.customers;
+    //   // console.log(customer);
+    //   //Filter the array to find the customer for each quote
+    //   var singleCustomer = customer.filter((obj) => obj.customerRef === customerRef);
+    //   // console.log(singleCustomer)
+    //   return singleCustomer[0]
+    // },
+    // getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
+		// 	this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
+		// 		.then((response) => {
+		// 			this.parseCustomers(response.data);
+		// 		})
+		// 		.catch((error) => {
+		// 				alert("Error getting customers: " + error);
+		// 		});
+		// },
+		// parseCustomers(data) { //Push customers into an array of objects then save to local storage
+		// 	for(var i = 0; i < data.length; i++){
+		// 		this.customers.push({ //Create an array of objects
+		// 			"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
+		// 			"customerRef": data[i].CustomerReference,
+		// 			"customerTel": data[i].CustomerTel,
+		// 			"customerAddress": data[i].CustomerAddress,
+    //       "customerEmail": data[i].CustomerEmail,
+    //       "sageCustomer": data[i].SageCustomer,
+		// 		});
+    //   }
+    //   localStorage.setItem("customers", JSON.stringify(this.customers));
+		// },
     deleteQuote(row){
       var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
       let data = { "QuoteId": row.quoteId, "Active": false} ;
@@ -294,7 +292,7 @@ export default {
     }
   },
 	mounted() {
-    this.getAllCustomers();
+    //this.getAllCustomers();
     this.getExistingQuotes();
 	}
 }
