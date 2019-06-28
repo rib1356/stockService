@@ -158,7 +158,7 @@ export default {
 		},
   },  
   mounted() {
-    console.log(this.$parent.baseUrl)
+    //console.log(this.$root.baseUrl);
     if(sessionStorage.getItem('batchList') == null) {
       console.log("getting data from db");
       this.retrieveData();
