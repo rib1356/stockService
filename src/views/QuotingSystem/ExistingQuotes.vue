@@ -154,7 +154,7 @@ export default {
       this.filter = ''
     },
     customFormatter(date) { //Return the correct format so that the table dates can be filtered
-      return moment(new Date(date)).format('DD/MM/YYYY');
+      return moment(new Date(date)).format('D/M/YYYY');
     },
     setFilter(date) {
       this.filter = this.customFormatter(date)
@@ -225,8 +225,8 @@ export default {
       return (price/100).toFixed(2);
     },
     convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"
-        var p = dateString.split(/\D/g)
-        return [p[2],p[1],p[0] ].join("/")
+      var p = dateString.split(/\D/g)
+      return [p[1],p[0],p[2] ].join("/")
     },
     // getCustomerName(customerRef){
     //   let customer = this.customers;

@@ -459,21 +459,29 @@ export default {
 		this.getBatchList();
 		this.getQuoteDate();
 		this.getFirebase();
+		
 	},
 	created() {
-		if(this.$route.params.singleCustomer === null) { //If singleCustomer is null then a customer from dropdown has been passed through
+		window.onbeforeunload = function() {
+			return 'This wont save the quote?';
+		};
+		// window.onpopstate = function() {
+		// 	confirm("Warning changes havent been saved. Go back to customer selection?");
+			
+		// }
+		if(this.$route.params.custFromList) { //If singleCustomer is null then a customer from dropdown has been passed through
 			this.customerInfo = this.$route.params.selectedCustomer;
 		} else {
 			this.customerInfo = this.$route.params.singleCustomer;
-			if(this.$route.params.retail) { //When manually entered customer is used, choose the referenced based on if trade or retail is chosen
-				this.customerInfo.customerRef = this.$route.params.retCustomer;
-			} else {
-				this.customerInfo.customerRef = this.$route.params.trdCustomer;
-			}
+			// if(this.$route.params.retail) { //When manually entered customer is used, choose the referenced based on if trade or retail is chosen
+			// 	this.customerInfo.customerRef = this.$route.params.retCustomer;
+			// } else {
+			// 	this.customerInfo.customerRef = this.$route.params.trdCustomer;
+			// }
 		}
 		this.siteRef = this.$route.params.siteRef;
 		this.retail = this.$route.params.retail;
-	}
+	},
 }
 </script>
 
@@ -501,11 +509,6 @@ export default {
 		width:70%;
 		overflow:hidden;
 	}
-
-	/* .info-div {
-		width: 70%;
-		float: left;
-	} */
 	
 	/* starts here */
 	  ul {

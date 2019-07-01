@@ -98,7 +98,7 @@ const router = new Router({
     {
       path: '/QuoteCreation',
       name: 'QuoteCreation',
-      component: QuoteCreation
+      component: QuoteCreation,
     },
     {
       path: '/CustomerInformation',

@@ -8,9 +8,9 @@
 								 track-by="customerName"
    							 label="customerName"
 								 :allow-empty="true"
-								 placeholder="Select a customer"
-								 @close="customerSelected"
-								 @open="selectOpened">
+								 placeholder="Select a customer"								
+								 @open="selectOpened"
+								 @input="customerSelected">
 		</multiselect>
 		<b-form-input v-model="siteRef"
 									type="text"
@@ -29,8 +29,7 @@
 																													singleCustomer: singleCustomer,
 																													siteRef: siteRef,
 																													retail: retail,
-																													trdCustomer: nextTRD,
-																													retCustomer: nextRET, } }">
+																													custFromList: custFromList} }">
 				<b-button :disabled="disabled == 1 ? true : false" @click="saveCustomer" variant="outline-primary" style="margin-top: 5px;">Go to quote</b-button>
 			</router-link>
 			</div>
@@ -115,6 +114,7 @@ export default {
 			retail: false,
 			nextTRD: null,
 			nextRET: null,
+			custFromList: false,
 		}		
   },
   methods: {
@@ -141,9 +141,8 @@ export default {
 		},
 		customerSelected() {
 			this.disabled = 0;
-				console.log("ehere")
+			this.custFromList = true;
 			if(this.selectedCustomer == '') {
-				// this.singleCustomer = null;
 				this.trade = false;
 				this.retail = false;
 				this.disabled = 1;
@@ -151,6 +150,7 @@ export default {
 		},
 		saveCustomer() {
 			var custRef;
+			this.custFromList = false;
 			if(this.retail){ //Get the customer reference based upon what value has been selected
 				custRef = this.nextRET;
 			} else {
@@ -168,6 +168,7 @@ export default {
 				.then((response) => {
 					console.log(response);
 					this.getCustomers();
+					this.singleCustomer['customerRef'] = custRef;
 					this.$router.push('QuoteCreation')
 				})
 				.catch((error) => {
