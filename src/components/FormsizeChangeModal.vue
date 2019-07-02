@@ -3,11 +3,13 @@
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Form Size</b-button>
     <b-modal ref="formSizeModal" title="Change Batch Form Size" size="lg" centered hide-footer>
-      <b-alert :show="newBatchNeeded" >Quantity changed, this will create a new batch when a location is chosen</b-alert>
+      <b-alert :show="newBatchNeeded" >This will change saleable quantity and will create a new batch when a location is chosen</b-alert>
       <!-- Div for the modal body -->
       <div class="block">
         <!-- Form validation -->
-        <label for="quantity">Quantity: </label>
+        <label>Allocated Qty: {{allocatedQty}} </label><br>
+        <label>Growing Qty: {{growingQty}}</label><br>
+        <label for="quantity">Saleable Qty: </label>
         <input  v-validate="'required|numeric|min_value:1'" 
                 name="quantity"
                 id="quantity" 
@@ -19,12 +21,15 @@
                 inputmode="numeric"
                 @keyup="validationCheck">
         <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
+        <br>
+        <b-checkbox v-model="manualEdit">Manually enter formsize?</b-checkbox>
+        <input v-if="manualEdit" v-model="manualForm" class="form-control" placeholder="Change formsize">
       </div>
       <div>   
         <b-container>
           <b-row>
             <b-col>
-              <p>New Form Size</p>
+              <!-- <p>New Form Size</p> -->
               <b-form-group class="modal__content">
                 <b-form-radio-group id="newFormSizeButtons"
                                     v-model="selectedFormSize"
@@ -52,6 +57,7 @@
         <p>Are the changes to form size Correct?</p>
         <p>Old form size: {{oldFormSize}} </p>
         <p>New form size: {{selectedFormSize}}</p>
+        <!-- <p v-if="manualEdit">New form size: {{manualForm}}</p> -->
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="showModal">Back</b-btn>
@@ -78,6 +84,10 @@ export default {
       batchId: '',
       newBatchNeeded: false,
       disabled: 1,
+      allocatedQty: '',
+      growingQty: '',
+      manualEdit: false,
+      manualForm: '',
     }
   },
   methods: {
@@ -179,9 +189,23 @@ export default {
     var selectedBatchInformation = JSON.parse(sessionStorage.getItem('selectedBatchInformation'));
     this.batchId = selectedBatchInformation.batchId;
     this.quantity = selectedBatchInformation.quantity;
+    this.growingQty = selectedBatchInformation.growingQuantity;
+    this.allocatedQty = selectedBatchInformation.allocatedQuantity;
     this.originalQuantity = selectedBatchInformation.quantity;
     this.oldFormSize = selectedBatchInformation.formSize;
     this.Sku = selectedBatchInformation.Sku;
+  },
+  watch: {
+    manualEdit: function() {
+      if(this.manualEdit) {
+        this.disabled = 0;
+        this.selectedFormSize = this.manualForm;
+      } else {
+        this.disabled = 1;
+        this.selectedFormSize = '';
+        this.manualForm = '';
+      }
+    }
   }
 }
 </script>

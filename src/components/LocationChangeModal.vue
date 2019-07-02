@@ -3,11 +3,13 @@
     <b-button @click="showLocationModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Location</b-button>
     <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer>
-      <b-alert :show="newBatchNeeded" >Quantity changed, this will create a new batch at chosen location</b-alert>
+      <b-alert :show="newBatchNeeded" >This will change saleable quantity and will create a new batch when a location is chosen</b-alert>
       <!-- Div for the modal body -->
       <div class="block">
         <!-- Form validation -->
-        <label for="quantity">Quantity:</label>
+        <label>Allocated Qty: {{allocatedQuantity}} </label><br>
+        <label>Growing Qty: {{growingQuantity}}</label><br>
+        <label for="quantity">Saleable Qty:</label>
         <input  v-validate="'required|numeric|min_value:1'" 
                 name="quantity"
                 id="quantity" 

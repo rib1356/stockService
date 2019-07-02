@@ -27,6 +27,12 @@
         <b-button class="myBtn misc-btn" variant="secondary">Admin Page</b-button>
       </router-link>  
       <b-button class="myBtn misc-btn" variant="secondary" @click="reloadBatches">Refresh values</b-button>
+      <export-excel 
+          :data = "excelBatches"
+          worksheet = "BatchList"
+          name = "HillsStock">
+          <b-button class="myBtn export-btn" variant="secondary">Export Batches</b-button>
+      </export-excel>
     </div>
     <div class="dashboard">
       <h3>Dashboard</h3>
@@ -62,6 +68,8 @@ export default {
       salesOrders: 'loading',
       customers: 'loading',
       batchData: [],
+      excelBatches: [],
+      blahsd: "blah"
     }
   },
   methods: {
@@ -90,11 +98,14 @@ export default {
       localStorage.removeItem('customers');
       location.reload();
     },
-    retrieveData () {
+    retrieveData (dbBatch) {
       this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
         .then((response) => {
           console.log(response);
-          this.changeData(response.data);
+          this.excelBatch(response.data); //Call this each time so the correct batch data can be export
+          if(dbBatch) { //Only call this if the batch data needs to be saved into browser storage
+            this.changeData(response.data);
+          }
       }).catch((error) => {
         //DO SOME ERROR HANDLING HERE
       });
@@ -123,6 +134,23 @@ export default {
       sessionStorage.setItem('batchList', JSON.stringify(this.batchData));
       sessionStorage.setItem('batchInMemory', true);
       this.batches = this.batchData.length;
+    },
+    excelBatch(response) {
+      console.log("here")
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+        if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+          this.excelBatches.push({                 //This is then pushed into an array and used to populate the data table
+            "plantName": response[i].Name,
+            "formSize": response[i].FormSize,
+            "location": response[i].Location,
+            "quantity": response[i].Quantity,
+            //"batchPrice": response[i].WholesalePrice, 
+            "growingQuantity": response[i].GrowingQuantity,
+            "allocatedQuantity": response[i].AllocatedQuantity,
+            "dateStamp": response[i].DateStamp,
+          });
+        }
+      }
     },
     getCustomers() {
       if(localStorage.getItem('customers') == null) {
@@ -158,14 +186,17 @@ export default {
 		},
   },  
   mounted() {
-    //console.log(this.$root.baseUrl);
+    var bool;
     if(sessionStorage.getItem('batchList') == null) {
       console.log("getting data from db");
-      this.retrieveData();
+      bool = true;
+      // this.retrieveData(pleb);
     } else {
       console.log("getting length from session");
       setTimeout(this.getNoBatches, 1500);
+      bool = false;
     }
+    this.retrieveData(bool);
     setTimeout(this.getCustomers,1500);
     setTimeout(this.getQuotes,1500);
     sessionStorage.setItem('timesLoaded', 0);
@@ -238,6 +269,11 @@ export default {
   .misc-btn{
     border-color: #B22222;
     background: #B22222;
+  }
+
+  .export-btn{
+    border-color: lightblue;
+    background: lightblue;
   }
 
   .misc-btn > :hover {

@@ -7,7 +7,7 @@
           <div>
             <!-- Form Validation -->
             <label class="control-label" for="quantity">Saleable Quantity: {{originalQuantities.saleable}}</label>
-            <input  v-validate="'required|numeric|min_value:1'" 
+            <input  v-validate="'numeric|min_value:0'" 
                     name="quantity"
                     id="quantity" 
                     v-model="quantity" 
@@ -19,7 +19,7 @@
                     @change="validationCheck">
             <p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
             <label class="control-label" for="quantity">Growing Quantity: {{originalQuantities.growing}}</label>
-            <input  v-validate="'required|numeric|min_value:1'" 
+            <input  v-validate="'numeric|min_value:0'" 
                     name="quantity"
                     id="quantity" 
                     v-model="growingQuantity" 
@@ -30,7 +30,7 @@
                     inputmode="numeric"
                     @change="validationCheck">
             <label class="control-label" for="quantity">Allocated Quantity: {{originalQuantities.allocated}}</label>
-            <input  v-validate="'required|numeric|min_value:1'" 
+            <input  v-validate="'numeric|min_value:0'" 
                     name="quantity"
                     id="quantity" 
                     v-model="allocatedQuantity" 
@@ -44,7 +44,7 @@
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false"
+        <b-btn class="mt-3"
                variant="outline-primary" @click="validateBeforeSubmit">Save Changes</b-btn>
       </div>
     </b-modal>
@@ -134,7 +134,7 @@ export default {
 }
 
 .modal-lg { /*Used to overwrite the size of the modal */
-    height: 30vh;
+    height: 40vh;
 }
 
 p {
@@ -144,6 +144,23 @@ p {
 }
 .para {
   padding: 15% 0;
+}
+
+/* For mobile screens potential for more css in here? */
+@media only screen and (max-width : 768px) {
+ .modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  }
+
+  .modal-lg {
+    height: 60vh;
+  }
 }
 
 </style>

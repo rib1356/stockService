@@ -13,8 +13,11 @@
         <b-col cols="10"><form-size-change-modal></form-size-change-modal></b-col>
       </b-row>
       <b-row>
-        <b-col cols="2"><label for="quantity">Saleable Quantity: {{quantity}} 
-          Growing Quantity: {{growingQuantity}}  Allocated Quantity: {{allocatedQuantity}} </label></b-col> 
+        <b-col cols="2">
+          <label for="quantity">Saleable Quantity: {{quantity}} </label>
+          <label>Growing Quantity: {{growingQuantity}}</label>
+          <label>Allocated Quantity: {{allocatedQuantity}}</label>
+        </b-col> 
         <b-col cols="10"><quantity-change-modal></quantity-change-modal></b-col> 
       </b-row>
       <b-row>

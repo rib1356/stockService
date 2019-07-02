@@ -64,7 +64,7 @@
              :sort-by.sync="sortBy"
              :sort-desc.sync="sortDesc"
              :sort-direction="sortDirection"
-             class="table"  
+             class="p-2"  
              :busy="isBusy"  
              >
       <div slot="empty">
@@ -109,7 +109,9 @@ export default {
         { key: 'plantName', label: 'Plant Full Name', sortable: true, sortDirection: 'desc' },
         { key: 'formSize', label: 'Form Size' },
         { key: 'location', label: 'Location', sortable: true },
-        { key: 'quantity', label: 'Quantity', sortable: true },
+        { key: 'quantity', label: 'Saleable Qty', sortable: true },
+        { key: 'growingQuantity', label: 'Growing Qty', sortable: true },
+        { key: 'allocatedQuantity', label: 'Allocated Qty', sortable: true },
         { key: 'actions', label: 'Actions' }
       ],
       sortBy: 'plantName',
@@ -380,6 +382,20 @@ export default {
     -webkit-overflow-scrolling: touch;
 	}
 
+  .b-table[aria-busy="true"] {
+  content: '';
+}
+
+body.modal-open {
+    position: fixed;
+    overflow: hidden;
+    left:0;
+    right:0;
+}
+.modal{
+    -webkit-overflow-scrolling: auto;
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -408,31 +424,5 @@ export default {
 }
 
 
-/* 
-tbody {
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-} */
-
-/* thead {
-  width: 100%;
-  vertical-align: top;
-} */
-
-.b-table[aria-busy="true"] {
-  content: '';
-}
-
-body.modal-open {
-    position: fixed;
-    overflow: hidden;
-    left:0;
-    right:0;
-}
-.modal{
-    -webkit-overflow-scrolling: auto;
-}
 
 </style>
