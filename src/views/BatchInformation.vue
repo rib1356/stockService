@@ -134,6 +134,7 @@ export default {
       // console.log(moment(new Date));
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, {
         "Id": this.batchId,
+        "Quantity": -1,
         "Active": true,
         "DateStamp": moment(new Date)
       })

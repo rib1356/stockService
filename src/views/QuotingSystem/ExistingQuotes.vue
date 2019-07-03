@@ -90,7 +90,7 @@
           {{pickListInfo.deliveryNeeded}}
         </b-form-checkbox>
       </b-form-group>                            
-      <b-button variant="outline-primary" block>Allocate Plants</b-button>
+      <b-button variant="outline-primary" @click="savePickListInfo" block>Allocate Plants</b-button>
       <b-button variant="outline-danger" block @click="hidePickListModal()">Cancel</b-button>
     </b-modal>
   </div>
@@ -101,6 +101,7 @@
 import moment from 'moment'
 import Datepicker from 'vuejs-datepicker';
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
+// import PickListModel from '@/views//PickListModel.vue'
 export default {
   name: 'ExistingQuotes',
   components: {
@@ -164,6 +165,10 @@ export default {
     },
     hidePickListModal() {
       this.$refs['pickListModel'].hide()
+    },
+    savePickListInfo() {
+      sessionStorage.setItem('pickListInfo', JSON.stringify(this.pickListInfo));
+      this.$router.push('PlantAllocation');
     },
     getExistingQuotes() {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')

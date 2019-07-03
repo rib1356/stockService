@@ -102,6 +102,7 @@ export default {
       let data = { "Id": this.batchId, "Quantity": parseInt(this.quantity), "GrowingQuantity": parseInt(this.growingQuantity), "AllocatedQuantity": parseInt(this.allocatedQuantity), "Active": true , "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
+          console.log(data);
           console.log(response);
 			  })
 			.catch((error) => {

@@ -195,7 +195,7 @@ export default {
         }
     },
     saveDbLocation(newLocation) { //Save the new location of the batch in the database
-      let data = { "Id": this.batchId, "Location": newLocation, "Active": true , "DateStamp": null};
+      let data = { "Id": this.batchId, "Location": newLocation, "Quantity": -1, "Active": true , "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);
@@ -205,16 +205,22 @@ export default {
 			});
     },
     createNewBatch(newLocation) { //Create a new batch with the new location and quantity
+      var form;
+      if(this.formSize == ""){ //If the form size has manually been entered use that one when creating a new batch
+        form = this.manualFormSize;
+      } else {
+        form = this.formSize;
+      }
       this.axios.post('https://ahillsbatchservice.azurewebsites.net/api/Batches', {
         "Sku": this.Sku,
 				"Name": this.name,
-				"FormSize": this.formSize,
+				"FormSize": form,
 				"Location": newLocation,
 				"Quantity": this.quantity,
 				"WholesalePrice": this.wholesalePrice,
         "ImageExists": false,
-        "GrowingQuantity": this.growingQuantity,
-        "AllocatedQuantity": this.allocatedQuantity,
+        "GrowingQuantity": 0,
+        "AllocatedQuantity": 0,
         "DateStamp": moment(new Date),
 				"Active": true,
 			})
@@ -273,6 +279,7 @@ export default {
     this.$root.$on('LocationChangeModal',() => { //test CREATED()
     this.quantity = sessionStorage.getItem('newQuantity');
     this.formSize = sessionStorage.getItem('newFormSize');
+    this.manualFormSize = sessionStorage.getItem('manualFormSize');
     this.formSizeChanged = 1;
     this.showLocationModal();   
     });

@@ -127,6 +127,7 @@ export default {
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, {
         "Id": this.batchId,
         "ImageExists": true,
+        "Quantity": -1,
         "Active": true,
         "DateStamp": null
       })

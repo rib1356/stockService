@@ -48,7 +48,7 @@
       </div>
       <div class="modal__footer">
         <b-btn class="mt-3" variant="outline-danger" @click="hideModal">Cancel</b-btn>
-        <b-btn class="mt-3" :disabled="disabled == 1 ? true : false" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
+        <b-btn class="mt-3" variant="outline-primary" @click="continueOrSave">Continue</b-btn>
       </div>
     </b-modal>
     <div>
@@ -57,7 +57,7 @@
         <p>Are the changes to form size Correct?</p>
         <p>Old form size: {{oldFormSize}} </p>
         <p>New form size: {{selectedFormSize}}</p>
-        <!-- <p v-if="manualEdit">New form size: {{manualForm}}</p> -->
+        <p v-if="manualEdit">New manual form size: {{manualForm}}</p>
       </div>
       <div>
         <b-btn class="mt-3" variant="outline-danger" @click="showModal">Back</b-btn>
@@ -107,6 +107,7 @@ export default {
       } else {
         sessionStorage.setItem("newQuantity", this.quantity);
         sessionStorage.setItem("newFormSize", this.selectedFormSize);
+        sessionStorage.setItem("newManualFormSize". this.manualForm);
         this.$root.$emit('LocationChangeModal'); //Else the changed quantity need to be a new batch, therefore set to a new location
       }
     },
@@ -160,7 +161,13 @@ export default {
     saveFormSizes() {
       this.updateFormSize();
       this.hideConfirmModal();
-      let data = { "Id": this.batchId, "FormSize": this.selectedFormSize, "Active": true, "DateStamp": null};
+      var formsize;
+      if(this.manualEdit) {
+        formsize = this.manualForm;
+      } else {
+        formsize = this.selectedFormSize;
+      }
+      let data = { "Id": this.batchId, "FormSize": formsize, "Quantity": -1, "Active": true, "DateStamp": null};
       this.axios.put("https://ahillsbatchservice.azurewebsites.net/api/Batches/" + this.batchId, data)
 			  .then((response) => {
           console.log(response);    
@@ -170,6 +177,7 @@ export default {
 			});
     },
     validationCheck() { 
+      
       //If quantities are different display alert
       if(this.quantity != this.originalQuantity) {
         this.newBatchNeeded = true;
@@ -180,6 +188,8 @@ export default {
       //If no validation errors and a formsize is selected enable button
       if (!this.errors.any() && this.selectedFormSize != '') {
         this.disabled = 0;
+        this.manualEdit = false;
+        this.manualForm = '';
       } else {
         this.disabled = 1;
       }
@@ -199,10 +209,9 @@ export default {
     manualEdit: function() {
       if(this.manualEdit) {
         this.disabled = 0;
-        this.selectedFormSize = this.manualForm;
+        this.selectedFormSize = '';
       } else {
         this.disabled = 1;
-        this.selectedFormSize = '';
         this.manualForm = '';
       }
     }
