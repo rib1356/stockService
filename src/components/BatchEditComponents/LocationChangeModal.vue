@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import DeleteBatchModal from '@/components/DeleteBatchModal';
+import DeleteBatchModal from '@/components/BatchEditComponents/DeleteBatchModal';
 import moment from 'moment';
 export default {
   name: 'LocationChangeModal',

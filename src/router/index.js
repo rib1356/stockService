@@ -21,7 +21,6 @@ import BatchPricing from '@/views/Pricing/BatchPricing'
 //Quote Pages
 import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'
 import CustomerInformation from '@/views/QuotingSystem/CustomerInformation'
-import QuoteNavigation from '@/views/QuotingSystem/QuoteNavigation'
 import ExistingQuotes from '@/views/QuotingSystem/ExistingQuotes'
 import EditQuote from '@/views/QuotingSystem/EditQuote'
 
@@ -104,11 +103,6 @@ const router = new Router({
       path: '/CustomerInformation',
       name: 'CustomerInformation',
       component: CustomerInformation
-    },
-    {
-      path: '/QuoteNavigation',
-      name: 'QuoteNavigation',
-      component: QuoteNavigation
     },
     {
       path: '/ExistingQuotes',

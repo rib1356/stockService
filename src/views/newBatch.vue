@@ -60,7 +60,7 @@
 
 <script>
 import moment from 'moment'
-import PictureModal from '@/components/PictureModal';
+import PictureModal from '@/components/BatchEditComponents/PictureModal';
 import MiscNavbar from '@/components/MiscNavbar.vue'
 export default {
   data () {

@@ -49,12 +49,12 @@
 </template>
 
 <script>
-  import LocationChangeModal from '@/components/LocationChangeModal';
-  import FormSizeChangeModal from '@/components/FormSizeChangeModal';
-  import QuantityChangeModal from '@/components/QuantityChangeModal';
-  import PriceChangeModal from '@/components/PriceChangeModal';
-  import PictureModal from '@/components/PictureModal';
-  import DeleteBatchModal from '@/components/DeleteBatchModal';
+  import LocationChangeModal from '@/components/BatchEditComponents/LocationChangeModal';
+  import FormSizeChangeModal from '@/components/BatchEditComponents/FormSizeChangeModal';
+  import QuantityChangeModal from '@/components/BatchEditComponents/QuantityChangeModal';
+  import PriceChangeModal from '@/components/BatchEditComponents/PriceChangeModal';
+  import PictureModal from '@/components/BatchEditComponents/PictureModal';
+  import DeleteBatchModal from '@/components/BatchEditComponents/DeleteBatchModal.vue';
   import moment from 'moment';
   import {db} from '../main'
   import firebase from 'firebase/app';

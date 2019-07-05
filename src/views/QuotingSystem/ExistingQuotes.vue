@@ -69,7 +69,7 @@
 				</router-link>
 				<i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete Item" style="color:red" @click.stop="deleteQuote(row.item)"></i>
         <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" style="color:#0b720b" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
-        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Pick List" @click="openPickList" style="color:#11979e" v-else></i>
+        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Pick List" @click="openPickList(row.item)" style="color:#11979e" v-else></i>
       </template> 
     </b-table>
     <b-modal ref="pickListModel" size="lg" no-close-on-backdrop hide-footer title="Create Pick List for Sales Order">
@@ -127,6 +127,7 @@ export default {
         estimatedDate: null,
         exactDate: null,
         deliveryNeeded: false,
+        salesOrderInfo: {},
       },
       quotes: [],
       saleOrders: [],
@@ -160,7 +161,8 @@ export default {
     setFilter(date) {
       this.filter = this.customFormatter(date)
     },
-    openPickList() {
+    openPickList(row) {
+      this.pickListInfo.salesOrderInfo = row;
       this.$refs['pickListModel'].show()
     },
     hidePickListModal() {

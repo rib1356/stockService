@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import {db} from '../main'
+  import {db} from '../../main'
   import firebase from 'firebase/app';
   import 'firebase/storage';
   import 'firebase/database';
