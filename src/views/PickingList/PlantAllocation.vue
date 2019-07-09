@@ -1,7 +1,7 @@
 <template>
   <div>
-    <pick-list-info class="info" v-bind:pickListInfo='pickListInfo'></pick-list-info>
-    <pick-list-items class="list" v-bind:pickListInfo='pickListInfo'></pick-list-items>
+    <pick-list-info class="info" v-bind:pickListInformation='pickListInformation'></pick-list-info>
+    <pick-list-items class="list" v-bind:pickListInformation='pickListInformation'></pick-list-items>
   </div>
 </template>
 
@@ -16,12 +16,12 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
     },
     data() {
       return {
-        pickListInfo: '',
+        pickListInformation: '',
 
       }
     },
     mounted() {
-      this.pickListInfo = JSON.parse(sessionStorage.getItem('pickListInfo'));
+      this.pickListInformation = JSON.parse(sessionStorage.getItem('pickListInfo'));
     }      
   }
 </script>
@@ -41,7 +41,7 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
   height: fit-content;
   max-height: 85vh;
 	width: 80%;
-  background-color:lightgray;
+  /* background-color:lightgray; */
   color: black;
   -webkit-overflow-scrolling: touch;
 }

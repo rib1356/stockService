@@ -339,27 +339,27 @@ export default {
     hideModal(rowId) {
       this.$refs['editModal'+rowId].hide();
     },
-    pickingList(row, rowId) {
-      this.$refs['pickListModal'+rowId].show();
-      // this.$refs['checkbox'+rowId].is_checked = false;
-      this.selected = [];
-      this.quantityNeeded = row.Quantity
-      let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
-      let selectedPlants = stockBatches.filter(stockBatches => //Loop through batches to find which match the one selected for picking
-          (stockBatches.plantName === row.PlantName && stockBatches.formSize === row.FormSize));  
-      var counter = 0;    
-      selectedPlants.forEach(element => {
-        element.quantityUse = element.quantity; //Add a new element to the object for the quantity thats going to be use on picklist
-        this.checkboxIds.push("checkbox"+counter);
-        counter++;
-      });  
-      this.batchesToPick = selectedPlants;
-      // this.batchesToPick.forEach(element => {
-      //   var counter = 0;
-      //   this.checkboxIds.push("checkbox"+counter);
-      //   counter++;
-      // });
-    },
+    // pickingList(row, rowId) {
+    //   this.$refs['pickListModal'+rowId].show();
+    //   // this.$refs['checkbox'+rowId].is_checked = false;
+    //   this.selected = [];
+    //   this.quantityNeeded = row.Quantity
+    //   let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
+    //   let selectedPlants = stockBatches.filter(stockBatches => //Loop through batches to find which match the one selected for picking
+    //       (stockBatches.plantName === row.PlantName && stockBatches.formSize === row.FormSize));  
+    //   var counter = 0;    
+    //   selectedPlants.forEach(element => {
+    //     element.quantityUse = element.quantity; //Add a new element to the object for the quantity thats going to be use on picklist
+    //     this.checkboxIds.push("checkbox"+counter);
+    //     counter++;
+    //   });  
+    //   this.batchesToPick = selectedPlants;
+    //   // this.batchesToPick.forEach(element => {
+    //   //   var counter = 0;
+    //   //   this.checkboxIds.push("checkbox"+counter);
+    //   //   counter++;
+    //   // });
+    // },
     hidePickListModal(rowId) {
       this.$refs['pickListModal'+rowId].hide();
     },
@@ -392,7 +392,6 @@ export default {
 							var obj = child.val();
 							if(child.key == "VAT"){
 								this.VAT = obj.value;
-								console.log(this.VAT);
 							}
             });
 			}, 
