@@ -2,10 +2,11 @@
   <div>
     <b-button size="sm" @click="openHSModal" style="margin-left: 5px;">Hills</b-button>
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
+      <p>Quantity Needed: {{rowInfo.Quantity}}</p>
       <ul v-for="batches in batchesToPick" v-bind:key="batches.batchId">
         <li>
           PlantName: {{batches.plantName}} | FormSize: {{batches.formSize}} | Location: {{batches.location}} |
-          Saleable Qty: {{batches.quantity}} <input v-model="amountNeeded" type="number" step="1" />
+          Saleable Qty: {{batches.quantity}} <input v-model="batches.batchId" type="number" step="1" />
         </li>
       </ul>
       <b-button variant="outline-primary" block @click="acceptValues">Use selected batches</b-button>
