@@ -13,7 +13,7 @@
       <template slot="actions" slot-scope="row">
         <div class="btn-group" role="group" aria-label="Basic example">
         <supplier-modal></supplier-modal>
-        <hills-stock-modal @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></hills-stock-modal>
+        <hills-stock-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></hills-stock-modal>
         <subs-modal></subs-modal>
         </div>  
         <!-- <b-button size="sm">Supplier</b-button> -->
@@ -48,6 +48,7 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         ],
         quotePlants: [],
         pickListInfo1: '',
+        arrayOfBatches: [],
       }
     },
     methods: {
@@ -90,6 +91,10 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
           }
         });  
       },
+      createArrayofBatches(batches) {
+        this.arrayOfBatches.push(batches);
+        console.log(this.arrayOfBatches);
+      }
       // setVal(item, value) {
       //   console.log("setVal item:" + item + " val: "+ value)
       //   this.counter = item;

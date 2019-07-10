@@ -15,6 +15,7 @@
         <b-dropdown-item @click="sendHome" v-if="authenticated">Home</b-dropdown-item>
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
+        <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add New Batch</b-dropdown-item>
         <!-- <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item> -->
         <!-- <b-dropdown-item @click="pricing" v-if="authenticated">Pricing</b-dropdown-item> -->
         <!-- <b-dropdown-item @click="admin" v-if="authenticated">Admin Page</b-dropdown-item> -->

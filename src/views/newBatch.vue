@@ -51,7 +51,8 @@
 		</b-modal>							
 		<picture-modal style=""></picture-modal>											 					 	 
 		<div style="margin-top: 30px;">
-			<b-button @click="cancel" variant="outline-danger">Cancel</b-button>
+			<b-button @click="cancel" variant="outline-danger">Back To Home</b-button>
+			<b-button @click="noImage" variant="outline-danger">Back To Stock</b-button>
 			<b-button @click="saveBatch" variant="outline-primary">Submit</b-button>
 		</div>
 	</div>

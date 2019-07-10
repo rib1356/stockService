@@ -3,13 +3,14 @@
     <b-button size="sm" @click="openHSModal" style="margin-left: 5px;">Hills</b-button>
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
       <p>Quantity Needed: {{rowInfo.Quantity}}</p>
+      <p v-if="batchesToPick.length == 0">Sorry no batches of this type exist on the nursery</p>
       <ul v-for="batches in batchesToPick" v-bind:key="batches.batchId">
         <li>
           PlantName: {{batches.plantName}} | FormSize: {{batches.formSize}} | Location: {{batches.location}} |
-          Saleable Qty: {{batches.quantity}} <input v-model="batches.batchId" type="number" step="1" />
+          Saleable Qty: {{batches.quantity}} <input v-model="batches.amountNeeded" type="number" step="1" />
         </li>
       </ul>
-      <b-button variant="outline-primary" block @click="acceptValues">Use selected batches</b-button>
+      <b-button variant="outline-primary" v-if="!batchesToPick.length == 0" block @click="acceptValues">Use selected batches</b-button>
       <b-button variant="outline-danger" block @click="hideModal">Close Me</b-button>
     </b-modal>
   </div>
@@ -21,24 +22,47 @@
     data() {
       return {
         batchesToPick: '',
-        amountNeeded: ''
+        batchesUsed: [],
+        // amountNeeded: ''
       }
     },
     methods: {
       openHSModal() {  
         this.$refs.HillsStockModal.show();
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList')); //Get the latest batches in stock
+        if(this.batchesToPick.length == 0) {
+          console.log("here")
         let selectedPlants = stockBatches.filter(stockBatches => //Filter through the batches where the plantName/FormSize is the same
             (stockBatches.plantName === this.rowInfo.PlantName && stockBatches.formSize === this.rowInfo.FormSize)); //This will give you a list of batches that are the same
+        selectedPlants.forEach(element => {
+          element['amountNeeded'] = 0;
+        });    
         this.batchesToPick = selectedPlants;
+        }
       },
       hideModal() {
         this.$refs.HillsStockModal.hide();
       },
       acceptValues() {
-        this.rowInfo.QuantityOutstanding = this.amountNeeded;
+        if(this.rowInfo.Quantity < this.checkBatchesUsed()) {
+          alert("This is more than the quantity needed (Will update the new quantity eventually)")
+          this.rowInfo.QuantityOutstanding = this.checkBatchesUsed();
+        } else {
+          this.rowInfo.QuantityOutstanding = this.checkBatchesUsed();
+        }
         this.$emit('sendVal');
+        this.$emit('batchesUsed', this.batchesUsed);
         this.hideModal();
+      },
+      checkBatchesUsed() {
+        var amount = 0;
+        this.batchesToPick.forEach(element => {
+          if(parseInt(element.amountNeeded) > 0) {
+            amount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
+            this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+          }
+        });
+        return amount;
       }
     }
   }
