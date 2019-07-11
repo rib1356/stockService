@@ -26,6 +26,7 @@ import EditQuote from '@/views/QuotingSystem/EditQuote'
 
 //Picking List Pages 
 import PlantAllocation from '@/views/PickingList/PlantAllocation'
+import PickListFinalisation from '@/views/PickingList/PickListFinalisation'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -128,6 +129,11 @@ const router = new Router({
       path: '/PlantAllocation',
       name: 'PlantAllocation',
       component: PlantAllocation
+    },
+    {
+      path: '/PickListFinalisation',
+      name: 'PickListFinalisation',
+      component: PickListFinalisation
     },
     {
       path: '/Admin',

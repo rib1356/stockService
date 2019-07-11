@@ -90,7 +90,8 @@
       <!-- Picture Modal -->
      <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
         <h4 v-if="!imageLoaded">Image Loading</h4>
-        <p v-else-if="imgError">Sorry there was an error: {{err}} </p>
+        <p v-else-if="imgError">Sorry there was an error finding this image</p>
+        <p v-if="imgError && !imageLoaded && authenticated">{{err}}</p>
         <!-- <div v-if="!imageLoaded" class="box"></div> -->
         <img @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
       </b-modal>

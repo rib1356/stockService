@@ -92,13 +92,15 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         });  
       },
       createArrayofBatches(batches) {
-        this.arrayOfBatches.push(batches);
-        console.log(this.arrayOfBatches);
+        batches.forEach(element => {
+          if(!this.arrayOfBatches.includes(element))
+          this.arrayOfBatches.push(element);
+        });
+        this.$emit('getUsedBatches', this.arrayOfBatches);
+      },
+      fetchUsedBatches() {
+        return this.arrayOfBatches;
       }
-      // setVal(item, value) {
-      //   console.log("setVal item:" + item + " val: "+ value)
-      //   this.counter = item;
-      // }
     },
     created() {
       this.pickListInfo1 = JSON.parse(sessionStorage.getItem('pickListInfo'));

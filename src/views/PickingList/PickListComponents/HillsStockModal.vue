@@ -3,22 +3,22 @@
     <b-button size="sm" @click="openHSModal" style="margin-left: 5px;">Hills</b-button>
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
       <div v-if="batchesToPick.length != 0"> <!-- Grid items to hold all of the batches to select from -->
-        <p><u>Quantity Needed: {{rowInfo.Quantity}}</u></p>
+        <p><u>Quantity Needed: {{rowInfo.Quantity}} Current Amount: {{currentAmount}}</u></p>
         <div class="grid-container">
           <div class="grid-item">
-            <p>Plant Name</p>
+            <p><u>Plant Name</u></p>
           </div>
           <div class="grid-item">
-            <p>Form Size</p>
+            <p><u>Form Size</u></p>
           </div>
           <div class="grid-item">
-            <p>Location</p>
+            <p><u>Location</u></p>
           </div>  
           <div class="grid-item">
-            <p>Quantity</p>
+            <p><u>Quantity</u></p>
           </div>  
           <div class="grid-item">
-            <p>Amount Needed</p>
+            <p><u>Amount Needed</u></p>
           </div>  
         </div>
         <ul v-for="batches in batchesToPick" v-bind:key="batches.batchId" class="myList">
@@ -36,7 +36,7 @@
               <p>{{batches.quantity}}</p>
             </div>  
             <div class="grid-item">
-              <input v-model="batches.amountNeeded" type="number" step="1" />
+              <input v-model="batches.amountNeeded" type="number" step="1" @input="calcAmounts" min="0"/>
             </div>   
           </div>
         </ul>
@@ -55,7 +55,7 @@
       return {
         batchesToPick: '',
         batchesUsed: [],
-        // amountNeeded: ''
+        currentAmount: 0,
       }
     },
     methods: {
@@ -88,12 +88,20 @@
       checkBatchesUsed() {
         var amount = 0;
         this.batchesToPick.forEach(element => {
-          if(parseInt(element.amountNeeded) > 0) {
-            amount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
-            this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+          if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
+            amount += parseInt(element.amountNeeded); //Calculate the total amounts that have been used on different batches
+            if(!this.batchesUsed.includes(element)) { //It doesnt exist in the array so add it
+              this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+            }
           }
         });
         return amount;
+      },
+      calcAmounts() {
+        this.currentAmount = 0;
+        this.batchesToPick.forEach(element => {
+            this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
+        });
       }
     }
   }

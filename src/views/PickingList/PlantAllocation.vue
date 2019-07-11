@@ -1,7 +1,15 @@
 <template>
   <div>
-    <pick-list-info class="info" v-bind:pickListInformation='pickListInformation'></pick-list-info>
-    <pick-list-items class="list" v-bind:pickListInformation='pickListInformation'></pick-list-items>
+    <div class="info" >
+    <pick-list-info v-bind:pickListInformation='pickListInformation'></pick-list-info>
+    <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+      <b-button variant="outline-danger" class="myBtn">Cancel Allocation</b-button>
+    </router-link>
+    <router-link :to="{name: 'PickListFinalisation', params: { itemsToPick: this.items } }">
+      <b-button variant="outline-primary" class="myBtn">Allocate Plants</b-button>
+    </router-link>  
+    </div>
+    <pick-list-items class="list" v-bind:pickListInformation='pickListInformation' @getUsedBatches="putBatches"></pick-list-items>
   </div>
 </template>
 
@@ -17,7 +25,12 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
     data() {
       return {
         pickListInformation: '',
-
+        items: '',
+      }
+    },
+    methods: {
+      putBatches(batches) { //Items for the picklist are passed up through components to then be sent to the next page
+        this.items = batches;
       }
     },
     mounted() {
@@ -32,8 +45,18 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
   width: 20%;
 	height: 100%; 
 	float:left;
-  background-color: slategray;
+  /* background-color: slategray; */
+  text-align: center;
   color: black;
+}
+
+.myBtn
+{
+  width: 100%;
+  float: left;
+  margin-top: 5px;
+  /* position: relative; */
+  /* margin-top: 35px; */
 }
 
 .list {
