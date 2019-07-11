@@ -2,7 +2,7 @@
   <div>
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
         Change Quantity</b-button>
-    <b-modal ref="quantityModal" title="Change Batch Quantity" size="lg" centered hide-footer>
+    <b-modal ref="quantityModal" title="Change Batch Quantity" size="lg" centered hide-footer no-close-on-backdrop>
       <div class="modal-lg">
           <div>
             <!-- Form Validation -->

@@ -2,7 +2,7 @@
   <div>
     <b-button @click="showLocationModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Location</b-button>
-    <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer>
+    <b-modal ref="locationModal" title="Change Batch Location" size="lg" centered hide-footer no-close-on-backdrop>
       <b-alert :show="newBatchNeeded" >This will change saleable quantity and will create a new batch when a location is chosen</b-alert>
       <!-- Div for the modal body -->
       <div class="block">

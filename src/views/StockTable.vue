@@ -90,7 +90,7 @@
       <!-- Picture Modal -->
      <b-modal id="modalInfo" size="lg" class="modal-lg" @hide="resetModal" :title="modalInfo.title" ok-only>
         <h4 v-if="!imageLoaded">Image Loading</h4>
-        <h2 v-else-if="imgError" v>Sorry no picture exists for this batch</h2>
+        <p v-else-if="imgError">Sorry there was an error: {{err}} </p>
         <!-- <div v-if="!imageLoaded" class="box"></div> -->
         <img @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
       </b-modal>
@@ -132,6 +132,7 @@ export default {
       imgError: false,
       imageLoaded: false,
       customers: [],
+      err: ''
     }
   },
   computed: {
@@ -270,8 +271,9 @@ export default {
         document.querySelector('img').scr = url;
         this.imageURL = url;
       }).catch((error) => {
-        this.imageLoaded = false;
+        this.imageLoaded = true;
         this.imgError = true;
+        this.err = error;
         console.log(error);
       });
     },

@@ -2,7 +2,7 @@
   <div>
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-danger">
               Delete Batch</b-button>
-    <b-modal ref="DeleteModal" title="Delete Batch" size="lg" centered hide-footer>
+    <b-modal ref="DeleteModal" title="Delete Batch" size="lg" centered hide-footer no-close-on-backdrop>
       <div>
         <p>Are you sure you want to delete this batch?</p>
         <p>Name: {{plantName}}</p>

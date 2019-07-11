@@ -2,7 +2,7 @@
   <div>
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary" v-if="visible">
               Change Picture</b-button>
-    <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer>
+    <b-modal ref="PictureModal" title="Change Batch Picture" size="lg" centered hide-footer no-close-on-backdrop>
       <div class="modal-lg">
         <!-- <b-button class="myBtn" @click="openCamera">Add/Edit Image: </b-button> -->
         <!-- <input type="file" accept="image/*" @change="onFileSelected">  -->
@@ -169,22 +169,19 @@ export default {
 }
 
 .modal-lg { /*Used to overwrite the size of the modal */
-    height: 50vh;
+    height: 60vh;
 }
 
 .b-img {
   align-content: center;
 }
-/* .modal-body {
-  max-width: 150vh;
+
+@media only screen and (max-width : 725px) {
+
+.modal-lg { /*Used to overwrite the size of the modal */
+    height: 75vh;
 }
 
-.modal-dialog {
-  width: 40% !important;
-  height: 80% !important;
 }
- 
-.modal-content {
-    /* 80% of window height */
 
 </style>

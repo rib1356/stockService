@@ -2,7 +2,7 @@
   <div>
     <b-button @click="showModal" size="sm" style="position: absolute;" variant="outline-primary">
               Change Price</b-button>
-    <b-modal ref="PriceModal" title="Change Batch Price" size="lg" centered hide-footer>
+    <b-modal ref="PriceModal" title="Change Batch Price" size="lg" centered hide-footer no-close-on-backdrop>
       <div class="modal-lg">
         <p>Previous selling price £{{computedPrice}}</p>
         <p>Set new selling price: £

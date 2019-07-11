@@ -2,16 +2,48 @@
   <div>
     <b-button size="sm" @click="openHSModal" style="margin-left: 5px;">Hills</b-button>
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
-      <p>Quantity Needed: {{rowInfo.Quantity}}</p>
-      <p v-if="batchesToPick.length == 0">Sorry no batches of this type exist on the nursery</p>
-      <ul v-for="batches in batchesToPick" v-bind:key="batches.batchId">
-        <li>
-          PlantName: {{batches.plantName}} | FormSize: {{batches.formSize}} | Location: {{batches.location}} |
-          Saleable Qty: {{batches.quantity}} <input v-model="batches.amountNeeded" type="number" step="1" />
-        </li>
-      </ul>
+      <div v-if="batchesToPick.length != 0"> <!-- Grid items to hold all of the batches to select from -->
+        <p><u>Quantity Needed: {{rowInfo.Quantity}}</u></p>
+        <div class="grid-container">
+          <div class="grid-item">
+            <p>Plant Name</p>
+          </div>
+          <div class="grid-item">
+            <p>Form Size</p>
+          </div>
+          <div class="grid-item">
+            <p>Location</p>
+          </div>  
+          <div class="grid-item">
+            <p>Quantity</p>
+          </div>  
+          <div class="grid-item">
+            <p>Amount Needed</p>
+          </div>  
+        </div>
+        <ul v-for="batches in batchesToPick" v-bind:key="batches.batchId" class="myList">
+          <div class="grid-container">
+            <div class="grid-item">
+              <p>{{batches.plantName}}</p>
+            </div>
+            <div class="grid-item">
+              <p>{{batches.formSize}}</p>
+            </div>
+            <div class="grid-item">
+              <p>{{batches.location}}</p>
+            </div>  
+            <div class="grid-item">
+              <p>{{batches.quantity}}</p>
+            </div>  
+            <div class="grid-item">
+              <input v-model="batches.amountNeeded" type="number" step="1" />
+            </div>   
+          </div>
+        </ul>
+      </div>  
+      <p v-else>Sorry no batches of this type exist on the nursery</p>
       <b-button variant="outline-primary" v-if="!batchesToPick.length == 0" block @click="acceptValues">Use selected batches</b-button>
-      <b-button variant="outline-danger" block @click="hideModal">Close Me</b-button>
+      <b-button variant="outline-danger" block @click="hideModal">Cancel</b-button>
     </b-modal>
   </div>
 </template>
@@ -31,7 +63,6 @@
         this.$refs.HillsStockModal.show();
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList')); //Get the latest batches in stock
         if(this.batchesToPick.length == 0) {
-          console.log("here")
         let selectedPlants = stockBatches.filter(stockBatches => //Filter through the batches where the plantName/FormSize is the same
             (stockBatches.plantName === this.rowInfo.PlantName && stockBatches.formSize === this.rowInfo.FormSize)); //This will give you a list of batches that are the same
         selectedPlants.forEach(element => {
@@ -69,5 +100,37 @@
 </script>
 
 <style scoped>
+
+  .myModal {
+    height: 80vh;
+  }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 250px 130px 130px 130px auto;
+    /* background-color: lightslategray; */
+    /* margin-top: 20px; */
+    /* padding: 5px; */
+  }
+  .grid-item {
+    /* background-color: rgba(97, 26, 26, 0.8); */
+    /* border: 1px solid rgba(0, 0, 0, 0.8); */
+    /* padding: 5px; */
+    /* width: 100px; */
+    /* font-size: 20px; */
+    text-align: center;
+  }
+
+  .myList {
+    padding: 0px;
+  }
+
+  /* modal-content {
+      width: 125%;
+  } */
+
+  input {
+    width: 80px;
+  }
 
 </style>
