@@ -14,7 +14,7 @@
         <div class="btn-group" role="group" aria-label="Basic example">
         <supplier-modal></supplier-modal>
         <hills-stock-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></hills-stock-modal>
-        <subs-modal></subs-modal>
+        <subs-modal v-bind:rowInfo='row.item'></subs-modal>
         </div>  
         <!-- <b-button size="sm">Supplier</b-button> -->
         <!-- <b-button size="sm">Hills</b-button> -->
@@ -86,6 +86,8 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
             element._rowVariant = 'success';
           } else if (element.QuantityOutstanding == 0) {
             element._rowVariant ='danger';
+          } else if (element.QuantityOutstanding > element.Quantity) {
+            element._rowVariant = 'info'
           } else {
             element._rowVariant = 'warning'
           }

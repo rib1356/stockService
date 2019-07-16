@@ -3,6 +3,7 @@
     <b-button size="sm" @click="openHSModal" style="margin-left: 5px;">Hills</b-button>
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
       <div v-if="batchesToPick.length != 0"> <!-- Grid items to hold all of the batches to select from -->
+        <b-alert show v-model="showAlert" variant="danger">The amount selected is higher than the current batch quantity!</b-alert>
         <p><u>Quantity Needed: {{rowInfo.Quantity}} Current Amount: {{currentAmount}}</u></p>
         <div class="grid-container">
           <div class="grid-item">
@@ -36,7 +37,7 @@
               <p>{{batches.quantity}}</p>
             </div>  
             <div class="grid-item">
-              <input v-model="batches.amountNeeded" type="number" step="1" @input="calcAmounts" min="0"/>
+              <input v-model="batches.amountNeeded" type="number" step="1" @input="calcAmounts" min="0" :max="batches.quantity"/>
             </div>   
           </div>
         </ul>
@@ -53,9 +54,10 @@
     props: ['rowInfo'],
     data() {
       return {
-        batchesToPick: '',
+        batchesToPick: [],
         batchesUsed: [],
         currentAmount: 0,
+        showAlert: false,
       }
     },
     methods: {
@@ -85,7 +87,7 @@
         this.$emit('batchesUsed', this.batchesUsed);
         this.hideModal();
       },
-      checkBatchesUsed() {
+      checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
         var amount = 0;
         this.batchesToPick.forEach(element => {
           if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
@@ -100,10 +102,20 @@
       calcAmounts() {
         this.currentAmount = 0;
         this.batchesToPick.forEach(element => {
-            this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
+          this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
         });
+        console.log(this.batchesToPick.some(this.quantityGreater))
+        if(this.batchesToPick.some(this.quantityGreater)) { //If the amount entered in input is greater than the batches quantity
+            this.showAlert = true; //Show an alert for the user
+        } else {
+            this.showAlert = false;
+        }
+      },
+      quantityGreater() {
+        let arr = this.batchesToPick;
+        return arr.quantity < arr.amountNeeded;
       }
-    }
+    },
   }
 </script>
 

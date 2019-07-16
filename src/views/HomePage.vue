@@ -95,7 +95,7 @@ export default {
       sessionStorage.removeItem('batchInMemory');
       sessionStorage.removeItem('batchList');
       sessionStorage.removeItem('timesLoaded');
-      localStorage.removeItem('customers');
+      sessionStorage.removeItem('customers');
       location.reload();
     },
     retrieveData (dbBatch) {
@@ -153,11 +153,11 @@ export default {
       }
     },
     getCustomers() {
-      if(localStorage.getItem('customers') == null) {
+      if(sessionStorage.getItem('customers') == null) {
         console.log("getting customers from db")
         this.getAllCustomers();
       } else {
-        this.customers = JSON.parse(localStorage.getItem('customers')).length;
+        this.customers = JSON.parse(sessionStorage.getItem('customers')).length;
       }
     },
     getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
@@ -181,7 +181,7 @@ export default {
           "sageCustomer": data[i].SageCustomer,
 				});
       }
-      localStorage.setItem("customers", JSON.stringify(cust));
+      sessionStorage.setItem("customers", JSON.stringify(cust));
       this.customers = cust.length
 		},
   },  

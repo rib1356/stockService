@@ -198,15 +198,15 @@ export default {
 		  "sageCustomer": data[i].SageCustomer,
 				});
 			}
-			localStorage.removeItem("customers"); //Remove the previous list of customers
-			localStorage.setItem("customers", JSON.stringify(cust)); //Save the new customers to storage
+			sessionStorage.removeItem("customers"); //Remove the previous list of customers
+			sessionStorage.setItem("customers", JSON.stringify(cust)); //Save the new customers to storage
 			
 			this.displaySageCustomers(cust);
 			this.getRetailTradeReferences(cust);
 		},
 		getAllCustomers() {
-	  if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
-				let cust = JSON.parse(localStorage.getItem("customers"));
+	  if(sessionStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
+				let cust = JSON.parse(sessionStorage.getItem("customers"));
 				this.displaySageCustomers(cust);
 				this.getRetailTradeReferences(cust);
 	  } else {
