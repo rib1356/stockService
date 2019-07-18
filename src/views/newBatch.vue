@@ -38,7 +38,11 @@
 									type="number"
 									name="wholesalePrice"
 									inputmode="numeric"
-									v-validate="'decimal:2|min_value:0.01'"></b-form-input>	
+									v-validate="'decimal:2|min_value:0.01'"
+									style="margin-bottom: 10px;"></b-form-input>	
+		<b-form-input v-model="comment"
+									placeholder="Enter a batch comment (can be nothing)"
+									name="comment"></b-form-input>	
 		<b-form-checkbox id="checkbox" v-model="salable" style="margin-top: 10px;">
       Add batch as saleable
     </b-form-checkbox>
@@ -82,6 +86,7 @@ export default {
 			batchDate: '',
 			salable: false,
 			quantity: '',
+			comment: null,
 		}		
   },
 	components: {
@@ -112,6 +117,7 @@ export default {
 			"AllocatedQuantity": 0,
 			"DateStamp": this.getDate(),
 			"SalesOrder": 0,
+			"Comment": this.comment,
 			"Active": true,
 		})
 		.then((response) => {

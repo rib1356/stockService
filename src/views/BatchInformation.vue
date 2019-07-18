@@ -29,6 +29,10 @@
         <b-col cols="10"><picture-modal></picture-modal></b-col>
       </b-row>
       <b-row>
+        <b-col cols="2"><label for="comment">Update Comment: {{comment}}</label></b-col>
+        <b-col cols="10"><comment-modal></comment-modal></b-col>
+      </b-row>
+      <b-row>
         <b-col cols="2"><label for="deletion">Update Batch Date: </label></b-col> 
         <b-col cols="10"><b-button variant="outline-primary" size="sm" style="position: absolute;" @click="updateDate">Update Date</b-button></b-col>
       </b-row>
@@ -55,6 +59,7 @@
   import PriceChangeModal from '@/components/BatchEditComponents/PriceChangeModal';
   import PictureModal from '@/components/BatchEditComponents/PictureModal';
   import DeleteBatchModal from '@/components/BatchEditComponents/DeleteBatchModal.vue';
+  import CommentModal from '@/components/BatchEditComponents/CommentModal.vue';
   import moment from 'moment';
   import {db} from '../main'
   import firebase from 'firebase/app';
@@ -72,6 +77,7 @@ export default {
       batchPrice: '',
       batchId: '',
       batchDate: '',
+      comment: '',
     }
   },
   components: {
@@ -81,6 +87,7 @@ export default {
     PriceChangeModal,
     PictureModal,
     DeleteBatchModal,
+    CommentModal,
   },
   methods: {
     displayBatchInformation(selectedBatchInformation) {
@@ -92,6 +99,7 @@ export default {
       this.formSize = selectedBatchInformation.formSize;
       this.batchPrice = selectedBatchInformation.batchPrice;
       this.batchDate = this.convertDate(selectedBatchInformation.dateStamp);
+      this.comment = selectedBatchInformation.comment;
       this.batchId = selectedBatchInformation.batchId;
     },
     convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"

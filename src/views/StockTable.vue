@@ -114,6 +114,7 @@ export default {
         { key: 'quantity', label: 'Saleable Qty', sortable: true },
         { key: 'growingQuantity', label: 'Growing Qty', sortable: true },
         { key: 'allocatedQuantity', label: 'Allocated Qty', sortable: true },
+        { key: 'comment', label: 'Comment'},
         { key: 'actions', label: 'Actions' }
       ],
       sortBy: 'plantName',
@@ -170,6 +171,7 @@ export default {
       selectedBatch.formSize = item.formSize;
       selectedBatch.batchPrice = item.batchPrice;
       selectedBatch.batchId = item.batchId;
+      selectedBatch.comment = item.comment;
       selectedBatch.active = item.active;
 
       sessionStorage.setItem('selectedBatchInformation', JSON.stringify(selectedBatch)); //Save the current row to session storage to access data
@@ -193,15 +195,17 @@ export default {
         this.isBusy = false;
       } else { 
       console.log("loading batches from db")  
-      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/batches') //Call the database to retrieve the current batches
         .then((response) => {
           this.changeData(response.data);
+          console.log(response);
           this.status = 'Stock Information loaded'
           this.ifError = false;
           this.loading = false; //Hide the spinner once data is loaded
           this.isBusy = false;
           this.button 
       }).catch((error) => {
+          console.log(error);
           this.status = error;
           this.ifError = true;
       });
@@ -222,6 +226,7 @@ export default {
           "growingQuantity": response[i].GrowingQuantity,
           "allocatedQuantity": response[i].AllocatedQuantity,
           "dateStamp": response[i].DateStamp,
+          "comment": response[i].Comment,
           "active": response[i].Active,
         });
       }

@@ -107,7 +107,7 @@ export default {
             this.changeData(response.data);
           }
       }).catch((error) => {
-        //DO SOME ERROR HANDLING HERE
+          console.log(error);
       });
     },
     changeData (response) {
@@ -125,6 +125,7 @@ export default {
             "growingQuantity": response[i].GrowingQuantity,
             "allocatedQuantity": response[i].AllocatedQuantity,
             "dateStamp": response[i].DateStamp,
+            "comment": response[i].Comment,
             "active": response[i].Active,
           });
         }

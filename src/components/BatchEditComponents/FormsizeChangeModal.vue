@@ -10,7 +10,7 @@
         <label>Allocated Qty: {{allocatedQty}} </label><br>
         <label>Growing Qty: {{growingQty}}</label><br>
         <label for="quantity">Saleable Qty: </label>
-        <input  v-validate="'required|numeric|min_value:1'" 
+        <input  v-validate="'required|numeric|min_value:0'" 
                 name="quantity"
                 id="quantity" 
                 v-model="quantity" 
