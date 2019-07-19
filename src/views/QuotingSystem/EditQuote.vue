@@ -3,14 +3,14 @@
     <quote-navbar class="navbar-custom" id="navbar2" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote information -->  
     <div class="left-div">
-      			<b-button @click="showCollapse = !showCollapse"
+      <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
                 style="margin-bottom: 5px;"
                 block
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-plus plus"></i></p>
+        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-minus plus"></i></p>
         <p v-else>Show Customer Information<i class="fas fa-plus plus"></i></p>
       </b-button>
 			<b-collapse v-model="showCollapse" id="collapse">
@@ -85,93 +85,96 @@
       <!-- Buttons to exit or save -->
       <b-button variant="outline-primary" v-if="selectedQuote.SalesOrder" @click="createPDF('Sales Order')" style="margin-bottom: 7px;">Create Sales Order PDF</b-button>
       <br>
-    	<router-link v-if="selectedQuote.SalesOrder" :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
-        <b-button variant="outline-danger">Back to Sales Order</b-button>
-      </router-link>
-    	<router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
-        <b-button variant="outline-danger">Back to quotes</b-button>
-      </router-link>
+    	  <router-link v-if="selectedQuote.SalesOrder" :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+          <b-button variant="outline-danger">Back to Sales Order</b-button>
+        </router-link>
+    	  <router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
+          <b-button variant="outline-danger">Back to quotes</b-button>
+        </router-link>
         <b-button @click="saveQuote" variant="outline-success" v-if="totalPrice != 0">Save Edits</b-button>
         <p v-else>Before you can save a quote it needs some items</p>
     </div>
     <!-- EditQuote table -->
     <div class="right-div">
-    <strong>Quote Price: £{{computedTotalPrice}}</strong>  
-    <b-table show-empty
-             stacked="md"
-             :items="quotePlants"
-             :fields="fields"   
-             outlined       
-             >
-      <div slot="empty">
-        <strong>Loading quotes plants...</strong>
-      </div>   
-      <template slot="Price" slot-scope="row">
-        £{{(row.item.Price/100).toFixed(2)}}
-      </template>      
-      <template slot="actions" slot-scope="row">
-				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
-				<i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
-        <!-- <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i> -->
-        <!-- Editing modal -->
-        <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
-          <div>
-            <b-form-group horizontal label="Comment:" >
-              <b-form-input v-model="rowComment"
-                            placeholder="Enter a comment" />
-            </b-form-group>
-            <b-form-group horizontal label="Quantity:" >
-              <b-form-input v-model="rowQuantity"
-                            placeholder="Enter a quantity"
-                            type="number"
-                            pattern="[0-9]*"
-                            name="rowQuantity"
-                            inputmode="numeric"
-                            v-validate="'required|numeric|min_value:1'"  />
-            </b-form-group>
-            <p class="text-danger" v-if="errors.has('rowQuantity')">{{ errors.first('rowQuantity') }}</p>
-            <b-form-group horizontal label="Price" >
-              <b-form-input v-model="rowPrice"
-                            placeholder="Enter a price"
-                            inputmode="numeric"
-                            name="rowPrice"
-                            v-validate="'required|decimal:2|min_value:0.01'" />
-            </b-form-group>
-            <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
-          </div>
-            <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
-            <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
-        </b-modal>
-        <!-- <b-modal :ref='"pickListModal"+row.index' size="lg" no-close-on-backdrop hide-footer @close="emptySelectedArr" title="Select a batch to add to pick list">
-          <div v-if="batchesToPick != null">
-            <p>Row quantity needed: {{quantityNeeded-quantityTyped}}</p>
-            <br>
-            <p>Selected {{selected}}</p>
-            <b-table striped hover :items="batchesToPick" :fields="pickListFields">
-              <template slot="actions" slot-scope="row">
-                <b-form-checkbox :ref='"checkbox"+row.index' @change="selectedItem(row.item, row.item.batchId)" >
-                  Use Batch:
-                </b-form-checkbox>
-                <b-form-group v-if="selected.includes(row.item)" horizontal label="Qty:" >
-                  <b-form-input v-model="row.item.quantityUse"
-                                placeholder="Enter a quantity"
-                                @input="calculateQuantity" />
-                </b-form-group>
-              </template>
-            </b-table>
-          </div>
-            <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button>
-            <b-button variant="outline-danger" block @click="hidePickListModal(row.index)">Close Me</b-button>
-        </b-modal> -->
-      </template>
-    </b-table>
+      <strong>Quote Price: £{{computedTotalPrice}}</strong>  
+      <b-table show-empty
+              stacked="md"
+              :items="quotePlants"
+              :fields="fields"   
+              outlined       
+              >
+        <div slot="empty">
+          <strong>Loading quotes plants...</strong>
+        </div>   
+        <template slot="Price" slot-scope="row">
+          £{{(row.item.Price/100).toFixed(2)}}
+        </template>      
+        <template slot="actions" slot-scope="row">
+          <i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
+          <i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
+          <i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
+          <!-- <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i> -->
+          <!-- Editing modal -->
+          <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
+            <div>
+              <b-form-group horizontal label="Comment:" >
+                <b-form-input v-model="rowComment"
+                              placeholder="Enter a comment" />
+              </b-form-group>
+              <b-form-group horizontal label="Quantity:" >
+                <b-form-input v-model="rowQuantity"
+                              placeholder="Enter a quantity"
+                              type="number"
+                              pattern="[0-9]*"
+                              name="rowQuantity"
+                              inputmode="numeric"
+                              v-validate="'required|numeric|min_value:1'"  />
+              </b-form-group>
+              <p class="text-danger" v-if="errors.has('rowQuantity')">{{ errors.first('rowQuantity') }}</p>
+              <b-form-group horizontal label="Price" >
+                <b-form-input v-model="rowPrice"
+                              placeholder="Enter a price"
+                              inputmode="numeric"
+                              name="rowPrice"
+                              v-validate="'required|decimal:2|min_value:0.01'" />
+              </b-form-group>
+              <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
+            </div>
+              <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
+              <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
+          </b-modal>
+          <!-- <b-modal :ref='"pickListModal"+row.index' size="lg" no-close-on-backdrop hide-footer @close="emptySelectedArr" title="Select a batch to add to pick list">
+            <div v-if="batchesToPick != null">
+              <p>Row quantity needed: {{quantityNeeded-quantityTyped}}</p>
+              <br>
+              <p>Selected {{selected}}</p>
+              <b-table striped hover :items="batchesToPick" :fields="pickListFields">
+                <template slot="actions" slot-scope="row">
+                  <b-form-checkbox :ref='"checkbox"+row.index' @change="selectedItem(row.item, row.item.batchId)" >
+                    Use Batch:
+                  </b-form-checkbox>
+                  <b-form-group v-if="selected.includes(row.item)" horizontal label="Qty:" >
+                    <b-form-input v-model="row.item.quantityUse"
+                                  placeholder="Enter a quantity"
+                                  @input="calculateQuantity" />
+                  </b-form-group>
+                </template>
+              </b-table>
+            </div>
+              <b-button variant="outline-primary" block @click="boop">Use selected batches</b-button>
+              <b-button variant="outline-danger" block @click="hidePickListModal(row.index)">Close Me</b-button>
+          </b-modal> -->
+        </template>
+      </b-table>
     </div>
     <b-modal ref="createPDFModal" size="md" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
 		  <div class="modal__footer">
-        <router-link to="/ExistingQuotes">
-        	<b-button variant="outline-danger">Back to quotes</b-button>
-      	</router-link>
+        <router-link v-if="selectedQuote.SalesOrder" :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+        <b-button variant="outline-danger">Back to Sales Order</b-button>
+      </router-link>
+    	<router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
+        <b-button variant="outline-danger">Back to quotes</b-button>
+        </router-link>
         <b-btn variant="outline-primary" v-if="!selectedQuote.SalesOrder" @click="createPDF('Quotation')">Create Quote PDF</b-btn>
         <b-btn variant="outline-primary" v-else @click="createPDF('Sales Order')">Create Sales Order PDF</b-btn>
       </div>
@@ -469,8 +472,8 @@ export default {
       });
     },
     getCustomerInfo() {
-      if(localStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
-        let customers = JSON.parse(localStorage.getItem("customers")); 
+      if(sessionStorage.getItem("customers") != null) { //If exists load parse customers back to array of objects
+        let customers = JSON.parse(sessionStorage.getItem("customers")); 
         for (let i = 0; i < customers.length; i++) { //Loop through the current customers to find whos quote it belongs to
           if(customers[i].customerRef === this.selectedQuote.customerRef) {
             this.currentCustomer = customers[i]; //Set an accessable variable so that their information can be added on the pdf

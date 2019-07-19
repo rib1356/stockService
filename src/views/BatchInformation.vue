@@ -29,7 +29,7 @@
         <b-col cols="10"><picture-modal></picture-modal></b-col>
       </b-row>
       <b-row>
-        <b-col cols="2"><label for="comment">Update Comment: {{comment}}</label></b-col>
+        <b-col cols="2"><label for="comment">Update Comment: <br>{{comment}}</label></b-col>
         <b-col cols="10"><comment-modal></comment-modal></b-col>
       </b-row>
       <b-row>

@@ -10,7 +10,7 @@
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-plus plus"></i></p>
+        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-minus plus"></i></p>
         <p v-else>Show Customer Information<i class="fas fa-plus plus"></i></p>
       </b-button>
 			<b-collapse v-model="showCollapse" id="collapse">

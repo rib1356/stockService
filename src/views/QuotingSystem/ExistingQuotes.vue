@@ -10,89 +10,89 @@
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showCollapse">Hide Filters<i class="fas fa-plus plus"></i></p>
+        <p v-if="showCollapse">Hide Filters<i class="fas fa-minus plus"></i></p>
         <p v-else>Show Filters<i class="fas fa-plus plus"></i></p>
       </b-button>  
       <!-- Collapsible area to show the filters for the table -->
       <b-collapse v-model="showCollapse" id="collapse">
-      <b-input-group class="input-filter">
-        <b-form-input v-model="filter" placeholder="Type to Search"/>
-          <b-input-group-append>
-            <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-          </b-input-group-append>
-      </b-input-group>
-      <b-input-group class="input-filter">
-        <b-form-select v-model="sortBy" :options="sortOptions">
-          <option slot="first" :value="null">Choose Sort Option</option>
-        </b-form-select>
-        <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
-          <option :value="false">Asc</option>
-          <option :value="true">Desc</option>
-        </b-form-select>
-      </b-input-group>
-      <datepicker placeholder="Select Date"
-                  v-model="selectedDate"
-                  :format="customFormatter"
-                  @selected="setFilter"
-                  @cleared="clearDate"
-                  monday-first
-                  clear-button
-                  bootstrap-styling
-                  ></datepicker>
-        <b-button @click="toggleQuoteSales" style="margin-top: 5px;">
-          <p v-if="!showSaleOrders">Show sales orders</p>        
-          <p v-else>Show quotes</p> </b-button>          
+        <b-input-group class="input-filter">
+          <b-form-input v-model="filter" placeholder="Type to Search"/>
+            <b-input-group-append>
+              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+            </b-input-group-append>
+        </b-input-group>
+        <b-input-group class="input-filter">
+          <b-form-select v-model="sortBy" :options="sortOptions">
+            <option slot="first" :value="null">Choose Sort Option</option>
+          </b-form-select>
+          <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
+            <option :value="false">Asc</option>
+            <option :value="true">Desc</option>
+          </b-form-select>
+        </b-input-group>
+        <datepicker placeholder="Select Date"
+                    v-model="selectedDate"
+                    :format="customFormatter"
+                    @selected="setFilter"
+                    @cleared="clearDate"
+                    monday-first
+                    clear-button
+                    bootstrap-styling
+                    ></datepicker>
+          <b-button @click="toggleQuoteSales" style="margin-top: 5px;">
+            <p v-if="!showSaleOrders">Show sales orders</p>        
+            <p v-else>Show quotes</p> </b-button>          
       </b-collapse>   
     </div>
     <!-- Quote Table -->
     <div class="right-div">
-		<b-table show-empty
-             stacked="sm"
-             :items="quotes"
-             :fields="fields"
-             :filter="filter"
-             :sort-by.sync="sortBy"
-             :sort-desc.sync="sortDesc"
-             :sort-direction="sortDirection"
-             class="table" 
-             outlined   
-             >
-      <div slot="empty">
-        <strong>Loading quotes...</strong>
-      </div>   
-      <template slot="totalPrice" slot-scope="row">
-        £{{row.item.totalPrice}}
-      </template>    
-      <template slot="actions" slot-scope="row">
-				<router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
-					<i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:green"></i>
-				</router-link>
-				<i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete Item" style="color:red" @click.stop="deleteQuote(row.item)"></i>
-        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" style="color:#0b720b" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
-        <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Pick List" @click="openPickList(row.item)" style="color:#11979e" v-else></i>
-      </template> 
-    </b-table>
-    <b-modal ref="pickListModel" size="lg" no-close-on-backdrop hide-footer title="Create Pick List for Sales Order">
-      <b-form-group horizontal label="Address:" >
-        <b-form-input v-model="pickListInfo.address"
-                      placeholder="Enter an address" />
-      </b-form-group>                            
-      <b-form-group horizontal label="Estimated Date:" >
-        <b-form-input v-model="pickListInfo.estimatedDate"
-                      placeholder="Enter an estimated date" />
-      </b-form-group>                            
-      <b-form-group horizontal label="Exact Date:" >
-        <b-form-input v-model="pickListInfo.exactDate"
-                      placeholder="Enter an exact date" />
-      </b-form-group>                            
-      <b-form-group horizontal label="Delivery Needed:" >
-        <b-form-checkbox v-model="pickListInfo.deliveryNeeded" style="align: left;">
-          {{pickListInfo.deliveryNeeded}}
-        </b-form-checkbox>
-      </b-form-group>                            
-      <b-button variant="outline-primary" @click="savePickListInfo" block>Allocate Plants</b-button>
-      <b-button variant="outline-danger" block @click="hidePickListModal()">Cancel</b-button>
-    </b-modal>
+      <b-table show-empty
+              stacked="sm"
+              :items="quotes"
+              :fields="fields"
+              :filter="filter"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
+              :sort-direction="sortDirection"
+              class="table" 
+              outlined   
+              >
+        <div slot="empty">
+          <strong>Loading quotes...</strong>
+        </div>   
+        <template slot="totalPrice" slot-scope="row">
+          £{{row.item.totalPrice}}
+        </template>    
+        <template slot="actions" slot-scope="row">
+          <router-link :to="{name: 'EditQuote', params: { selectedQuote: row.item } }">
+            <i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:green"></i>
+          </router-link>
+          <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete Item" style="color:red" @click.stop="deleteQuote(row.item)"></i>
+          <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Sales Order" style="color:#0b720b" @click.stop="turnToSalesOrder(row.item)" v-if="!row.item.SalesOrder"></i>
+          <i class="fas fa-check fa-lg" v-b-tooltip.hover title="Convert to Pick List" @click="openPickList(row.item)" style="color:#11979e" v-else></i>
+        </template> 
+      </b-table>
+      <b-modal ref="pickListModel" size="lg" no-close-on-backdrop hide-footer title="Create Pick List for Sales Order">
+        <b-form-group horizontal label="Address:" >
+          <b-form-input v-model="pickListInfo.address"
+                        placeholder="Enter an address" />
+        </b-form-group>                            
+        <b-form-group horizontal label="Estimated Date:" >
+          <b-form-input v-model="pickListInfo.estimatedDate"
+                        placeholder="Enter an estimated date" />
+        </b-form-group>                            
+        <b-form-group horizontal label="Exact Date:" >
+          <b-form-input v-model="pickListInfo.exactDate"
+                        placeholder="Enter an exact date" />
+        </b-form-group>                            
+        <b-form-group horizontal label="Delivery Needed:" >
+          <b-form-checkbox v-model="pickListInfo.deliveryNeeded" style="align: left;">
+            {{pickListInfo.deliveryNeeded}}
+          </b-form-checkbox>
+        </b-form-group>                            
+        <b-button variant="outline-primary" @click="savePickListInfo" block>Allocate Plants</b-button>
+        <b-button variant="outline-danger" block @click="hidePickListModal()">Cancel</b-button>
+      </b-modal>
   </div>
   </section>
 </template>
@@ -235,36 +235,6 @@ export default {
       var p = dateString.split(/\D/g)
       return [p[1],p[0],p[2] ].join("/")
     },
-    // getCustomerName(customerRef){
-    //   let customer = this.customers;
-    //   // console.log(customer);
-    //   //Filter the array to find the customer for each quote
-    //   var singleCustomer = customer.filter((obj) => obj.customerRef === customerRef);
-    //   // console.log(singleCustomer)
-    //   return singleCustomer[0]
-    // },
-    // getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
-		// 	this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/customer/all')
-		// 		.then((response) => {
-		// 			this.parseCustomers(response.data);
-		// 		})
-		// 		.catch((error) => {
-		// 				alert("Error getting customers: " + error);
-		// 		});
-		// },
-		// parseCustomers(data) { //Push customers into an array of objects then save to local storage
-		// 	for(var i = 0; i < data.length; i++){
-		// 		this.customers.push({ //Create an array of objects
-		// 			"customerName": data[i].CustomerName,    //Data coming in is string so just assign values in object to be displayed
-		// 			"customerRef": data[i].CustomerReference,
-		// 			"customerTel": data[i].CustomerTel,
-		// 			"customerAddress": data[i].CustomerAddress,
-    //       "customerEmail": data[i].CustomerEmail,
-    //       "sageCustomer": data[i].SageCustomer,
-		// 		});
-    //   }
-    //   localStorage.setItem("customers", JSON.stringify(this.customers));
-		// },
     deleteQuote(row){
       var url = ("https://ahillsquoteservice.azurewebsites.net/api/quote/delete?id=" + row.quoteId); 
       let data = { "QuoteId": row.quoteId, "Active": false} ;

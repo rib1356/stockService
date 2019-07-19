@@ -145,10 +145,6 @@
     padding: 0px;
   }
 
-  /* modal-content {
-      width: 125%;
-  } */
-
   input {
     width: 80px;
   }

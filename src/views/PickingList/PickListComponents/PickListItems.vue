@@ -42,8 +42,8 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
           { key: 'FormSize', label: 'Form Size'},
           { key: 'Comment', label: 'Comment'},
           { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
-          { key: 'Quantity', label: 'Quantity Needed', sortable: true},
-          { key: 'QuantityOutstanding', label: 'Quantity Outstanding', sortable: true},
+          { key: 'Quantity', label: 'Qty Needed', sortable: true},
+          { key: 'QuantityOutstanding', label: 'Qty Outstanding', sortable: true},
           { key: 'actions', label: 'Actions' }
         ],
         quotePlants: [],
