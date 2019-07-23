@@ -15,7 +15,8 @@
           <p v-if="showCollapse">Hide Batches<i class="fas fa-minus my-icon"></i></p>
           <p v-else>Show Batches<i class="fas fa-plus my-icon"></i></p>
         </b-button>
-        <p class="qty"><u>Quantity Needed: {{rowInfo.Quantity}} Current Amount:</u></p>
+        <p class="qty"><u>Quantity Needed: {{rowInfo.Quantity}} | Qty Outstanding: {{rowInfo.QuantityOutstanding}} |
+           Current Amount: {{currentAmount}}</u></p>
       </div>  
       <br>
       <div v-if="batchesToPick.length != 0" class="modal-body"> <!-- Grid items to hold all of the batches to select from -->
@@ -72,33 +73,62 @@
       return {
         values: '',
         batchesToPick: [],
+        batchesUsed: [],
         showCollapse: true,
-
+        currentAmount: 0,
+        originalAmount: 0,
       }
     },
     methods: {
       openSubModal() {
         this.$refs.SubModal.show();
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList')); //Get the latest batches in stock
+        console.log(this.rowInfo);
         if(this.batchesToPick.length == 0) {
         let selectedPlants = stockBatches.filter(stockBatches => //Filter through the batches where the plantName is the same
-            (stockBatches.plantName === this.rowInfo.PlantName)); //This will give you a list of batches that are the same
+            (stockBatches.plantName === this.rowInfo.PlantName && !(stockBatches.formSize === this.rowInfo.FormSize) )); //This will give you a list of batches that are the same
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
         });    
         this.batchesToPick = selectedPlants;
         }
+        this.getBatchUsedQuantity();
       },
       hideModal() {
         this.$refs.SubModal.hide();
       },
       allocateItems() {
-        this.rowInfo.QuantityOutstanding += parseInt(this.values);
+        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
+        this.$emit('sendVal'); //Changes the colours of the rows on the table based upon how many are chosen
+        this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
         this.hideModal();
       },
+      checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
+        var amount = 0;
+        this.batchesToPick.forEach(element => {
+          if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
+            amount += parseInt(element.amountNeeded); //Calculate the total amounts that have been used on different batches
+            if(!this.batchesUsed.includes(element)) { //It doesnt exist in the array so add it
+              this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+            }
+          }
+        });
+        return amount;
+      },
       calcAmounts() {
-        //yo
-      }
+        this.currentAmount = 0;
+        this.batchesToPick.forEach(element => {
+          this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
+        });
+      },
+      getBatchUsedQuantity() {
+        this.originalAmount = 0;
+        if(this.batchesUsed.length > 0) {
+          this.batchesUsed.forEach(element => {
+            this.originalAmount += parseInt(element.amountNeeded);
+          });
+        }
+      },
     }
   }
 </script>

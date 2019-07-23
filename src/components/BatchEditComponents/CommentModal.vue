@@ -22,7 +22,7 @@ export default {
   data () {
     return {
       batchId: '',
-      comment: null,
+      comment: '',
     }
   },
   methods: {

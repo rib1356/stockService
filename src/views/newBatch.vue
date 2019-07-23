@@ -86,7 +86,7 @@ export default {
 			batchDate: '',
 			salable: false,
 			quantity: '',
-			comment: null,
+			comment: '',
 		}		
   },
 	components: {

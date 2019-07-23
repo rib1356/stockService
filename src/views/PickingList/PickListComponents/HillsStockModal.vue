@@ -4,7 +4,7 @@
     <b-modal :ref='"HillsStockModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
       <div v-if="batchesToPick.length != 0"> <!-- Grid items to hold all of the batches to select from -->
         <b-alert show v-model="showAlert" variant="danger">The amount selected is higher than the current batch quantity!</b-alert>
-        <p><u>Quantity Needed: {{rowInfo.Quantity}} Current Amount: {{currentAmount}}</u></p>
+        <p><u>Quantity Needed: {{rowInfo.Quantity}} Qty Outstanding: {{rowInfo.QuantityOutstanding}} Current Amount: {{currentAmount}}</u></p>
         <div class="grid-container">
           <div class="grid-item">
             <p><u>Plant Name</u></p>
@@ -58,6 +58,7 @@
         batchesUsed: [],
         currentAmount: 0,
         showAlert: false,
+        originalAmount: 0,
       }
     },
     methods: {
@@ -72,19 +73,21 @@
         });    
         this.batchesToPick = selectedPlants;
         }
+        this.getBatchUsedQuantity();
       },
       hideModal() {
         this.$refs.HillsStockModal.hide();
       },
       acceptValues() {
-        if(this.rowInfo.Quantity < this.checkBatchesUsed()) {
-          alert("This is more than the quantity needed (Will update the new quantity eventually)")
-          this.rowInfo.QuantityOutstanding = this.checkBatchesUsed();
-        } else {
-          this.rowInfo.QuantityOutstanding = this.checkBatchesUsed();
-        }
-        this.$emit('sendVal');
-        this.$emit('batchesUsed', this.batchesUsed);
+        // console.log((this.rowInfo.QuantityOutstanding - this.originalAmount) + this.checkBatchesUsed());
+        // if(this.rowInfo.Quantity < this.checkBatchesUsed()) {
+          // alert("This is more than the quantity needed (Will update the new quantity eventually)");
+          // this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed()); //Set the quantity to be whats chosen
+        // } else {
+          // }
+        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
+        this.$emit('sendVal');//Changes the colours of the rows on the table based upon how many are chosen    
+        this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
         this.hideModal();
       },
       checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
@@ -97,18 +100,20 @@
             }
           }
         });
-        return amount;
+        return parseInt(amount);
       },
-      calcAmounts() {
+      calcAmounts() { //Check the current amount from whats currently entered in the inputs
         this.currentAmount = 0;
         this.batchesToPick.forEach(element => {
           this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
         });
-        console.log(this.batchesToPick.some(this.quantityGreater))
-        if(this.batchesToPick.some(this.quantityGreater)) { //If the amount entered in input is greater than the batches quantity
-            this.showAlert = true; //Show an alert for the user
-        } else {
-            this.showAlert = false;
+      },
+      getBatchUsedQuantity() { //Get the original amount
+        this.originalAmount = 0;
+        if(this.batchesUsed.length > 0) {
+          this.batchesUsed.forEach(element => {
+            this.originalAmount += parseInt(element.amountNeeded);
+          });
         }
       },
       quantityGreater() {

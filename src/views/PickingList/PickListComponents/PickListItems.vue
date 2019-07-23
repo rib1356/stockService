@@ -14,7 +14,7 @@
         <div class="btn-group" role="group" aria-label="Basic example">
         <supplier-modal></supplier-modal>
         <hills-stock-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></hills-stock-modal>
-        <subs-modal v-bind:rowInfo='row.item'></subs-modal>
+        <subs-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></subs-modal>
         </div>  
         <!-- <b-button size="sm">Supplier</b-button> -->
         <!-- <b-button size="sm">Hills</b-button> -->
@@ -88,6 +88,7 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
             element._rowVariant ='danger';
           } else if (element.QuantityOutstanding > element.Quantity) {
             element._rowVariant = 'info'
+            alert("Quantity is more than needed. This will update the Sales Order!")
           } else {
             element._rowVariant = 'warning'
           }
@@ -100,9 +101,6 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         });
         this.$emit('getUsedBatches', this.arrayOfBatches);
       },
-      fetchUsedBatches() {
-        return this.arrayOfBatches;
-      }
     },
     created() {
       this.pickListInfo1 = JSON.parse(sessionStorage.getItem('pickListInfo'));
