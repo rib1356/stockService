@@ -57,9 +57,11 @@
               </div>   
             </div>
           </ul>
-			  </b-collapse>
+			  </b-collapse>   
       </div>  
       <p v-else>Sorry no batches of this type exist on the nursery</p>
+      <input type="text" v-model="search">
+      <b-button  @click="searchBatches">Search</b-button>
       <b-button variant="outline-primary" block @click="allocateItems">Use selected batches</b-button>
       <b-button variant="outline-danger" block @click="hideModal">Close Me</b-button>
     </b-modal>
@@ -77,6 +79,8 @@
         showCollapse: true,
         currentAmount: 0,
         originalAmount: 0,
+        search: '',
+        originalSearch: [],
       }
     },
     methods: {
@@ -128,6 +132,24 @@
             this.originalAmount += parseInt(element.amountNeeded);
           });
         }
+      },
+      searchBatches() {
+        //If original search is !empty then remove the search from the batchesToPickArray 
+        
+        //-----------------
+        //Should I initialise this on mainpage load then pass as props rather than every search
+        let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
+        //-----------------
+
+        let filtered = stockBatches.filter(stockBatches => //Filter through the batches where the plantName is the same
+            (stockBatches.plantName.toLowerCase().includes(this.search.toLowerCase()) ));
+          this.originalSearch = filtered; //Store the original search array? Then remove the values?
+          console.log(filtered);
+          console.log(this.batchesToPick.concat(filtered));
+          filtered.forEach(element => {
+            element['amountNeeded'] = 0;
+            this.batchesToPick.push(element);
+          });
       },
     }
   }
