@@ -134,18 +134,17 @@
         }
       },
       searchBatches() {
-        //If original search is !empty then remove the search from the batchesToPickArray 
-        
+        //If original search is !empty then remove the search from the batchesToPickArray for the new search  
+        if(this.originalSearch.length != 0) {
+          this.batchesToPick = this.batchesToPick.filter((el) => !this.originalSearch.includes( el )); //Remove the original search
+        }
         //-----------------
         //Should I initialise this on mainpage load then pass as props rather than every search
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
         //-----------------
-
         let filtered = stockBatches.filter(stockBatches => //Filter through the batches where the plantName is the same
             (stockBatches.plantName.toLowerCase().includes(this.search.toLowerCase()) ));
           this.originalSearch = filtered; //Store the original search array? Then remove the values?
-          console.log(filtered);
-          console.log(this.batchesToPick.concat(filtered));
           filtered.forEach(element => {
             element['amountNeeded'] = 0;
             this.batchesToPick.push(element);
