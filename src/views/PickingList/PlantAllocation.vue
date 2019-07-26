@@ -29,6 +29,9 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
       }
     },
     methods: {
+      //----------------------------------
+      // Worth saving the picklist items and their amounts to session storage until they are saved to the database?
+      //----------------------------------
       putBatches(batches) { //Items for the picklist are passed up through components to then be sent to the next page
         this.items = batches;
       },
