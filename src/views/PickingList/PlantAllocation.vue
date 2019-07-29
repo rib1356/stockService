@@ -6,7 +6,7 @@
       <b-button variant="outline-danger" class="myBtn">Cancel Allocation</b-button>
     </router-link>
     <router-link :to="{name: 'PickListFinalisation', params: { itemsToPick: this.items } }">
-      <b-button variant="outline-primary" class="myBtn">Allocate Plants</b-button>
+      <b-button variant="outline-primary" @click="tempSave" class="myBtn">Allocate Plants</b-button>
     </router-link>  
     </div>
     <pick-list-items class="list" v-bind:pickListInformation='pickListInformation' @getUsedBatches="putBatches"></pick-list-items>
@@ -33,8 +33,18 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
       // Worth saving the picklist items and their amounts to session storage until they are saved to the database?
       //----------------------------------
       putBatches(batches) { //Items for the picklist are passed up through components to then be sent to the next page
+        batches.forEach(element => {
+          if(element.amountNeeded == 0) {  //Loop through the batches and remove any that have a picked quantity of 0 as they shouldnt be used
+            var index = batches.indexOf(element);
+            batches.splice(index, 1);
+          }
+        });
         this.items = batches;
       },
+      tempSave() {
+        sessionStorage.setItem('tempBatchSave', JSON.parse(this.items));
+        //Save the items to session storage so that if you want to go back you are able to get the original values
+      }
     },
     mounted() {
       this.pickListInformation = JSON.parse(sessionStorage.getItem('pickListInfo'));

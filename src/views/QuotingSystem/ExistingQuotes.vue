@@ -75,7 +75,7 @@
       <b-modal ref="pickListModel" size="lg" no-close-on-backdrop hide-footer title="Create Pick List for Sales Order">
         <b-form-group horizontal label="Address:" >
           <b-form-input v-model="pickListInfo.address"
-                        placeholder="Enter an address" />
+                        placeholder="Enter an address (leave blank if using customers)" />
         </b-form-group>                            
         <b-form-group horizontal label="Estimated Date:" >
           <b-form-input v-model="pickListInfo.estimatedDate"

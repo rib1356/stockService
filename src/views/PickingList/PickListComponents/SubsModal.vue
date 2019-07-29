@@ -93,6 +93,7 @@
             (stockBatches.plantName === this.rowInfo.PlantName && !(stockBatches.formSize === this.rowInfo.FormSize) )); //This will give you a list of batches that are the same
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
+          element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
         });    
         this.batchesToPick = selectedPlants;
         }

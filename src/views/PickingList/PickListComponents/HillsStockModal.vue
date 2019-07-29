@@ -70,6 +70,7 @@
             (stockBatches.plantName === this.rowInfo.PlantName && stockBatches.formSize === this.rowInfo.FormSize)); //This will give you a list of batches that are the same
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0;
+          element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
         });    
         this.batchesToPick = selectedPlants;
         }

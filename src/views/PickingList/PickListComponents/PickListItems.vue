@@ -104,7 +104,11 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
     },
     created() {
       this.pickListInfo1 = JSON.parse(sessionStorage.getItem('pickListInfo'));
-      this.getPlants();
+      if(sessionStorage.getItem('tempBatchSave') != null) {
+        console.log("pelb")
+      } else {
+        this.getPlants();
+      }
     }
   }
 </script>

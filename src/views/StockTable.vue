@@ -14,6 +14,12 @@
         <!-- <b-dropdown-item @click="sendHome">Home</b-dropdown-item> -->
         <b-dropdown-item @click="sendHome" v-if="authenticated">Home</b-dropdown-item>
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
+        <export-excel 
+          :data = "excelBatches"
+          worksheet = "BatchList"
+          name = "HillsStock">
+          <b-dropdown-item>Export Batches</b-dropdown-item>
+        </export-excel>
         <b-dropdown-item @click="reloadBatches" v-if="authenticated">Reload Table</b-dropdown-item>
         <b-dropdown-item @click="addNewBatch" v-if="authenticated">Add New Batch</b-dropdown-item>
         <!-- <b-dropdown-item @click="quote" v-if="authenticated">Quote</b-dropdown-item> -->
@@ -125,6 +131,7 @@ export default {
       modalInfo: { title: '', content: ''},
       status: '',
       plantData: [],
+      excelBatches: [],
       loading: true,
       isBusy: true,
       userAuthenticated: '',
@@ -197,6 +204,7 @@ export default {
       console.log("loading batches from db")  
       this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/batches') //Call the database to retrieve the current batches
         .then((response) => {
+          this.excelBatch(response.data); //Generate excel batches that can be exported
           this.changeData(response.data);
           console.log(response);
           this.status = 'Stock Information loaded'
@@ -235,6 +243,22 @@ export default {
       if(this.authenticated) {
       sessionStorage.setItem('batchList', JSON.stringify(this.plantData));
       sessionStorage.setItem('batchInMemory', true);
+      }
+    },
+    excelBatch(response) {
+      for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+        if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+          this.excelBatches.push({                 //This is then pushed into an array and used to populate the data table
+            "plantName": response[i].Name,
+            "formSize": response[i].FormSize,
+            "location": response[i].Location,
+            "quantity": response[i].Quantity,
+            //"batchPrice": response[i].WholesalePrice, 
+            "growingQuantity": response[i].GrowingQuantity,
+            "allocatedQuantity": response[i].AllocatedQuantity,
+            "dateStamp": response[i].DateStamp,
+          });
+        }
       }
     },
     getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--

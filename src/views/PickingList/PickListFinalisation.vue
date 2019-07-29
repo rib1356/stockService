@@ -58,7 +58,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
     },
     methods: {
       createPDF() {
-        let pdfName = 'Picklist X'
+        let pdfName = 'Picklist' + this.picklistInfo.salesOrderInfo.quoteId;
         var doc = new jsPDF('p', 'pt');
         var columns = [
           {title: "Batch Id", dataKey: "batchId"},
@@ -85,7 +85,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         } else {
           deliveryNeeded = "No"
         }
-        var testAdd = "17 Plebian Road Stockton On Tees TS18 4LS"    
+        var testAdd = "17 Test Road Stockton On Tees TS"    
         var splitAdd = doc.splitTextToSize(testAdd, 150);       
         var orderTo =	  "Customer Ref: " + this.picklistInfo.salesOrderInfo.customerRef + "\n" +
                         "Customer Name: " + this.picklistInfo.salesOrderInfo.customerName + "\n" +
@@ -109,9 +109,13 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         doc.text(splitAdd, 90, 80); //---------------------------------------------------Customer Address
         doc.setFontStyle("normal");
         doc.text("Deliver To:", 300, 35);
-        var splitDelivAdd = doc.splitTextToSize(this.picklistInfo.address, 200); 
         doc.setFontStyle("bold");
-        doc.text(splitDelivAdd, 360, 35); //---------------------------------------------Delivery Address
+        if(this.picklistInfo.address != null) {
+          var splitDelivAdd = doc.splitTextToSize(this.picklistInfo.address, 200); 
+          doc.text(splitDelivAdd, 360, 35); //---------------------------------------------Delivery Address
+        } else {
+          doc.text(splitAdd, 360, 35);
+        }
         doc.setFontStyle("normal");
         doc.text(deliveryStuff, 40, 130);
         doc.setLineWidth(1);
@@ -132,10 +136,10 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
                                                   });
         let finalY = doc.autoTable.previous.finalY;
         doc.text("Comment: " + this.comment, 40, finalY+10);
-        doc.text("Packed In: ", 40, finalY+20);
-        doc.text("Crate Qty: ", 40, finalY+30);
-        doc.text("Trolly Qty: ", 40, finalY+40);
-        doc.text("Loose Qty: ", 40, finalY+50);
+        doc.text("Packed In: ", 40, finalY+25);
+        doc.text("In Crates: ", 40, finalY+40);
+        doc.text("In Trolly: ", 40, finalY+55);
+        doc.text("Loose: ", 40, finalY+70);
         
         // let quotePrice = (this.totalPrice/100).toFixed(2);
         // let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);

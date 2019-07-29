@@ -137,7 +137,6 @@ export default {
       this.batches = this.batchData.length;
     },
     excelBatch(response) {
-      console.log("here")
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
         if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
           this.excelBatches.push({                 //This is then pushed into an array and used to populate the data table
