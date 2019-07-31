@@ -3,15 +3,26 @@
     <div class="info">
       <pick-list-info></pick-list-info>
       <hr>
-      <p>Add Note to Picklist</p>
-      <input type="text" v-model="comment">
-      <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
-        <b-button variant="outline-danger" class="myBtn">Cancel Allocation</b-button>
-      </router-link>
-      <!-- <router-link :to="{name: 'PickListFinalisation', params: { itemsToPick: this.items } }"> -->
-        <b-button variant="outline-primary" class="myBtn">Save Picklist</b-button>
-      <!-- </router-link> -->
+      <b-form-group vertical label="Add a note to picklist:" >
+        <b-form-input v-model="comment"
+                      placeholder="Picklist Comment/Note" />
+        </b-form-group>
+      <b-form-group label="Delivery Details:">
+        <!-- <b-form-checkbox-group> -->
+          <b-form-checkbox v-model="packedIn">Packed In</b-form-checkbox>
+          <b-form-checkbox v-model="inCrate">In Crate</b-form-checkbox>
+          <b-form-checkbox v-model="inTrolly">In Trolly</b-form-checkbox>
+          <b-form-checkbox v-model="loose">Loose</b-form-checkbox>
+        <!-- </b-form-checkbox-group> -->
+      </b-form-group> 
+      <b-button variant="outline-primary" class="myBtn">Save Picklist</b-button>
       <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button> 
+      <router-link :to="{name: 'PlantAllocation'}">
+        <b-button variant="outline-success" class="myBtn">Change Allocation</b-button>
+      </router-link>
+      <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
+        <b-button variant="outline-danger" @click="cancel" class="myBtn">Cancel Allocation</b-button>
+      </router-link>
     </div>
     <div class="list">
       <b-table show-empty
@@ -48,15 +59,23 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           { key: 'plantName', label: 'Plant Name', sortable: true},
           { key: 'formSize', label: 'Form Size'},
           { key: 'comment', label: 'Comment'},
+          { key: 'subFor', label: 'Subbed For'},
           { key: 'batchPrice', label: 'Item Price', sortable: true},
           { key: 'location', label: 'Location', sortable: true},
           { key: 'amountNeeded', label: 'Amount to pick', sortable: true},
         ],
         picklistInfo: '',
-        comment: ''
+        comment: '',
+        packedIn: false,
+        inCrate: false,
+        inTrolly: false,
+        loose: false,
       }
     },
     methods: {
+      cancel() {
+        sessionStorage.removeItem('tempBatchSave');
+      },
       createPDF() {
         let pdfName = 'Picklist' + this.picklistInfo.salesOrderInfo.quoteId;
         var doc = new jsPDF('p', 'pt');
@@ -86,7 +105,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           deliveryNeeded = "No"
         }
         var testAdd = "17 Test Road Stockton On Tees TS"    
-        var splitAdd = doc.splitTextToSize(testAdd, 150);       
+        var splitAdd = doc.splitTextToSize(this.picklistInfo.salesOrderInfo.customerAddress, 150);       
         var orderTo =	  "Customer Ref: " + this.picklistInfo.salesOrderInfo.customerRef + "\n" +
                         "Customer Name: " + this.picklistInfo.salesOrderInfo.customerName + "\n" +
                         "Customer Tel: get this " + "\n"	
@@ -123,23 +142,22 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         doc.autoTable(columns, this.itemsToPick, {theme: 'striped', startY: 170,
                                                   styles: {
                                                       overflow: 'linebreak',
-                                                      
                                                       },
                                                   columnStyles: {
                                                     0: {cellWidth: 50},
                                                     1: {cellWidth: 100},
                                                     2: {cellWidth: 100},
-                                                    3: {cellWidth: 10},
+                                                    3: {cellWidth: 100},
                                                     4: {cellWidth: 50},
                                                     5: {cellWidth: 75},
                                                     }    
                                                   });
         let finalY = doc.autoTable.previous.finalY;
         doc.text("Comment: " + this.comment, 40, finalY+10);
-        doc.text("Packed In: ", 40, finalY+25);
-        doc.text("In Crates: ", 40, finalY+40);
-        doc.text("In Trolly: ", 40, finalY+55);
-        doc.text("Loose: ", 40, finalY+70);
+        doc.text("Packed In: " + this.packedIn, 40, finalY+25);
+        doc.text("In Crates: " + this.inCrate, 40, finalY+40);
+        doc.text("In Trolly: " + this.inTrolly, 40, finalY+55);
+        doc.text("Loose: " + this.loose, 40, finalY+70);
         
         // let quotePrice = (this.totalPrice/100).toFixed(2);
         // let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
@@ -152,11 +170,8 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
       },
     },
     created() {
-      
       this.itemsToPick = this.$route.params.itemsToPick;
       this.picklistInfo = JSON.parse(sessionStorage.getItem('pickListInfo'));
-      console.log(this.picklistInfo)
-    
     }
   }
 </script>

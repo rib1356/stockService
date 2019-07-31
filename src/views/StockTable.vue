@@ -15,6 +15,7 @@
         <b-dropdown-item @click="sendHome" v-if="authenticated">Home</b-dropdown-item>
         <b-dropdown-item @click="contactPage">Contact Us</b-dropdown-item>
         <export-excel 
+          v-if="!authenticated"
           :data = "excelBatches"
           worksheet = "BatchList"
           name = "HillsStock">
@@ -99,7 +100,7 @@
         <p v-else-if="imgError">Sorry there was an error finding this image</p>
         <p v-if="imgError && !imageLoaded && authenticated">{{err}}</p>
         <!-- <div v-if="!imageLoaded" class="box"></div> -->
-        <img @load="imageFinishedLoading" :src="imageURL" height="400" width="300">
+        <img @load="imageFinishedLoading" :src="imageURL" class="my-img">
       </b-modal>
     </div>
   </b-container>
@@ -434,11 +435,21 @@ body.modal-open {
     100% { transform: rotate(360deg); }
 }
 
+  .my-img {
+   height: 600px;
+   width: 600px;
+ }
+
 @media only screen and (max-width : 768px) {
   .loader {
       left: 45%;  
       top: 50%;
       right: 55%;
+  }
+
+  .my-img {
+    height: 400px;
+    width: 300px;
   }
 
 	.table-div {

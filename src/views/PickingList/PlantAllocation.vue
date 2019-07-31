@@ -42,7 +42,7 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
         this.items = batches;
       },
       tempSave() {
-        sessionStorage.setItem('tempBatchSave', JSON.parse(this.items));
+        sessionStorage.setItem('tempBatchSave', JSON.stringify(this.items));
         //Save the items to session storage so that if you want to go back you are able to get the original values
       }
     },

@@ -49,6 +49,7 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         quotePlants: [],
         pickListInfo1: '',
         arrayOfBatches: [],
+        originalBatches: [],
       }
     },
     methods: {
@@ -78,6 +79,11 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
             });   
           }
         }
+        //After getting the plants get any batches that may have been saved and need re allocating.
+        if(sessionStorage.getItem('tempBatchSave') != null) {
+          this.originalBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+          this.sortOriginalBatches(); //Call this method to sort out the items
+        }
         this.checkRowVariant();
       },
       checkRowVariant(row) {
@@ -101,14 +107,18 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         });
         this.$emit('getUsedBatches', this.arrayOfBatches);
       },
+      sortOriginalBatches() {
+        this.quotePlants.forEach(el => {
+          let tempAmountNeeded = 0;
+          let filtered = this.originalBatches.filter(orig => //Filter through the batches where the plantName is the same
+            (orig.plantQuoteIdUsed == el.PlantForQuoteId));
+            console.log(filtered);
+        });
+      }
     },
     created() {
       this.pickListInfo1 = JSON.parse(sessionStorage.getItem('pickListInfo'));
-      if(sessionStorage.getItem('tempBatchSave') != null) {
-        console.log("pelb")
-      } else {
-        this.getPlants();
-      }
+      this.getPlants();
     }
   }
 </script>

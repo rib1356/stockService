@@ -15,6 +15,7 @@
           <p v-if="showCollapse">Hide Batches<i class="fas fa-minus my-icon"></i></p>
           <p v-else>Show Batches<i class="fas fa-plus my-icon"></i></p>
         </b-button>
+        <p>Item to pick: {{rowInfo.PlantName}} {{rowInfo.FormSize}}</p>
         <p class="qty"><u>Quantity Needed: {{rowInfo.Quantity}} | Qty Outstanding: {{rowInfo.QuantityOutstanding}} |
            Current Amount: {{currentAmount}}</u></p>
       </div>  
@@ -61,7 +62,7 @@
       </div>  
       <p v-else>Sorry no batches of this type exist on the nursery</p>
       <input type="text" v-model="search">
-      <b-button  @click="searchBatches">Search</b-button>
+      <b-button class="search-btn" @click="searchBatches">Search</b-button>
       <b-button variant="outline-primary" block @click="allocateItems">Use selected batches</b-button>
       <b-button variant="outline-danger" block @click="hideModal">Close Me</b-button>
     </b-modal>
@@ -94,6 +95,7 @@
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
           element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
+          element['subFor'] = this.rowInfo.PlantName;
         });    
         this.batchesToPick = selectedPlants;
         }
@@ -148,6 +150,8 @@
           this.originalSearch = filtered; //Store the original search array? Then remove the values?
           filtered.forEach(element => {
             element['amountNeeded'] = 0;
+            element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
+            element['subFor'] = this.rowInfo.PlantName + " " + this.rowInfo.FormSize;
             this.batchesToPick.push(element);
           });
       },
@@ -163,7 +167,7 @@
     overflow-y: auto;
   }
 
-.grid-container {
+  .grid-container {
     display: grid;
     grid-template-columns: 200px 130px 130px 130px auto;
   }
@@ -194,7 +198,13 @@
   }
 
   input {
-    width: 80px;
+    width: 100px;
+  }
+
+  .search-btn {
+    height: 30px;
+    width: 100px;
+    margin-bottom: 5px;
   }
 
 </style>
