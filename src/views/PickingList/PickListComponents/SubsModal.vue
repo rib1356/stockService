@@ -95,7 +95,7 @@
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
           element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
-          element['subFor'] = this.rowInfo.PlantName;
+          element['subFor'] = this.rowInfo.PlantName  + " " + this.rowInfo.FormSize;
         });    
         this.batchesToPick = selectedPlants;
         }

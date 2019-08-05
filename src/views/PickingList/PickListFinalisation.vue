@@ -109,15 +109,15 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         var orderTo =	  "Customer Ref: " + this.picklistInfo.salesOrderInfo.customerRef + "\n" +
                         "Customer Name: " + this.picklistInfo.salesOrderInfo.customerName + "\n" +
                         "Customer Tel: get this " + "\n"	
+        var delivStr;                
+        if(this.picklistInfo.estDeliv) {
+          delivStr = "Estimated Delivery: "
+        } else {
+          delivStr = "Exact Delivery: "
+        }                
+
         var deliveryStuff =	"Delivery Needed: " + deliveryNeeded + "\n" +
-                            "Estimated Delivery: " + this.picklistInfo.estimatedDate + "\n" +
-                            "Exact Delivery: " + this.picklistInfo.exactDate + "\n"	     
-        // var deliveryInfo = "Customer Name: " + this.selectedQuote.customerName + "\n" +
-        //                   "Customer Ref: " + this.selectedQuote.customerRef + "\n" +
-        //                   "Customer Tel: " + this.currentCustomer.customerTel + "\n" +
-        //                   "Customer Email: " + this.currentCustomer.customerEmail + "\n" +
-        //                   "Customer Address: "+ this.currentCustomer.customerAddress + "\n"
-        // doc.addImage(companyLogo.src, 'PNG', 30, 30, 100, 75);
+                            delivStr + this.picklistInfo.dispatchDate + "\n"
         doc.setFontSize(20);
         doc.text("PICKING LIST", 240, 20);
         doc.setFontSize(10);

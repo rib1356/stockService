@@ -3,7 +3,7 @@
     <div class="info" >
     <pick-list-info v-bind:pickListInformation='pickListInformation'></pick-list-info>
     <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
-      <b-button variant="outline-danger" class="myBtn">Cancel Allocation</b-button>
+      <b-button variant="outline-danger" class="myBtn" @click="cancel">Cancel Allocation</b-button>
     </router-link>
     <router-link :to="{name: 'PickListFinalisation', params: { itemsToPick: this.items } }">
       <b-button variant="outline-primary" @click="tempSave" class="myBtn">Allocate Plants</b-button>
@@ -40,6 +40,9 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
           }
         });
         this.items = batches;
+      },
+      cancel() {
+        sessionStorage.removeItem('tempBatchSave');
       },
       tempSave() {
         sessionStorage.setItem('tempBatchSave', JSON.stringify(this.items));

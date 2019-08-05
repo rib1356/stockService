@@ -76,13 +76,18 @@
         <b-form-group horizontal label="Delivery Address:" >
           <b-form-input v-model="pickListInfo.address"
                         placeholder="Enter an address (leave blank if using customers)" />
-        </b-form-group>                            
-        <b-form-group horizontal label="Estimated Date:" >
-          <b-form-input v-model="pickListInfo.estimatedDate"
+        </b-form-group> 
+        <b-form-group horizontal label="Estimated/Exact Date:" >
+          <b-form-checkbox v-model="pickListInfo.estDeliv" style="align: left;">
+            {{pickListInfo.estDeliv}}
+          </b-form-checkbox>
+        </b-form-group>                           
+        <b-form-group horizontal label="Estimated Date:" v-if="pickListInfo.estDeliv" >
+          <b-form-input v-model="pickListInfo.dispatchDate"
                         placeholder="Enter an estimated date" />
         </b-form-group>                            
-        <b-form-group horizontal label="Exact Date:" >
-          <b-form-input v-model="pickListInfo.exactDate"
+        <b-form-group horizontal label="Exact Date:" v-else>
+          <b-form-input v-model="pickListInfo.dispatchDate"
                         placeholder="Enter an exact date" />
         </b-form-group>                            
         <b-form-group horizontal label="Delivery Needed:" >
@@ -124,8 +129,8 @@ export default {
       ],
       pickListInfo: {
         address: null,
-        estimatedDate: null,
-        exactDate: null,
+        dispatchDate: null,
+        estDeliv: false,
         deliveryNeeded: false,
         salesOrderInfo: {},
       },
@@ -141,6 +146,7 @@ export default {
       sortDirection: 'asc',
       selectedDate: '',
       showSaleOrders: false,
+      
     }
   },
   computed: {

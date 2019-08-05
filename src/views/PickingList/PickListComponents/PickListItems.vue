@@ -53,6 +53,7 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
       }
     },
     methods: {
+      //TBH Picklist components are a mess of array of objects and functions which I probably wont remember what they do
       getPlants() {
         // console.log(this.pickListInformation.salesOrderInfo.quoteId);
         this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/detail?id=' + this.pickListInfo1.salesOrderInfo.quoteId)
@@ -81,7 +82,9 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         }
         //After getting the plants get any batches that may have been saved and need re allocating.
         if(sessionStorage.getItem('tempBatchSave') != null) {
-          this.originalBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+          // this.originalBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+          this.arrayOfBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+          this.$emit('getUsedBatches', this.arrayOfBatches);
           this.sortOriginalBatches(); //Call this method to sort out the items
         }
         this.checkRowVariant();
@@ -108,12 +111,16 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         this.$emit('getUsedBatches', this.arrayOfBatches);
       },
       sortOriginalBatches() {
-        this.quotePlants.forEach(el => {
+        this.quotePlants.forEach(el => { //Loop through all of the plants
           let tempAmountNeeded = 0;
-          let filtered = this.originalBatches.filter(orig => //Filter through the batches where the plantName is the same
-            (orig.plantQuoteIdUsed == el.PlantForQuoteId));
-            console.log(filtered);
+          //Filter through the batches where the plantName is the same
+          let filtered = this.arrayOfBatches.filter(orig => (orig.plantQuoteIdUsed == el.PlantForQuoteId));
+            filtered.forEach(element => {
+              tempAmountNeeded += parseInt(element.amountNeeded)
+            });
+            el.QuantityOutstanding = tempAmountNeeded;
         });
+        //remove the session storage once its done? OR DO IT BEFORE IT SAVES -----------------------------------------
       }
     },
     created() {

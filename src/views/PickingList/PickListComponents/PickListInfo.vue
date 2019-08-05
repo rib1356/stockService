@@ -13,8 +13,8 @@
 		<b-collapse v-model="showCollapse" id="collapse">
       <h3>PickList Information</h3>
       <p>Address: {{pickListInfo1.address}}</p>
-      <p>Estimated Date: {{pickListInfo1.estimatedDate}}</p>
-      <p>Exact Date: {{pickListInfo1.exactDate}}</p>
+      <p v-if="pickListInfo1.estDeliv">Estimated Date: {{pickListInfo1.dispatchDate}}</p>
+      <p v-else>Exact Date: {{pickListInfo1.dispatchDate}}</p>
       <p>Delivery Needed: {{pickListInfo1.deliveryNeeded}}</p>
 
       <h3>Customer/Quote Information</h3>

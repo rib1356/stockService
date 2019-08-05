@@ -62,6 +62,8 @@
       }
     },
     methods: {
+      //TBH Picklist components are a mess of array of objects and functions which I probably wont remember what they do
+      //And will probably break once a database is involved
       openHSModal() {  
         this.$refs.HillsStockModal.show();
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList')); //Get the latest batches in stock
@@ -74,18 +76,16 @@
         });    
         this.batchesToPick = selectedPlants;
         }
-        this.getBatchUsedQuantity();
+        if(sessionStorage.getItem('tempBatchSave') != null && this.batchesUsed.length == 0) {
+          this.getTempSaveBatches();
+        }
+        this.getOriginalAmount();
       },
       hideModal() {
         this.$refs.HillsStockModal.hide();
       },
       acceptValues() {
-        // console.log((this.rowInfo.QuantityOutstanding - this.originalAmount) + this.checkBatchesUsed());
-        // if(this.rowInfo.Quantity < this.checkBatchesUsed()) {
-          // alert("This is more than the quantity needed (Will update the new quantity eventually)");
-          // this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed()); //Set the quantity to be whats chosen
-        // } else {
-          // }
+        //change this cunt
         this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
         this.$emit('sendVal');//Changes the colours of the rows on the table based upon how many are chosen    
         this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
@@ -96,8 +96,12 @@
         this.batchesToPick.forEach(element => {
           if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
             amount += parseInt(element.amountNeeded); //Calculate the total amounts that have been used on different batches
-            if(!this.batchesUsed.includes(element)) { //It doesnt exist in the array so add it
+            if(!this.batchesUsed.some(({batchId}) => batchId === element.batchId)) { //It doesnt exist in the array so add it
               this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+            } else { //The element exists so change the quantity of the one that exists
+              console.log("exists in batchesUsed")
+              var indexOfBatch = this.batchesUsed.findIndex(i => i.batchId === element.batchId);
+              this.batchesUsed[indexOfBatch].amountNeeded = element.amountNeeded;
             }
           }
         });
@@ -109,18 +113,27 @@
           this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
         });
       },
-      getBatchUsedQuantity() { //Get the original amount
+      getOriginalAmount() { //Get the original amount
         this.originalAmount = 0;
+        console.log("here")
         if(this.batchesUsed.length > 0) {
           this.batchesUsed.forEach(element => {
             this.originalAmount += parseInt(element.amountNeeded);
           });
         }
       },
-      quantityGreater() {
-        let arr = this.batchesToPick;
-        return arr.quantity < arr.amountNeeded;
-      }
+      getTempSaveBatches() {
+        let tempBatch = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+        this.batchesToPick.forEach(el => { //Loop through the batches that are on the modal
+          let filtered = tempBatch.filter(orig => (orig.batchId == el.batchId)); //Find previous one that has been chosen to get its values
+          console.log(filtered)
+          if(filtered.length > 0) {
+            el.amountNeeded = filtered[0].amountNeeded; //Set the amount needed to be the same as what it once was
+            this.batchesUsed.push(filtered[0]);
+          }
+        });
+        this.getOriginalAmount();
+      },
     },
   }
 </script>
