@@ -115,7 +115,6 @@
       },
       getOriginalAmount() { //Get the original amount
         this.originalAmount = 0;
-        console.log("here")
         if(this.batchesUsed.length > 0) {
           this.batchesUsed.forEach(element => {
             this.originalAmount += parseInt(element.amountNeeded);

@@ -82,7 +82,6 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         }
         //After getting the plants get any batches that may have been saved and need re allocating.
         if(sessionStorage.getItem('tempBatchSave') != null) {
-          // this.originalBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
           this.arrayOfBatches = JSON.parse(sessionStorage.getItem('tempBatchSave'));
           this.$emit('getUsedBatches', this.arrayOfBatches);
           this.sortOriginalBatches(); //Call this method to sort out the items
@@ -104,9 +103,16 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
         });  
       },
       createArrayofBatches(batches) {
+        console.log(this.arrayOfBatches);
+        console.log(batches);
         batches.forEach(element => {
-          if(!this.arrayOfBatches.includes(element))
-          this.arrayOfBatches.push(element);
+          if(this.arrayOfBatches.some(({batchId}) => batchId === element.batchId)) {
+            var indexOfBatch = this.arrayOfBatches.findIndex(i => i.batchId === element.batchId);
+            this.arrayOfBatches[indexOfBatch].amountNeeded = element.amountNeeded;
+          } else {
+            console.log("here")
+            this.arrayOfBatches.push(element);
+          }
         });
         this.$emit('getUsedBatches', this.arrayOfBatches);
       },
