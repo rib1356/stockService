@@ -88,24 +88,26 @@
       openSubModal() {
         this.$refs.SubModal.show();
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList')); //Get the latest batches in stock
-        console.log(this.rowInfo);
         if(this.batchesToPick.length == 0) {
         let selectedPlants = stockBatches.filter(stockBatches => //Filter through the batches where the plantName is the same
             (stockBatches.plantName === this.rowInfo.PlantName && !(stockBatches.formSize === this.rowInfo.FormSize) )); //This will give you a list of batches that are the same
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
-          element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
-          element['subFor'] = this.rowInfo.PlantName  + " " + this.rowInfo.FormSize;
+          element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId; //The plantQuoteId so that it can be saved into the db 
+          element['subFor'] = this.rowInfo.PlantName  + " " + this.rowInfo.FormSize; //Visuals
         });    
         this.batchesToPick = selectedPlants;
         }
-        this.getBatchUsedQuantity();
+        if(sessionStorage.getItem('tempBatchSave') != null && this.batchesUsed.length == 0) {
+          this.getTempSaveBatches();
+        }
+        this.getOriginalAmount();
       },
       hideModal() {
         this.$refs.SubModal.hide();
       },
       allocateItems() {
-        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
+        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding - this.originalAmount) + this.checkBatchesUsed());
         this.$emit('sendVal'); //Changes the colours of the rows on the table based upon how many are chosen
         this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
         this.hideModal();
@@ -113,14 +115,20 @@
       checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
         var amount = 0;
         this.batchesToPick.forEach(element => {
+          var indexOfBatch = this.batchesUsed.findIndex(i => i.batchId === element.batchId);
           if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
             amount += parseInt(element.amountNeeded); //Calculate the total amounts that have been used on different batches
-            if(!this.batchesUsed.includes(element)) { //It doesnt exist in the array so add it
+            if(!this.batchesUsed.some(({batchId}) => batchId === element.batchId)) { //It doesnt exist in the array so add it
               this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
+            } else { //The element exists so change the quantity of the one that exists
+              this.batchesUsed[indexOfBatch].amountNeeded = element.amountNeeded;
             }
+          //The item has already been allocated but its amount needed is changed to 0  
+          } else if(parseInt(element.amountNeeded) == 0 && this.batchesUsed.some(({batchId}) => batchId === element.batchId)) {
+            this.batchesUsed[indexOfBatch].amountNeeded = element.amountNeeded; //Set the value to be 0 so it can be removed (somehow?)
           }
         });
-        return amount;
+        return parseInt(amount);
       },
       calcAmounts() {
         this.currentAmount = 0;
@@ -128,7 +136,18 @@
           this.currentAmount += parseInt(element.amountNeeded); //Calculate the amounts that have been used on different batches
         });
       },
-      getBatchUsedQuantity() {
+      getTempSaveBatches() {
+        let tempBatch = JSON.parse(sessionStorage.getItem('tempBatchSave'));
+        this.batchesToPick.forEach(el => { //Loop through the batches that are on the modal
+          let filtered = tempBatch.filter(orig => (orig.batchId == el.batchId)); //Find previous one that has been chosen to get its values
+          if(filtered.length > 0) {
+            el.amountNeeded = filtered[0].amountNeeded; //Set the amount needed to be the same as what it once was
+            this.batchesUsed.push(filtered[0]);
+          }
+        });
+        this.getOriginalAmount();
+      },
+      getOriginalAmount() { //Get the original amount
         this.originalAmount = 0;
         if(this.batchesUsed.length > 0) {
           this.batchesUsed.forEach(element => {
@@ -141,10 +160,10 @@
         if(this.originalSearch.length != 0) {
           this.batchesToPick = this.batchesToPick.filter((el) => !this.originalSearch.includes( el )); //Remove the original search
         }
-        //-----------------
+        //-----------------------------------------------------------------------------------------------------------------------------------------
         //Should I initialise this on mainpage load then pass as props rather than every search
         let stockBatches = JSON.parse(sessionStorage.getItem('batchList'));
-        //-----------------
+        //-----------------------------------------------------------------------------------------------------------------------------------------
         let filtered = stockBatches.filter(stockBatches => //Filter through the batches where the plantName is the same
             (stockBatches.plantName.toLowerCase().includes(this.search.toLowerCase()) ));
           this.originalSearch = filtered; //Store the original search array? Then remove the values?
@@ -154,6 +173,8 @@
             element['subFor'] = this.rowInfo.PlantName + " " + this.rowInfo.FormSize;
             this.batchesToPick.push(element);
           });
+        this.getTempSaveBatches();  
+        this.getOriginalAmount();
       },
     }
   }

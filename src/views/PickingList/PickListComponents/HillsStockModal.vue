@@ -85,7 +85,6 @@
         this.$refs.HillsStockModal.hide();
       },
       acceptValues() {
-        //change this cunt
         this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
         this.$emit('sendVal');//Changes the colours of the rows on the table based upon how many are chosen    
         this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
@@ -94,15 +93,16 @@
       checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
         var amount = 0;
         this.batchesToPick.forEach(element => {
+          var indexOfBatch = this.batchesUsed.findIndex(i => i.batchId === element.batchId);
           if(parseInt(element.amountNeeded) > 0) { //Used to only add the batches that have been used 
             amount += parseInt(element.amountNeeded); //Calculate the total amounts that have been used on different batches
             if(!this.batchesUsed.some(({batchId}) => batchId === element.batchId)) { //It doesnt exist in the array so add it
               this.batchesUsed.push(element); //Push any of the used batches to array as these have been 'allocated'
             } else { //The element exists so change the quantity of the one that exists
-              console.log("exists in batchesUsed")
-              var indexOfBatch = this.batchesUsed.findIndex(i => i.batchId === element.batchId);
               this.batchesUsed[indexOfBatch].amountNeeded = element.amountNeeded;
             }
+          } else if(parseInt(element.amountNeeded) == 0 && this.batchesUsed.some(({batchId}) => batchId === element.batchId)) {
+            this.batchesUsed[indexOfBatch].amountNeeded = element.amountNeeded; //Set the value to be 0 so it can be removed (somehow?)
           }
         });
         return parseInt(amount);

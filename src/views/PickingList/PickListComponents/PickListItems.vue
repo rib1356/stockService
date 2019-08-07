@@ -102,16 +102,13 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
           }
         });  
       },
-      createArrayofBatches(batches) {
-        console.log(this.arrayOfBatches);
-        console.log(batches);
-        batches.forEach(element => {
-          if(this.arrayOfBatches.some(({batchId}) => batchId === element.batchId)) {
-            var indexOfBatch = this.arrayOfBatches.findIndex(i => i.batchId === element.batchId);
-            this.arrayOfBatches[indexOfBatch].amountNeeded = element.amountNeeded;
-          } else {
-            console.log("here")
-            this.arrayOfBatches.push(element);
+      createArrayofBatches(batches) { 
+        batches.forEach(element => { //Loop through the incoming batches that need to be added to the pick list
+          if(this.arrayOfBatches.some(({batchId}) => batchId === element.batchId)) { //If the batch is already contained in the original list (if went to allocate plants then came back)
+            var indexOfBatch = this.arrayOfBatches.findIndex(i => i.batchId === element.batchId); //Find the index of that item
+            this.arrayOfBatches[indexOfBatch].amountNeeded = element.amountNeeded; //Then change the quantity to the new one
+          } else { 
+            this.arrayOfBatches.push(element); //Else its a new item and add to the array
           }
         });
         this.$emit('getUsedBatches', this.arrayOfBatches);
@@ -126,7 +123,6 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
             });
             el.QuantityOutstanding = tempAmountNeeded;
         });
-        //remove the session storage once its done? OR DO IT BEFORE IT SAVES -----------------------------------------
       }
     },
     created() {

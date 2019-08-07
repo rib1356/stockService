@@ -33,10 +33,14 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
       // Worth saving the picklist items and their amounts to session storage until they are saved to the database?
       //----------------------------------
       putBatches(batches) { //Items for the picklist are passed up through components to then be sent to the next page
+      console.log(batches);
         batches.forEach(element => {
           if(element.amountNeeded == 0) {  //Loop through the batches and remove any that have a picked quantity of 0 as they shouldnt be used
             var index = batches.indexOf(element);
             batches.splice(index, 1);
+            //-------------------------------------------------------------------
+            // REMOVE THE ITEM WHERE AMOUNT NEEDED == 0 FROM SESSION STORAGE HERE
+            //-------------------------------------------------------------------
           }
         });
         this.items = batches;
@@ -45,8 +49,8 @@ import PickListItems from '@/views/PickingList/PickListComponents/PickListItems.
         sessionStorage.removeItem('tempBatchSave');
       },
       tempSave() {
-        sessionStorage.setItem('tempBatchSave', JSON.stringify(this.items));
         //Save the items to session storage so that if you want to go back you are able to get the original values
+        sessionStorage.setItem('tempBatchSave', JSON.stringify(this.items));
       }
     },
     mounted() {
