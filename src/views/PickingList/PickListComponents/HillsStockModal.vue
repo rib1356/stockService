@@ -84,11 +84,31 @@
       hideModal() {
         this.$refs.HillsStockModal.hide();
       },
+      overBatchQuantity() {
+        let arr = []
+        this.batchesToPick.forEach(element => {
+          if(parseInt(element.amountNeeded) > element.quantity) {
+            arr.push(true);
+          } else {
+            arr.push(false)
+          }
+        });
+        if(arr.includes(true)){
+          return true;
+        } else {
+          return false;
+        }
+      },
       acceptValues() {
-        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
-        this.$emit('sendVal');//Changes the colours of the rows on the table based upon how many are chosen    
-        this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
-        this.hideModal();
+        if(this.overBatchQuantity()) {
+          this.showAlert = true;
+        } else {
+          this.showAlert = false;
+          this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding -this.originalAmount) + this.checkBatchesUsed());
+          this.$emit('sendVal');//Changes the colours of the rows on the table based upon how many are chosen    
+          this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
+          this.hideModal();
+        }
       },
       checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
         var amount = 0;

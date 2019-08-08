@@ -2,7 +2,7 @@
   <div>
     <b-button size="sm" @click="openSubModal" style="margin-left: 5px;">Subsitute</b-button>
     <b-modal :ref='"SubModal"' size="lg" no-close-on-backdrop hide-footer title="Select batches to pick from">
-        <!-- <b-alert show v-model="showAlert" variant="danger">The amount selected is higher than the current batch quantity!</b-alert> -->
+      <b-alert show v-model="showAlert" variant="danger">The amount selected is higher than the current batch quantity!</b-alert>
       <div>  
         <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -82,6 +82,7 @@
         originalAmount: 0,
         search: '',
         originalSearch: [],
+        showAlert: false,
       }
     },
     methods: {
@@ -106,11 +107,31 @@
       hideModal() {
         this.$refs.SubModal.hide();
       },
+      overBatchQuantity() {
+        let arr = []
+        this.batchesToPick.forEach(element => {
+          if(parseInt(element.amountNeeded) > element.quantity) {
+            arr.push(true);
+          } else {
+            arr.push(false)
+          }
+        });
+        if(arr.includes(true)){
+          return true;
+        } else {
+          return false;
+        }
+      },
       allocateItems() {
-        this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding - this.originalAmount) + this.checkBatchesUsed());
-        this.$emit('sendVal'); //Changes the colours of the rows on the table based upon how many are chosen
-        this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
-        this.hideModal();
+        if(this.overBatchQuantity()) {
+          this.showAlert = true;
+        } else {
+          this.showAlert = false;
+          this.rowInfo.QuantityOutstanding = ((this.rowInfo.QuantityOutstanding - this.originalAmount) + this.checkBatchesUsed());
+          this.$emit('sendVal'); //Changes the colours of the rows on the table based upon how many are chosen
+          this.$emit('batchesUsed', this.batchesUsed); //Sends batches to be held for the next page
+          this.hideModal();
+        }
       },
       checkBatchesUsed() { //Used to calculate the amount that is used on the row and also remember which batch(es) has been used
         var amount = 0;
