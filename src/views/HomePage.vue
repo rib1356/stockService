@@ -50,9 +50,13 @@
           <p>{{salesOrders}}</p>
         </div>  
         <div class="grid-item">
-          <h4>Number of Customers</h4>
+          <h4>Sage Customers</h4>
+          <p>{{sageCustomers}}</p>
+        </div>
+        <div class="grid-item">
+          <h4>Other Customers</h4>
           <p>{{customers}}</p>
-        </div>  
+        </div>   
       </div>
     </div>
   </div>
@@ -67,9 +71,9 @@ export default {
       quotes: 'loading',
       salesOrders: 'loading',
       customers: 'loading',
+      sageCustomers: 'loading',
       batchData: [],
       excelBatches: [],
-      blahsd: "blah"
     }
   },
   methods: {
@@ -157,7 +161,9 @@ export default {
         console.log("getting customers from db")
         this.getAllCustomers();
       } else {
-        this.customers = JSON.parse(sessionStorage.getItem('customers')).length;
+        let cust = JSON.parse(sessionStorage.getItem('customers'));
+        this.sageCustomers = cust.filter((obj) => obj.sageCustomer === true).length;
+        this.customers = cust.filter((obj) => obj.sageCustomer === false).length;
       }
     },
     getAllCustomers() { //Get all customers from webservice --Is called from hasUserAuth()--
@@ -182,7 +188,9 @@ export default {
 				});
       }
       sessionStorage.setItem("customers", JSON.stringify(cust));
-      this.customers = cust.length
+      this.sageCustomers = cust.filter((obj) => obj.sageCustomer === true).length;
+      this.customers = cust.filter((obj) => obj.sageCustomer === false).length;
+      console.log(this.sageCustomers);
 		},
   },  
   mounted() {

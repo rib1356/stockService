@@ -190,10 +190,19 @@ export default {
     changeData(response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
         if(response[i].Active === true && response[i].SalesOrder === false) {
+          var newName;
+          if(response[i].CustomerName.length > 25) {
+            let orig = response[i].CustomerName.match(/.{1,25}/g);
+            newName = orig[0] + "...";
+            console.log(orig);
+            console.log(newName);
+          } else {
+            newName = response[i].CustomerName;
+          }
           this.quotes.push({ //This is then pushed into an array and used to populate the data table
             "quoteId": response[i].QuoteId,
             "customerRef": response[i].CustomerRef,
-            "customerName": response[i].CustomerName,
+            "customerName": newName,
             "customerAddress": response[i].CustomerAddress,
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
