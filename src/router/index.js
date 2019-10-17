@@ -13,6 +13,7 @@ import Login from '@/views/UserPages/Login'
 import SignUp from '@/views/UserPages/SignUp'
 import ResetPassword from '@/views/UserPages/ResetPassword'
 import ContactPage from '@/views/UserPages/ContactPage'
+import CustomerTable from '@/views/UserPages/CustomerTable'
 
 //Pricing Pages
 import PricingSelection from '@/views/Pricing/PricingSelection'
@@ -134,6 +135,11 @@ const router = new Router({
       path: '/PickListFinalisation',
       name: 'PickListFinalisation',
       component: PickListFinalisation
+    },
+    {
+      path: '/CustomerTable',
+      name: 'CustomerTable',
+      component: CustomerTable
     },
     {
       path: '/Admin',

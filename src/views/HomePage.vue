@@ -17,6 +17,9 @@
       <router-link :to="{name: 'PickList' }">
         <b-button class="myBtn p-btn" variant="secondary">View Picking Lists</b-button>
       </router-link>
+      <router-link :to="{name: 'CustomerTable' }">
+        <b-button class="myBtn misc-btn" variant="secondary">View Sage Customers</b-button>
+      </router-link>
       <router-link :to="{name: 'PricingSelection'}">
         <b-button class="myBtn misc-btn" variant="secondary">Pricing</b-button>
       </router-link>
@@ -185,6 +188,7 @@ export default {
 					"customerAddress": data[i].CustomerAddress,
           "customerEmail": data[i].CustomerEmail,
           "sageCustomer": data[i].SageCustomer,
+          "customerTel2": data[i].CustomerTel2,
 				});
       }
       sessionStorage.setItem("customers", JSON.stringify(cust));
@@ -218,7 +222,7 @@ export default {
 	.navigation
 	{
     width: 20%;
-		height: 100%; 
+		height: 100vh; 
 		float:left;
     background-color: lightslategray;
     color: black;
@@ -232,6 +236,7 @@ export default {
 		float: left;
 		width: 80%;
     background-color: lightslategray;
+    height: 100vh;
 	}
 
   .grid-container {

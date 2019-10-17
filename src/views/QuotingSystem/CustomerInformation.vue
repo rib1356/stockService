@@ -68,6 +68,11 @@
 		</b-row>
 		<b-row class="my-1">
 			<b-col sm="2">
+				<label for="input-tel">Customer Telephone2:</label>
+			</b-col>
+		</b-row>
+		<b-row class="my-1">
+			<b-col sm="2">
 				<label for="input-address">Customer Address:</label>
 			</b-col>
 			<b-col sm="10">
@@ -194,8 +199,9 @@ export default {
 					"customerRef": data[i].CustomerReference,
 					"customerTel": data[i].CustomerTel,
 					"customerAddress": data[i].CustomerAddress,
-		  "customerEmail": data[i].CustomerEmail,
-		  "sageCustomer": data[i].SageCustomer,
+		  		"customerEmail": data[i].CustomerEmail,
+					"sageCustomer": data[i].SageCustomer,
+					"customerTel2": data[i].CustomerTel2,
 				});
 			}
 			sessionStorage.removeItem("customers"); //Remove the previous list of customers

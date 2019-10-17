@@ -15,18 +15,19 @@
       </b-button>
 			<b-collapse v-model="showCollapse" id="collapse">
 				<p>
-					Customer Name: <strong>{{currentCustomer.customerName}}</strong>
-					Customer Reference: <strong>{{currentCustomer.customerRef}}</strong>
-					Customer Telephone: <strong>{{currentCustomer.customerTel}}</strong>
+					Customer Name: <strong>{{currentCustomer.customerName}}</strong> <br>
+					Customer Reference: <strong>{{currentCustomer.customerRef}}</strong> <br>
+					Customer Telephone: <strong>{{currentCustomer.customerTel}}</strong> <br>
+          Customer Telephone2: <strong>{{currentCustomer.customerTel2}}</strong>
 				</p>
 				<p>	
-					Customer Address: <strong>{{currentCustomer.customerAddress}}</strong>
-					Customer Email: <strong>{{currentCustomer.customerEmail}}</strong>
+					Customer Address: <strong>{{currentCustomer.customerAddress}}</strong> <br>
+					Customer Email: <strong>{{currentCustomer.customerEmail}}</strong> <br>
 				</p>
 				<p>
-					Site reference: <strong>{{selectedQuote.siteRef}}</strong>
-					Quote Date: <strong>{{selectedQuote.startDate}}</strong>
-					Expiry Date: <strong>{{selectedQuote.expiryDate}}</strong>
+					Site reference: <strong>{{selectedQuote.siteRef}}</strong> <br>
+					Quote Date: <strong>{{selectedQuote.startDate}}</strong> <br>
+					Expiry Date: <strong>{{selectedQuote.expiryDate}}</strong> <br>
 				</p>
         <hr>
 			</b-collapse>
