@@ -15,7 +15,7 @@
           <b-form-checkbox v-model="loose">Loose</b-form-checkbox>
         <!-- </b-form-checkbox-group> -->
       </b-form-group> 
-      <b-button variant="outline-primary" class="myBtn">Save Picklist</b-button>
+      <b-button variant="outline-primary" class="myBtn" @click="savePickList">Save Picklist</b-button>
       <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button> 
       <router-link :to="{name: 'PlantAllocation'}">
         <b-button variant="outline-success" class="myBtn">Change Allocation</b-button>
@@ -27,7 +27,7 @@
     <div class="list">
       <b-table show-empty
              stacked="md"
-             :items="itemsToPick"
+             :items="pickListItems"
              :fields="fields"   
              outlined       
              >
@@ -55,11 +55,12 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
     data() {
       return {
         itemsToPick: [],
+        pickListItems: [],
         fields: [
           { key: 'plantName', label: 'Plant Name', sortable: true},
           { key: 'formSize', label: 'Form Size'},
           { key: 'comment', label: 'Comment'},
-          { key: 'subFor', label: 'Subbed For'},
+          { key: 'subFor', label: 'Subbed For (Original Item)'},
           { key: 'batchPrice', label: 'Item Price', sortable: true},
           { key: 'location', label: 'Location', sortable: true},
           { key: 'amountNeeded', label: 'Amount to pick', sortable: true},
@@ -76,6 +77,51 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
       cancel() {
         sessionStorage.removeItem('tempBatchSave');
       },
+      sortItemsToPick(items) {
+        items.forEach(item => {
+          var isSubbed;
+          var subFor;
+          if("subFor" in item) { //If subFor exists in the current item
+            isSubbed = true;
+            subFor = item.subFor;
+          } else {
+            isSubbed = false;
+            subFor = null;
+          }
+          this.itemsToPick.push({
+            "PlantForQuoteId": item.plantQuoteIdUsed,
+            "PlantName": item.plantName,
+            "FormSize": item.formSize,
+            "QuantityToPick": parseInt(item.amountNeeded),
+            "IsSubbed": isSubbed,
+            "SubbedFor": subFor,
+            "DispatchLocation": null,
+          });
+        });
+      },
+      savePickList() {
+        this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/picklist', {
+          QuoteId: this.picklistInfo.salesOrderInfo.quoteId,
+          DispatchDate: this.picklistInfo.dispatchDate,
+          DeliveryAddress: this.picklistInfo.address,
+          DeliveryNeeded: this.picklistInfo.deliveryNeeded,
+          IsPicked: true,
+          IsPacked: false,
+          IsDelivered: false,
+          Comment: this.comment,
+          EstimatedDelivery: this.picklistInfo.estDeliv,
+          PickListPlants: this.itemsToPick,
+        }) 
+        .then((response) => {
+          alert("PickList saved");
+          this.$router.push("PickLists");
+          console.log(response);
+        })
+        .catch((error) => {
+          alert("Please check values before submitting" + error)
+          console.log(error);
+        });
+		  },
       createPDF() {
         let pdfName = 'Picklist' + this.picklistInfo.salesOrderInfo.quoteId;
         var doc = new jsPDF('p', 'pt');
@@ -170,7 +216,9 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
       },
     },
     created() {
-      this.itemsToPick = this.$route.params.itemsToPick;
+      this.pickListItems = this.$route.params.itemsToPick;
+      this.sortItemsToPick(this.$route.params.itemsToPick);
+      console.log(this.$route.params.itemsToPick)
       this.picklistInfo = JSON.parse(sessionStorage.getItem('pickListInfo'));
     }
   }

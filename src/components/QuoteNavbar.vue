@@ -15,6 +15,7 @@
         <b-dropdown-item @click="home">Home</b-dropdown-item>
         <b-dropdown-item @click="newQuote">Create New Quote</b-dropdown-item>
         <b-dropdown-item @click="existingQuote">Existing Quotes</b-dropdown-item>
+        <b-dropdown-item @click="pickLists">View PickLists</b-dropdown-item>
         <!-- <b-dropdown-item @click="stockTable">Stock Table</b-dropdown-item> -->
       </b-dropdown>
     </b-navbar>
@@ -40,7 +41,10 @@
 			},
 			newQuote() {
 				this.$router.push('CustomerInformation');
-			},
+      },
+      pickLists() {
+        this.$router.push('PickLists');
+      }
 		}
   }
 </script>

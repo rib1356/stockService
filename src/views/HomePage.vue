@@ -14,7 +14,7 @@
       <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
         <b-button class="myBtn so-btn" variant="secondary">View Existing Sales Orders</b-button>
       </router-link>
-      <router-link :to="{name: 'PickList' }">
+      <router-link :to="{name: 'PickLists' }">
         <b-button class="myBtn p-btn" variant="secondary">View Picking Lists</b-button>
       </router-link>
       <router-link :to="{name: 'CustomerTable' }">

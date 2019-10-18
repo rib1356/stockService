@@ -28,6 +28,7 @@ import EditQuote from '@/views/QuotingSystem/EditQuote'
 //Picking List Pages 
 import PlantAllocation from '@/views/PickingList/PlantAllocation'
 import PickListFinalisation from '@/views/PickingList/PickListFinalisation'
+import PickLists from '@/views/PickingList/PickLists'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -135,6 +136,11 @@ const router = new Router({
       path: '/PickListFinalisation',
       name: 'PickListFinalisation',
       component: PickListFinalisation
+    },
+    {
+      path: '/PickLists',
+      name: 'PickLists',
+      component: PickLists
     },
     {
       path: '/CustomerTable',

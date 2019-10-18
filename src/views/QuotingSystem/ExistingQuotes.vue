@@ -192,10 +192,8 @@ export default {
         if(response[i].Active === true && response[i].SalesOrder === false) {
           var newName;
           if(response[i].CustomerName.length > 25) {
-            let orig = response[i].CustomerName.match(/.{1,25}/g);
-            newName = orig[0] + "...";
-            console.log(orig);
-            console.log(newName);
+            let orig = response[i].CustomerName.match(/.{1,25}/g); //Splits the name after 25 characters to make the table smaller
+            newName = orig[0] + "...";                            //EG "a long name here..."
           } else {
             newName = response[i].CustomerName;
           }
