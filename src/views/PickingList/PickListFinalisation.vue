@@ -90,6 +90,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           }
           this.itemsToPick.push({
             "PlantForQuoteId": item.plantQuoteIdUsed,
+            "BatchId": item.batchId,
             "PlantName": item.plantName,
             "FormSize": item.formSize,
             "QuantityToPick": parseInt(item.amountNeeded),
@@ -100,6 +101,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         });
       },
       savePickList() {
+        sessionStorage.removeItem('tempBatchSave')
         this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/picklist', {
           QuoteId: this.picklistInfo.salesOrderInfo.quoteId,
           DispatchDate: this.picklistInfo.dispatchDate,
@@ -118,7 +120,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           console.log(response);
         })
         .catch((error) => {
-          alert("Please check values before submitting" + error)
+          alert("Please check values before submitting: " + error)
           console.log(error);
         });
 		  },

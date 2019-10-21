@@ -73,7 +73,9 @@
              :sort-desc.sync="sortDesc"
              :sort-direction="sortDirection"
              class="p-2"  
-             :busy="isBusy"  
+             :busy="isBusy"
+             outlined
+             
              >
       <div slot="empty">
         <strong>Loading batches...</strong>

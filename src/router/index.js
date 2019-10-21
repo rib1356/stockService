@@ -29,6 +29,7 @@ import EditQuote from '@/views/QuotingSystem/EditQuote'
 import PlantAllocation from '@/views/PickingList/PlantAllocation'
 import PickListFinalisation from '@/views/PickingList/PickListFinalisation'
 import PickLists from '@/views/PickingList/PickLists'
+import PickListDetail from '@/views/PickingList/PickListDetail'
 
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
@@ -143,9 +144,17 @@ const router = new Router({
       component: PickLists
     },
     {
+      path: '/PickListDetail',
+      name: 'PickListDetail',
+      component: PickListDetail
+    },
+    {
       path: '/CustomerTable',
       name: 'CustomerTable',
-      component: CustomerTable
+      component: CustomerTable,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/Admin',

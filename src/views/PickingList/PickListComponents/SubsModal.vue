@@ -95,6 +95,7 @@
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0; //Add in an amount needed so theres a value to v-model against
           element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId; //The plantQuoteId so that it can be saved into the db 
+          element['batchId'] = element.batchId;
           element['subFor'] = this.rowInfo.PlantName  + " " + this.rowInfo.FormSize; //Visuals
         });    
         this.batchesToPick = selectedPlants;
@@ -191,6 +192,7 @@
           filtered.forEach(element => {
             element['amountNeeded'] = 0;
             element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
+            element['batchId'] = element.batchId;
             element['subFor'] = this.rowInfo.PlantName + " " + this.rowInfo.FormSize;
             this.batchesToPick.push(element);
           });

@@ -73,6 +73,7 @@
         selectedPlants.forEach(element => {
           element['amountNeeded'] = 0;
           element['plantQuoteIdUsed'] = this.rowInfo.PlantForQuoteId;
+          element['batchId'] = element.batchId;
         });    
         this.batchesToPick = selectedPlants;
         }

@@ -12,7 +12,7 @@
                 :aria-expanded="showCollapse ? 'true' : 'false'">
         <p v-if="showCollapse">Hide Filters<i class="fas fa-minus plus"></i></p>
         <p v-else>Show Filters<i class="fas fa-plus plus"></i></p>
-      </b-button>  
+      </b-button>
       <!-- Collapsible area to show the filters for the table -->
       <b-collapse v-model="showCollapse" id="collapse">
         <b-input-group class="input-filter">
@@ -55,7 +55,9 @@
               :sort-desc.sync="sortDesc"
               :sort-direction="sortDirection"
               class="table" 
-              outlined   
+              outlined
+              striped
+              
               >
         <div slot="empty">
           <strong>Loading quotes...</strong>
@@ -83,15 +85,28 @@
           </b-form-checkbox>
         </b-form-group>                           
         <b-form-group horizontal label="Estimated Date:" v-if="pickListInfo.estDeliv" >
-          <b-form-input v-model="pickListInfo.dispatchDate"
-                        placeholder="Enter an estimated date" />
+          <datepicker id="modalDatepicker"
+                    placeholder="Select Estimated Date"
+                    :format="customFormatter"
+                    @cleared="clearDate"
+                    monday-first
+                    clear-button
+                    bootstrap-styling
+                    ></datepicker>
         </b-form-group>                            
         <b-form-group horizontal label="Exact Date:" v-else>
-          <b-form-input v-model="pickListInfo.dispatchDate"
-                        placeholder="Enter an exact date" />
+        <datepicker id="modalDatepicker"
+                    placeholder="Select Exact Date"
+                    :format="customFormatter"
+                    @cleared="clearDate"
+                    @selected="setSelectedDate"
+                    monday-first
+                    clear-button
+                    bootstrap-styling
+                    ></datepicker>
         </b-form-group>                            
         <b-form-group horizontal label="Delivery Needed:" >
-          <b-form-checkbox v-model="pickListInfo.deliveryNeeded" style="align: left;">
+          <b-form-checkbox v-model="pickListInfo.deliveryNeeded" style="align: left;" buttons>
             {{pickListInfo.deliveryNeeded}}
           </b-form-checkbox>
         </b-form-group>                            
@@ -166,6 +181,10 @@ export default {
     },
     setFilter(date) {
       this.filter = this.customFormatter(date)
+    },
+    setSelectedDate(date) {
+      this.pickListInfo.dispatchDate = this.customFormatter(date);
+      console.log(this.pickListInfo.dispatchDate);
     },
     openPickList(row) {
       this.pickListInfo.salesOrderInfo = row;

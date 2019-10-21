@@ -88,7 +88,7 @@
           });
         }
         this.sageCustomers = cust.filter((obj) => obj.sageCustomer === true);
-        console.log(this.sageCustomers);
+       
       },
     },
     mounted() {

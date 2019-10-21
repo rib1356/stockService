@@ -6,11 +6,19 @@
               :items="picklists"
               :fields="fields"
               class="table" 
-              outlined   
+              outlined
+              fixed
               >
           <div slot="empty">
             <strong>Loading picklists...</strong>
           </div>
+          <template slot="actions" slot-scope="row">
+            <router-link :to="{name: 'PickListDetail', params: { pickListDetail: row.item } }">
+              <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
+            </router-link>
+            <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
+            <i class="fas fa-check fa-lg icon-tick" v-b-tooltip.hover title="Convert to Delivery" @click.stop=""></i>
+        </template> 
       </b-table>
     </div>
 </template>
@@ -30,11 +38,11 @@ import QuoteNavbar from '@/components/QuoteNavbar.vue'
         { key: 'pickListId', label: 'PickList Id', sortable: true},
         { key: 'quoteId', label: 'Quote Id', sortable: true},
         { key: 'dispatchDate', label: 'Dispatch Date'},
-        { key: 'deliveryNeeded', label: 'Delivery Needed'},
+        { key: 'deliveryNeeded', label: 'Delivery Needed', sortable: true},
         { key: 'deliveryAddress', label: 'Delivery Address'},
         { key: 'state', label: 'State' },
         { key: 'comment', label: 'Comment'},
-        { key: 'itemsToPick', label: 'Items To Pick'},
+        { key: 'itemsToPick', label: 'Items To Pick', sortable: true},
         { key: 'actions', label: 'Actions' },
 			],
       }
@@ -51,17 +59,27 @@ import QuoteNavbar from '@/components/QuoteNavbar.vue'
       },
       changeData(response) {
         response.forEach(element => {
+          // var delivNeeded;
+          var currentState;
+          var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
           this.picklists.push({
           "pickListId": element.PicklistId,
           "quoteId": element.QuoteId,
-          "dispatchDate": element.DispatchDate,
-          "deliveryNeeded": element.DeliveryNeeded,
+          "dispatchDate": this.convertDate(element.DispatchDate),
+          "deliveryNeeded": delivNeeded,
           "deliveryAddress": element.DeliveryAddress,
           "state": element.IsPicked,
           "comment": element.Comment,
           "itemsToPick": element.PickListItemQty,
           });
         });
+      },
+      deletePickList(row) {
+        console.log(row);
+      },
+      convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"
+        var p = dateString.split(/\D/g)
+        return [p[2],p[1],p[0] ].join("/")
       },
     },
     mounted() {
@@ -71,9 +89,14 @@ import QuoteNavbar from '@/components/QuoteNavbar.vue'
 </script>
 
 <style scoped>
-
-.navbar-custom {
-			background-color: #0f6368;
+@import "https://use.fontawesome.com/releases/v5.7.2/css/all.css";
+  .navbar-custom {
+		background-color: #0f6368;
 	}
+
+.icon-tick {
+  color: #0f6368;
+  margin-left: 2px;
+}
 
 </style>
