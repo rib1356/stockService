@@ -1,13 +1,24 @@
 <template>
     <div>
       <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
-      <b-table show-empty
-             stacked="md"
-             :items="pickListDetailItems"
-             :fields="fields"   
-             outlined       
-             >
-      </b-table>
+      <div >
+        <b-input-group class="input-filter" >
+            <b-form-input v-model="filter" placeholder="Type to Search"/>
+              <b-input-group-append>
+                <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+              </b-input-group-append>
+          </b-input-group>
+      </div>
+      <div >
+        <b-table show-empty
+              stacked="md"
+              :items="pickListDetailItems"
+              :fields="fields"
+              :filter="filter"
+              outlined       
+              >
+        </b-table>
+      </div>
     </div>
 </template>
 
@@ -22,6 +33,15 @@ import QuoteNavbar from '@/components/QuoteNavbar.vue'
           pageName: "PickList Detail",
           pickListDetail: '',
           pickListDetailItems: [],
+          filter: '',
+          fields: [
+          { key: 'plantName', label: 'Plant Name', sortable: true},
+          { key: 'formSize', label: 'Form Size'},
+          { key: 'location', label: 'Location'},
+          { key: 'quantityToPick', label: 'Quantity To Pick', sortable: true},
+          { key: 'isSubbed', label: 'Is subbed'},
+          { key: 'subbedFor', label: 'Subbed For' }
+        ],
         }
       },
       methods: {
@@ -56,8 +76,42 @@ import QuoteNavbar from '@/components/QuoteNavbar.vue'
 
 <style scoped>
 
-.navbar-custom {
+  .navbar-custom {
 		background-color: #0f6368;
 	}
+
+  	.left-div
+	{
+    width: 20%;
+		height: 100%; 
+		float:left;
+	}
+  
+	.right-div {
+		float: left;
+    height: fit-content;
+    max-height: 90vh;
+		width: 80%;
+		overflow: auto;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+	}
+
+  .plus{
+    float: right;
+    text-align: center;
+  }
+
+  .input-filter{
+    margin-bottom: 5px;
+  }
+
+  .input-pad {
+    margin-top: 5px;
+  }
+
+  p {
+    margin-bottom: 0;
+  }
 
 </style>
