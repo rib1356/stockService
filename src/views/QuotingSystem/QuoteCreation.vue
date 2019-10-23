@@ -28,9 +28,50 @@
 					Quote Date: <strong>{{quoteDate}}</strong> <br>
 					Expiry Date: <strong>{{expiryDate}}</strong> <br>
 				</p>
-		<hr>
+		  <hr>
 			</b-collapse>
 		</div>
+    <div id="custom-add">
+      <b-button @click="showAddCollapse = !showAddCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+        <p v-if="showAddCollapse">Hide Custom Add<i class="fas fa-minus plus"></i></p>
+        <p v-else>Show Custom Add<i class="fas fa-plus plus"></i></p>
+      </b-button>
+			<b-collapse v-model="showAddCollapse" id="collapse">
+				<p>You can add any custom plant here</p>
+        <b-form-input v-model="customPlantName"
+									placeholder="Enter a plant name"
+									type="text"
+									style="margin-top: 10px;"
+									></b-form-input>
+        <b-form-input v-model="customFormSize"
+									placeholder="Enter a form size"
+									type="text"
+									style="margin-top: 10px;"
+									></b-form-input>          
+        <b-form-input v-model="customComment"
+									placeholder="Enter a plant comment"
+									type="text"
+									style="margin-top: 10px;"
+									></b-form-input>
+        <b-form-input v-model="customQuantity"
+									placeholder="Enter a quantity"
+									type="number"
+									style="margin-top: 10px;"
+									></b-form-input> 
+        <b-form-input v-model="customPrice"
+									placeholder="Enter a price"
+									type="number"
+									style="margin-top: 10px;"
+									v-validate="'required|decimal:2|min_value:0.01'"></b-form-input>                   
+		  <hr>
+			</b-collapse>
+    </div>
 		<label class="typo__label">Choose a plant to add to a quote</label>
 		<multiselect v-model="selectedBatch" 
 								:options="batches"  
@@ -40,6 +81,7 @@
 								:show-labels="false"
 								:allow-empty="false"
 								open-direction="bottom"
+                @select="closeAddCollapse"
 								>
 			<template slot="option" slot-scope="props">
 				<div>
@@ -75,8 +117,9 @@
 									type="text"
 									style="margin-top: 10px;"
 									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
+    <p v-if="showAddCollapse" style="color: red;"><b>Plants will be added from the Custom Add dropdown!</b></p>														
+		<p v-else>Please add plants to the quote to save</p>			
 		<b-button @click="saveQuote" v-if="totalPrice != 0" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>	
-		<p v-else>Please add plants to the quote to save</p>															
 		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
 	</div>
 		<div class="right-div" id="right">
@@ -192,8 +235,14 @@ export default {
 			nextCalculatedPrice: '',
 			untilNextBand: '',
 			showCollapse: true,
+      showAddCollapse: false,
 			currentGPM: '',
-			retail: '',
+      retail: '',
+      customPlantName: "",
+      customFormSize: "",
+      customComment: "",
+      customQuantity: "",
+      customPrice: "",
 		}		
 	},
   methods: {
@@ -206,7 +255,10 @@ export default {
 		remove(id) {
 			this.plants.splice(id,1);
 			this.getTotalPrice();
-		},
+    },
+    closeAddCollapse() {
+      this.showAddCollapse = false;
+    },
 		calculatePrice() {
 			if(this.selectedBatch != null) { //This method is called twice when using @input???
 				// this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*0.9).toFixed(2);
@@ -276,11 +328,15 @@ export default {
 				console.log(error);
 			});
 		},
-		validateBeforeSubmit(e) { //Check that all validation passes before adding
-			this.$validator.validateAll();
-      if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
+    validateBeforeSubmit(e) { //Check that all validation passes before adding
+      if(this.showAddCollapse != true){
+        this.$validator.validateAll();
+        if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
           this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
-      }
+        }
+        } else {
+          this.addToList();
+        }
 		},
 		validateEdits(e) { //Check that all validation passes before saving
       this.$validator.validate('rowQuantity', this.rowQuantity); //Validate the inputs on the modal
@@ -297,21 +353,41 @@ export default {
 			});
 		},
 		addToList() {
-			this.plants.push({
-				PlantName: this.selectedBatch.plantName,
-				FormSize: this.selectedBatch.formSize,
-				Quantity: this.quantity,
-				Comment: this.comment,
-				Price: Math.trunc((this.calculatedPrice)*100), //Remove any trailing decimals so that it can be saved as an integer
-				Active: true,
-				_rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
-			});
+      if(this.showAddCollapse == true) {
+        this.plants.push({
+          PlantName: this.customPlantName,
+          FormSize: this.customFormSize,
+          Comment: this.customComment,
+          Quantity: this.customQuantity,
+          Price: this.customPrice,
+          Active: true,
+        });
+        this.showAddCollapse = false;
+      }
+      else {
+        this.plants.push({
+          PlantName: this.selectedBatch.plantName,
+          FormSize: this.selectedBatch.formSize,
+          Quantity: this.quantity,
+          Comment: this.comment,
+          Price: Math.trunc((this.calculatedPrice)*100), //Remove any trailing decimals so that it can be saved as an integer
+          Active: true,
+          _rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
+			  });
+      }
+			
 			this.getTotalPrice(); //Once a plant is added recalculate the current quote price
 			//Reset input and validation
 			this.selectedBatch = null
 			this.quantity = null
 			this.comment = null
-			this.calculatedPrice = ''
+      this.calculatedPrice = '';
+
+      this.customPlantName = "";
+      this.customFormSize = "";
+      this.customComment = "";
+      this.customQuantity = null;
+      this.customPrice = null;
 			this.$validator.reset();
 		},
 		editItem(row, rowId) {

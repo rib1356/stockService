@@ -91,7 +91,7 @@ import Datepicker from 'vuejs-datepicker';
         picklists: [],
         fields: [
         { key: 'pickListId', label: 'PickList Id', sortable: true},
-        { key: 'quoteId', label: 'Quote Id', sortable: true},
+        { key: 'customerName', label: 'Customer Name', sortable: true},
         { key: 'dispatchDate', label: 'Dispatch Date'},
         { key: 'deliveryNeeded', label: 'Delivery Needed', sortable: true},
         { key: 'deliveryAddress', label: 'Delivery Address'},
@@ -132,11 +132,11 @@ import Datepicker from 'vuejs-datepicker';
           // var delivNeeded;
           var currentState;
           var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
-          if(element.IsPicked == true) {
+          if(element.IsPicked == true && element.IsPacked == false && element.IsDelivered == false) {
             currentState = "Picked";
-          } else if(element.IsPacked == true) {
+          } else if(element.IsPacked == true && element.IsPicked == false && element.IsDelivered == false) {
             currentState = "Packed";
-          } else if(element.IsDelivered == true) {
+          } else if(element.IsDelivered == true && element.IsPicked == false && element.IsPacked == false) {
             currentState = "Delivered";
           } else {
             currentState = "Unknown State";
@@ -145,7 +145,7 @@ import Datepicker from 'vuejs-datepicker';
           if(element.Active == true) {
             this.picklists.push({
             "pickListId": element.PicklistId,
-            "quoteId": element.QuoteId,
+            "customerName": element.CustomerName,
             "dispatchDate": this.convertDate(element.DispatchDate),
             "deliveryNeeded": delivNeeded,
             "deliveryAddress": element.DeliveryAddress,
