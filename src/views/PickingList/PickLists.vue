@@ -30,7 +30,6 @@
             </b-form-select>
           </b-input-group>
           <datepicker placeholder="Select Date"
-                      
                       :format="customFormatter"
                       @selected="setFilter"
                       @cleared="clearDate"
@@ -51,11 +50,12 @@
                 :sort-direction="sortDirection"
                 class="table" 
                 outlined
+                fixed
                 >
             <div slot="empty">
               <strong>Loading picklists...</strong>
             </div>
-            <template slot="actions" slot-scope="row">
+            <template slot="actions" slot-scope="row" class="actions">
               <router-link :to="{name: 'PickListDetail', params: { pickListDetail: row.item } }">
                 <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
               </router-link>
@@ -98,7 +98,7 @@ import Datepicker from 'vuejs-datepicker';
         { key: 'state', label: 'State' },
         { key: 'comment', label: 'Comment'},
         { key: 'itemsToPick', label: 'Items To Pick', sortable: true},
-        { key: 'actions', label: 'Actions' },
+        { key: 'actions', label: 'Actions', thClass: 'actions', class: 'actions', style: "width: 10%;"},
         ],
         showCollapse: true,
         filter: null,
@@ -131,6 +131,7 @@ import Datepicker from 'vuejs-datepicker';
         response.forEach(element => {
           // var delivNeeded;
           var currentState;
+          var dipatchDateVariant;
           var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
           if(element.IsPicked == true && element.IsPacked == false && element.IsDelivered == false) {
             currentState = "Picked";
@@ -140,6 +141,12 @@ import Datepicker from 'vuejs-datepicker';
             currentState = "Delivered";
           } else {
             currentState = "Unknown State";
+          }
+
+          if(element.EstimatedDelivery == true) {
+            dipatchDateVariant = 'warning';
+          } else {
+            dipatchDateVariant = 'success';
           }
 
           if(element.Active == true) {
@@ -152,6 +159,9 @@ import Datepicker from 'vuejs-datepicker';
             "state": currentState,
             "comment": element.Comment,
             "itemsToPick": element.PickListItemQty,
+            "quoteId": element.QuoteId,
+            "estDeliv": element.EstimatedDelivery,
+            "_cellVariants": { dispatchDate: dipatchDateVariant},
             });
           }
         });
@@ -226,6 +236,10 @@ import Datepicker from 'vuejs-datepicker';
 
   p {
     margin-bottom: 0;
+  }
+  
+  .actions {
+    width: 20% !important; 
   }
  
 

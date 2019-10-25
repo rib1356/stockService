@@ -89,6 +89,7 @@
                     placeholder="Select Estimated Date"
                     :format="customFormatter"
                     @cleared="clearDate"
+                    @selected="setSelectedDate"
                     monday-first
                     clear-button
                     bootstrap-styling
@@ -177,7 +178,7 @@ export default {
       this.filter = ''
     },
     customFormatter(date) { //Return the correct format so that the table dates can be filtered
-      return moment(new Date(date)).format('D/M/YYYY');
+      return moment(new Date(date)).format('DD/M/YYYY');
     },
     setFilter(date) {
       this.filter = this.customFormatter(date)
@@ -187,6 +188,7 @@ export default {
       console.log(this.pickListInfo.dispatchDate);
     },
     openPickList(row) {
+      console.log(row)
       this.pickListInfo.salesOrderInfo = row;
       this.$refs['pickListModel'].show()
     },
@@ -221,6 +223,7 @@ export default {
             "customerRef": response[i].CustomerRef,
             "customerName": newName,
             "customerAddress": response[i].CustomerAddress,
+            "customerTel" : response[i].CustomerTel,
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
@@ -234,6 +237,7 @@ export default {
             "customerRef": response[i].CustomerRef,
             "customerName": response[i].CustomerName,
             "customerAddress": response[i].CustomerAddress,
+            "customerTel" : response[i].CustomerTel,
             "startDate": this.convertDate(response[i].Date), //Used to format the date that was saved in the db
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,

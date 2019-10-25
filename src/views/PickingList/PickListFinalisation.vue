@@ -16,7 +16,7 @@
         <!-- </b-form-checkbox-group> -->
       </b-form-group> 
       <b-button variant="outline-primary" class="myBtn" @click="savePickList">Save Picklist</b-button>
-      <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button> 
+      <!-- <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button>  -->
       <router-link :to="{name: 'PlantAllocation'}">
         <b-button variant="outline-success" class="myBtn">Change Allocation</b-button>
       </router-link>
@@ -40,7 +40,14 @@
         </li>
       </ul> -->
     </div>
-    <!-- Current Items to Pick: {{itemsToPick}} -->
+    <b-modal ref="createPDFModal" size="sm" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
+		    <div class="modal__footer">
+          <router-link to="/PickLists">
+      	    <b-button variant="outline-danger">Back to picklists</b-button>
+    	    </router-link>
+          <b-btn variant="outline-primary" @click="createPDF">Create PDF</b-btn>
+        </div>
+    </b-modal>
   </div>
 </template>
 
@@ -71,6 +78,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         inCrate: false,
         inTrolly: false,
         loose: false,
+        plantsForPDF: [],
       }
     },
     methods: {
@@ -78,6 +86,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         sessionStorage.removeItem('tempBatchSave');
       },
       sortItemsToPick(items) {
+        console.log(items);
         items.forEach(item => {
           var isSubbed;
           var subFor;
@@ -98,14 +107,28 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
             "SubbedFor": subFor,
             "DispatchLocation": null,
           });
+          this.plantsForPDF.push({
+            "batchId": item.batchId,
+            "plantName": item.plantName,
+            "formSize": item.formSize,
+            "comment": item.comment,
+            "amountNeeded": item.amountNeeded,
+            "location": item.location,
+          });
         });
       },
       savePickList() {
-        sessionStorage.removeItem('tempBatchSave')
+        sessionStorage.removeItem('tempBatchSave');
+        var address;
+        if(this.picklistInfo.address == null) {
+          address = this.picklistInfo.salesOrderInfo.customerAddress;
+        } else {
+          address = this.picklistInfo.address;
+        }
         this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/picklist', {
           QuoteId: this.picklistInfo.salesOrderInfo.quoteId,
           DispatchDate: this.picklistInfo.dispatchDate,
-          DeliveryAddress: this.picklistInfo.address,
+          DeliveryAddress: address,
           DeliveryNeeded: this.picklistInfo.deliveryNeeded,
           IsPicked: true,
           IsPacked: false,
@@ -116,7 +139,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         }) 
         .then((response) => {
           alert("PickList saved");
-          this.$router.push("PickLists");
+          this.$refs.createPDFModal.show()
           console.log(response);
         })
         .catch((error) => {
@@ -156,7 +179,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         var splitAdd = doc.splitTextToSize(this.picklistInfo.salesOrderInfo.customerAddress, 150);       
         var orderTo =	  "Customer Ref: " + this.picklistInfo.salesOrderInfo.customerRef + "\n" +
                         "Customer Name: " + this.picklistInfo.salesOrderInfo.customerName + "\n" +
-                        "Customer Tel: get this " + "\n"	
+                        "Customer Tel: " + this.picklistInfo.salesOrderInfo.customerTel + "\n"	
         var delivStr;                
         if(this.picklistInfo.estDeliv) {
           delivStr = "Estimated Delivery: "
@@ -187,7 +210,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         doc.text(deliveryStuff, 40, 130);
         doc.setLineWidth(1);
         doc.line(0,160,700,160) 
-        doc.autoTable(columns, this.itemsToPick, {theme: 'striped', startY: 170,
+        doc.autoTable(columns, this.plantsForPDF, {theme: 'striped', startY: 170,
                                                   styles: {
                                                       overflow: 'linebreak',
                                                       },
@@ -215,6 +238,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
         // doc.text("VAT:                  £" + quoteVAT, 380, finalY+35);
         // doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
         doc.save(pdfName + '.pdf');
+        this.$router.push('PickLists');
       },
     },
     created() {

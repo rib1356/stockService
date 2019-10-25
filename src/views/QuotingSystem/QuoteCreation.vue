@@ -298,13 +298,6 @@ export default {
 				}
 			}
 		},
-		// sendEmail() {
-		// 	var link = "mailto:me@example.com"
-		// 					+ "?cc="
-		// 					+ "&subject=" + escape("Plant enquiry")
-		// 					+ "&body=" + escape("This is the body: " + JSON.stringify(this.plants));
-		// 	window.location.href = link;
-		// },
 		saveQuote() {
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
         CustomerRef: this.customerInfo.customerRef,
