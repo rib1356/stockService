@@ -39,8 +39,10 @@ import 'jspdf-autotable';
           pageName: "PickList Detail",
           pickListDetail: '',
           pickListDetailItems: [],
-          pickListDetailPDF: [],
+          plantsForPDF: [],
           filter: '',
+          customerRef: '',
+          customerTel: '',
           fields: [
           { key: 'plantName', label: 'Plant Name', sortable: true},
           { key: 'formSize', label: 'Form Size'},
@@ -56,6 +58,8 @@ import 'jspdf-autotable';
           this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/picklist/detail?id=' + this.pickListDetail.pickListId)
           .then((response) => {
             this.changeData(response.data.PickListPlants);
+            this.customerRef = response.data.CustomerRef;
+            this.customerTel = response.data.CustomerTel;
           })
           .catch((error) => {
               alert("Error getting current picklists: " + error);
@@ -107,11 +111,10 @@ import 'jspdf-autotable';
           // } else {
           //   deliveryNeeded = "No"
           // }
-          var testAdd = "17 Test Road Stockton On Tees TS"    
           var splitAdd = doc.splitTextToSize(this.pickListDetail.deliveryAddress, 150);       
-          var orderTo =	  //"Customer Ref: " + this.picklistInfo.salesOrderInfo.customerRef + "\n" +
-                          "Customer Name: " + this.pickListDetail.customerName + "\n" 
-                          //"Customer Tel: " + this.picklistInfo.salesOrderInfo.customerTel + "\n"	
+          var orderTo =	  "Customer Ref: " + this.customerRef + "\n" +
+                          "Customer Name: " + this.pickListDetail.customerName + "\n" +
+                          "Customer Tel: " + this.customerTel + "\n"	
           var delivStr;                
           if(this.pickListDetail.estDeliv) {
             delivStr = "Estimated Delivery: "
