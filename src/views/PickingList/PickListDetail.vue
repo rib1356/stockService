@@ -1,19 +1,35 @@
 <template>
     <div>
       <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
-      <div>
-        <router-link :to="{name: 'PickLists'}">
-          <b-button variant="outline-success" class="myBtn">Back To Picklists</b-button>
-        </router-link>
-        <b-button variant="outline-success" class="myBtn" @click="createPDF">Create Picklist PDF</b-button>
+      <div class="left-div">
         <b-input-group class="input-filter" >
             <b-form-input v-model="filter" placeholder="Type to Search"/>
               <b-input-group-append>
                 <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
               </b-input-group-append>
           </b-input-group>
+        <b-button @click="showCollapse = !showCollapse"
+                :class="showCollapse ? 'collapsed' : null"
+                style="margin-bottom: 0;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showCollapse ? 'true' : 'false'">
+          <p v-if="showCollapse">Hide Items On Quote<i class="fas fa-minus plus"></i></p>
+          <p v-else>Show Items On Quote<i class="fas fa-plus plus"></i></p>
+        </b-button> 
+        <b-collapse v-model="showCollapse" class="input-pad" id="collapse">
+          <p>Have a list of the items on the picklist</p> <br>
+          <p>Expand this side panel width - How to get what items have already been chosen?</p>
+        </b-collapse>
+        <div style="margin-top:5px;">
+          <router-link :to="{name: 'PickLists'}">
+            <b-button variant="outline-danger" class="myBtn">Back To Picklists</b-button>
+          </router-link>
+          <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button>
+        </div>
       </div>
-      <div >
+      <div class="right-div">
         <b-table show-empty
               stacked="md"
               :items="pickListDetailItems"
@@ -50,7 +66,9 @@ import 'jspdf-autotable';
           { key: 'quantityToPick', label: 'Quantity To Pick', sortable: true},
           { key: 'isSubbed', label: 'Is subbed'},
           { key: 'subbedFor', label: 'Subbed For' }
-        ],
+          ],
+          showCollapse: true,
+
         }
       },
       methods: {
@@ -217,6 +235,7 @@ import 'jspdf-autotable';
 
   .input-pad {
     margin-top: 5px;
+    margin-bottom: 5px;
   }
 
   p {

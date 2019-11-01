@@ -46,29 +46,40 @@
 				<p>You can add any custom plant here</p>
         <b-form-input v-model="customPlantName"
 									placeholder="Enter a plant name"
+                  name="customPlantName"
 									type="text"
 									style="margin-top: 10px;"
-									></b-form-input>
+									v-validate="'required'"></b-form-input>
+                  <p class="text-danger" v-if="errors.has('customPlantName')">{{ errors.first('customPlantName') }}</p>
         <b-form-input v-model="customFormSize"
 									placeholder="Enter a form size"
+                  name="customFormSize"
 									type="text"
 									style="margin-top: 10px;"
-									></b-form-input>          
+									v-validate="'required'"></b-form-input>
+                  <p class="text-danger" v-if="errors.has('customFormSize')">{{ errors.first('customFormSize') }}</p>
         <b-form-input v-model="customComment"
 									placeholder="Enter a plant comment"
+                  name="customComment"
 									type="text"
 									style="margin-top: 10px;"
-									></b-form-input>
+									></b-form-input>  
         <b-form-input v-model="customQuantity"
 									placeholder="Enter a quantity"
+                  name="customQuantity"
 									type="number"
 									style="margin-top: 10px;"
-									></b-form-input> 
+									v-validate="'required|min_value:1'"></b-form-input> 
+                  <p class="text-danger" v-if="errors.has('customQuantity')">{{ errors.first('customQuantity') }}</p>
         <b-form-input v-model="customPrice"
 									placeholder="Enter a price"
+                  name="customPrice"
 									type="number"
 									style="margin-top: 10px;"
+                  min="0"
+                  step="1"
 									v-validate="'required|decimal:2|min_value:0.01'"></b-form-input>                   
+                  <p class="text-danger" v-if="errors.has('customPrice')">{{ errors.first('customPrice') }}</p>
 		  <hr>
 			</b-collapse>
     </div>
@@ -238,11 +249,11 @@ export default {
       showAddCollapse: false,
 			currentGPM: '',
       retail: '',
-      customPlantName: "",
-      customFormSize: "",
-      customComment: "",
-      customQuantity: "",
-      customPrice: "",
+      customPlantName: null,
+      customFormSize: null,
+      customComment: null,
+      customQuantity: 0,
+      customPrice: 0,
 		}		
 	},
   methods: {
@@ -324,12 +335,18 @@ export default {
     validateBeforeSubmit(e) { //Check that all validation passes before adding
       if(this.showAddCollapse != true){
         this.$validator.validateAll();
-        if (!this.errors.any() && this.selectedBatch != null && this.quantity != null) { 
+        if (this.quantity != null && this.selectedBatch != null && this.quantity != null) { 
           this.addToList(); //If there are no validation errors and a batch has been selected add a plant to the list
         }
-        } else {
+      } else {
+        this.$validator.validate('customPlantName', this.customPlantName);
+        this.$validator.validate('customFormSize', this.customFormSize);
+        this.$validator.validate('customQuantity', this.customQuantity);
+        this.$validator.validate('customPrice', this.customPrice);
+        if(!this.errors.any()) {
           this.addToList();
         }
+      }
 		},
 		validateEdits(e) { //Check that all validation passes before saving
       this.$validator.validate('rowQuantity', this.rowQuantity); //Validate the inputs on the modal

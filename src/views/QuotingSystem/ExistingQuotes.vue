@@ -88,7 +88,7 @@
           <datepicker id="modalDatepicker"
                     placeholder="Select Estimated Date"
                     :format="customFormatter"
-                    @cleared="clearDate"
+                    @cleared="clearModalDate"
                     @selected="setSelectedDate"
                     monday-first
                     clear-button
@@ -99,7 +99,7 @@
         <datepicker id="modalDatepicker"
                     placeholder="Select Exact Date"
                     :format="customFormatter"
-                    @cleared="clearDate"
+                    @cleared="clearModalDate"
                     @selected="setSelectedDate"
                     monday-first
                     clear-button
@@ -111,7 +111,7 @@
             {{pickListInfo.deliveryNeeded}}
           </b-form-checkbox>
         </b-form-group>                            
-        <b-button variant="outline-primary" @click="savePickListInfo" block>Allocate Plants</b-button>
+        <b-button variant="outline-primary" @click="savePickListInfo" block :disabled="btnDisable">Allocate Plants</b-button>
         <b-button variant="outline-danger" block @click="hidePickListModal()">Cancel</b-button>
       </b-modal>
   </div>
@@ -162,7 +162,7 @@ export default {
       sortDirection: 'asc',
       selectedDate: '',
       showSaleOrders: false,
-      
+      btnDisable: true,
     }
   },
   computed: {
@@ -175,7 +175,10 @@ export default {
   },
   methods: {
     clearDate(){ //When the clear button is pressed completely clear the filters
-      this.filter = ''
+      this.filter = '';
+    },
+    clearModalDate() {
+      this.btnDisable = true;
     },
     customFormatter(date) { //Return the correct format so that the table dates can be filtered
       return moment(new Date(date)).format('DD/M/YYYY');
@@ -184,6 +187,7 @@ export default {
       this.filter = this.customFormatter(date)
     },
     setSelectedDate(date) {
+      this.btnDisable = false;
       this.pickListInfo.dispatchDate = this.customFormatter(date);
       console.log(this.pickListInfo.dispatchDate);
     },
