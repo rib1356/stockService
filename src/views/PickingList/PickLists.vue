@@ -37,7 +37,13 @@
                       clear-button
                       bootstrap-styling
                       ></datepicker>       
-        </b-collapse> 
+        </b-collapse>
+        <br>
+        <h5>Key</h5>
+        <p style="background-color: #c3e6cb;">Exact Date</p>
+        <p style="background-color: #ffeeba;">Estimated Date</p>
+        <p style="background-color: #c3e6cb;">Entire Row = Picklist Delivered</p>
+
       </div>
       <div class="right-div">
         <b-table show-empty
@@ -50,7 +56,6 @@
                 :sort-direction="sortDirection"
                 class="table" 
                 outlined
-                fixed
                 >
             <div slot="empty">
               <strong>Loading picklists...</strong>
@@ -60,7 +65,12 @@
                 <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
               </router-link>
               <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
-              <i class="fas fa-check fa-lg icon-tick" v-b-tooltip.hover title="Convert to Delivery" @click.stop=""></i>
+
+              <router-link v-if="row.item.state == 'Allocated'" :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
+                <i class="fas fa-check fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
+              </router-link>
+              <i class="fas fa-check fa-lg icon-tick-delivery" v-else-if="row.item.state == 'Picked'" v-b-tooltip.hover title="Create Delivery" @click.stop=""></i>
+              <i class="fas fa-check fa-lg icon-tick-delivery" v-else v-b-tooltip.hover title="Create Invoice" @click.stop=""></i>
           </template> 
         </b-table>
       </div>
@@ -134,11 +144,11 @@ import Datepicker from 'vuejs-datepicker';
           var currentState;
           var dipatchDateVariant;
           var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
-          if(element.IsPicked == true && element.IsPacked == false && element.IsDelivered == false) {
+          if(element.IsPicked == true && element.IsAllocated == false && element.IsDelivered == false) {
             currentState = "Picked";
-          } else if(element.IsPacked == true && element.IsPicked == false && element.IsDelivered == false) {
-            currentState = "Packed";
-          } else if(element.IsDelivered == true && element.IsPicked == false && element.IsPacked == false) {
+          } else if(element.IsAllocated == true && element.IsPicked == false && element.IsDelivered == false) {
+            currentState = "Allocated";
+          } else if(element.IsDelivered == true && element.IsPicked == false && element.IsAllocated == false) {
             currentState = "Delivered";
           } else {
             currentState = "Unknown State";
@@ -169,7 +179,7 @@ import Datepicker from 'vuejs-datepicker';
         });
       },
       deletePickList(row) {
-        console.log(row.pickListId);
+        console.log(row);
         if(confirm("Delete PickList?")) { //Bring up confirm dialog before deleting
           this.axios.put("https://ahillsquoteservice.azurewebsites.net/api/picklist/delete?id=" + row.pickListId)
             .then((response) => {
@@ -203,6 +213,11 @@ import Datepicker from 'vuejs-datepicker';
 
   .icon-tick {
     color: #0f6368;
+    margin-left: 2px;
+  }
+
+  .icon-tick-delivery {
+    color: rebeccapurple;
     margin-left: 2px;
   }
 

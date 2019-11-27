@@ -1,7 +1,7 @@
 <template>
   <div>
     <router-link :to="{name: 'HomePage'}">
-        <b-button class="myBtn" variant="primary">Home test</b-button>
+        <b-button class="myBtn" variant="primary">Home</b-button>
 		</router-link>
     <div class="filter-div">
     <b-row>

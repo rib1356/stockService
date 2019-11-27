@@ -15,12 +15,23 @@
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-          <p v-if="showCollapse">Hide Items On Quote<i class="fas fa-minus plus"></i></p>
-          <p v-else>Show Items On Quote<i class="fas fa-plus plus"></i></p>
+          <p v-if="showCollapse">Hide Items Left On Quote<i class="fas fa-minus plus"></i></p>
+          <p v-else>Show Items Left On Quote<i class="fas fa-plus plus"></i></p>
         </b-button> 
         <b-collapse v-model="showCollapse" class="input-pad" id="collapse">
-          <p>Have a list of the items on the picklist</p> <br>
-          <p>Expand this side panel width - How to get what items have already been chosen?</p>
+          <p>Will finish this soon, these items havent been allocated so need to deal with that somehow</p>
+          <ul>
+            <li v-for="(data, index) in remainingPlants" :key='index'>
+              {{data.plantName}} {{data.formSize}} | Amount On Quote: {{data.amountNeeded}} 
+              <b-form-input v-model="data.quantityEntered" 
+                            placeholder="Enter amount for plant above"
+                            >
+              </b-form-input>
+              <p v-if="data.amountNeeded < data.quantityEntered">More than allocated on quote</p>
+            </li>
+          </ul>
+          <b-button variant="outline-success" @click="addToList" v-if="remainingPlants.length != 0">Add Plant</b-button>
+          <p v-else>All plants have been allocated from quote: {{pickListDetail.quoteId}}</p>
         </b-collapse>
         <div style="margin-top:5px;">
           <router-link :to="{name: 'PickLists'}">
@@ -65,10 +76,11 @@ import 'jspdf-autotable';
           { key: 'location', label: 'Location'},
           { key: 'quantityToPick', label: 'Quantity To Pick', sortable: true},
           { key: 'isSubbed', label: 'Is subbed'},
-          { key: 'subbedFor', label: 'Subbed For' }
+          { key: 'subbedFor', label: 'Subbed For' },
+          { key: 'actions', label: 'Actions'}
           ],
           showCollapse: true,
-
+          remainingPlants: [],
         }
       },
       methods: {
@@ -94,12 +106,47 @@ import 'jspdf-autotable';
               "subbedFor": item.SubbedFor,
             });
             this.plantsForPDF.push({
-            "batchId": item.BatchId,
-            "plantName": item.PlantName,
-            "formSize": item.FormSize,
-            "amountNeeded": item.QuantityToPick,
-            "location": item.BatchLocation,
+              "batchId": item.BatchId,
+              "plantName": item.PlantName,
+              "formSize": item.FormSize,
+              "amountNeeded": item.QuantityToPick,
+              "location": item.BatchLocation,
+            });
           });
+        },
+        getRemainingPlants() {
+          this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/picklist/plantsNeeded?id=' + this.pickListDetail.quoteId)
+          .then((response) => {
+            this.displayRemainingPlants(response.data)
+          })
+          .catch((error) => {
+              alert("Error getting current remaining plants on quote: " + error);
+          });
+        },
+        displayRemainingPlants(items) {
+          items.forEach(element => {
+            this.remainingPlants.push({
+              "plantName": element.PlantName,
+              "formSize": element.FormSize,
+              "amountNeeded": element.AmountNeeded,
+              "quantityEntered": null,
+            });
+          });
+        },
+        addToList() {
+          this.remainingPlants.forEach(element => {
+            if(parseInt(element.quantityEntered) != null && parseInt(element.quantityEntered) <= element.amountNeeded 
+                         ){
+              this.pickListDetailItems.push({
+              "plantName": element.plantName,
+              "formSize": element.formSize,
+              "location": "addLocation",
+              "quantityToPick": element.quantityEntered,
+              "isSubbed": "GetThis",
+              "subbedFor": "AndThis",
+            });
+            element.quantityEntered = null;
+            }
           });
         },
         createPDF() {
@@ -197,6 +244,7 @@ import 'jspdf-autotable';
       mounted() {
         this.pickListDetail = this.$route.params.pickListDetail;
         this.getPickListDetail();
+        this.getRemainingPlants();
       },
     }
 </script>
@@ -209,7 +257,7 @@ import 'jspdf-autotable';
 
   	.left-div
 	{
-    width: 20%;
+    width: 25%;
 		height: 100%; 
 		float:left;
 	}
@@ -218,7 +266,7 @@ import 'jspdf-autotable';
 		float: left;
     height: fit-content;
     max-height: 90vh;
-		width: 80%;
+		width: 75%;
 		overflow: auto;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;

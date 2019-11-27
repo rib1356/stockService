@@ -395,7 +395,7 @@ export default {
 
       this.customPlantName = "";
       this.customFormSize = "";
-      this.customComment = "";
+      this.customComment = null;
       this.customQuantity = null;
       this.customPrice = null;
 			this.$validator.reset();
