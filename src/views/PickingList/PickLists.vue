@@ -66,11 +66,11 @@
               </router-link>
               <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
 
-              <router-link v-if="row.item.state == 'Allocated'" :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
-                <i class="fas fa-check fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
+              <router-link v-if="row.item.state == 'Allocated' || row.item.state == 'Partially Picked' " :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
+                <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
               </router-link>
-              <i class="fas fa-check fa-lg icon-tick-delivery" v-else-if="row.item.state == 'Picked'" v-b-tooltip.hover title="Create Delivery" @click.stop=""></i>
-              <i class="fas fa-check fa-lg icon-tick-delivery" v-else v-b-tooltip.hover title="Create Invoice" @click.stop=""></i>
+              <i class="fas fa-file-signature fa-lg icon-tick-delivery" v-else-if="row.item.state != 'Allocated'" v-b-tooltip.hover title="Create Delivery" @click.stop=""></i>
+              <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="row.item.itemsToPick == row.item.quantityPicked" v-b-tooltip.hover title="Create Invoice" @click.stop=""></i>
           </template> 
         </b-table>
       </div>
@@ -145,7 +145,9 @@ import Datepicker from 'vuejs-datepicker';
           var dipatchDateVariant;
           var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
           if(element.IsPicked == true && element.IsAllocated == false && element.IsDelivered == false) {
-            currentState = "Picked";
+            currentState = "All Picked";
+          } else if(element.IsPicked == false && element.IsAllocated == false && element.IsDelivered == false) {
+            currentState = "Partially Picked"
           } else if(element.IsAllocated == true && element.IsPicked == false && element.IsDelivered == false) {
             currentState = "Allocated";
           } else if(element.IsDelivered == true && element.IsPicked == false && element.IsAllocated == false) {

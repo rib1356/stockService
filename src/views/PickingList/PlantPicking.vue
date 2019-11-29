@@ -15,8 +15,8 @@
           </router-link>
           <br>
           <p>Pick these plants for delivery/invoicing</p>
-          <b-button variant="outline-primary">Pick all plants on list</b-button>
-          <b-button variant="outline-success" class="myBtn">Pick Plants</b-button>
+          <b-button variant="outline-primary" @click="pickAllPlants">Pick all plants on list</b-button>
+          <b-button variant="outline-success" class="myBtn" @click="pickPlants">Pick Plants</b-button>
           <!-- <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button> -->
         </div>
       </div>
@@ -33,6 +33,13 @@
           </template>      
         </b-table>
       </div>
+      <b-modal ref="deliveryModal" size="md" title="Save picked plants and print delivery note" centered hide-footer hide-header-close no-close-on-backdrop>
+		    <div class="modal__footer">
+      	    <b-button variant="outline-danger" @click="cancelModal">Cancel</b-button>
+            <b-btn variant="outline-primary" @click="pickPlants">Save picked plants</b-btn>
+            <b-btn variant="outline-success" >Save picked plants & print delivery note</b-btn>
+        </div>
+    </b-modal>
     </div>
 </template>
 
@@ -62,6 +69,7 @@ import 'jspdf-autotable';
           { key: 'actions', label: 'Picked'}
           ],
           showCollapse: true,
+          pickListPlants: [],
         }
       },
       methods: {
@@ -79,6 +87,7 @@ import 'jspdf-autotable';
         changeData(items) {
           items.forEach(item => {
             this.pickListDetailItems.push({
+              "plantForPicklistId": item.PlantForPicklistId,
               "plantName": item.PlantName,
               "formSize": item.FormSize,
               "location": item.BatchLocation,
@@ -89,6 +98,40 @@ import 'jspdf-autotable';
             });
           });
         },
+        pickAllPlants() {
+          this.pickListDetailItems.forEach(element => {
+            element.quantityPicked = element.quantityToPick
+          });
+        },
+        openDeliveryModal() {
+          this.$refs.deliveryModal.show();
+        },
+        cancelModal() {
+          this.$refs.deliveryModal.hide();
+        },
+        pickPlants() {
+          this.pickListDetailItems.forEach(element => {
+            if(element.quantityPicked != 0 || element.quantityPicked != null)
+            {
+              this.pickListPlants.push({
+                "PlantForPickListId": element.plantForPicklistId,
+                "QuantityPicked": parseInt(element.quantityPicked),
+              })
+            }
+          });
+          this.axios.put('https://ahillsquoteservice.azurewebsites.net/api/picklist/pickItems', {
+            PicklistId: this.pickListDetail.pickListId,
+            PickListPlants: this.pickListPlants,
+          }) 
+          .then((response) => {
+            console.log(response);
+            this.$router.push('PickLists');
+          })
+          .catch((error) => {
+            alert("Please check values before submitting")
+            console.log(error);
+          });
+        }
       },
       mounted() {
         this.pickListDetail = this.$route.params.pickListDetail;
