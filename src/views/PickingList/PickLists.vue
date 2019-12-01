@@ -1,6 +1,7 @@
 <template>
     <div>
       <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
+      <Delivery ref="delivery"></Delivery>
       <div class="left-div">
         <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -69,7 +70,7 @@
               <router-link v-if="row.item.state == 'Allocated' || row.item.state == 'Partially Picked' " :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
                 <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
               </router-link>
-              <i class="fas fa-file-signature fa-lg icon-tick-delivery" v-else-if="row.item.state != 'Allocated'" v-b-tooltip.hover title="Create Delivery" @click.stop=""></i>
+              <i class="fas fa-file-signature fa-lg icon-tick-delivery" v-else-if="row.item.state != 'Allocated'" v-b-tooltip.hover title="Create Delivery" @click.stop="createDeliveryNote"></i>
               <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="row.item.itemsToPick == row.item.quantityPicked" v-b-tooltip.hover title="Create Invoice" @click.stop=""></i>
           </template> 
         </b-table>
@@ -81,10 +82,12 @@
 import moment from 'moment'
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
 import Datepicker from 'vuejs-datepicker';
+import Delivery from '@/views/PickingList/PDFs/Delivery.vue'
   export default {
     components: {
       QuoteNavbar,
       Datepicker,
+      Delivery,
   	},
     name: 'PickLists',
     computed: {
@@ -199,6 +202,9 @@ import Datepicker from 'vuejs-datepicker';
       convertDate(dateString){ //Will change the date from "yyyy-MM-dd" to = "dd/MM/yyyy"
         var p = dateString.split(/\D/g)
         return [p[2],p[1],p[0] ].join("/")
+      },
+      createDeliveryNote() {
+        this.$refs.delivery.createDeliveryPDF();
       },
     },
     mounted() {
