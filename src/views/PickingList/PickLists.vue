@@ -1,7 +1,6 @@
 <template>
     <div>
       <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
-      
       <div class="left-div">
         <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -70,10 +69,9 @@
               <router-link v-if="row.item.state == 'Allocated' || row.item.state == 'Partially Picked' " :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
                 <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
               </router-link>
-              <i class="fas fa-file-signature fa-lg icon-tick-delivery" v-else-if="row.item.state != 'Allocated'" v-b-tooltip.hover title="Create Delivery" @click.stop="createDeliveryNote"></i>
-              <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="row.item.itemsToPick == row.item.quantityPicked" v-b-tooltip.hover title="Create Invoice" @click.stop=""></i>
-              <!-- DeliveryComponent -->
               <Delivery ref="delivery" v-bind:rowInfo='row.item'></Delivery>
+              <!-- <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="row.item.itemsToPick == row.item.quantityPicked" v-b-tooltip.hover title="Create Invoice" @click.stop=""></i> -->
+              
           </template> 
         </b-table>
       </div>

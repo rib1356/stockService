@@ -85,6 +85,7 @@
       <hr>
       <!-- Buttons to exit or save -->
       <b-button variant="outline-primary" v-if="selectedQuote.SalesOrder" @click="createPDF('Sales Order')" style="margin-bottom: 7px;">Create Sales Order PDF</b-button>
+      <b-button variant="outline-primary" v-else @click="createPDF('Quotation')" style="margin-bottom: 7px;">Create Quote PDF</b-button>
       <br>
     	  <router-link v-if="selectedQuote.SalesOrder" :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
           <b-button variant="outline-danger">Back to Sales Order</b-button>
@@ -176,7 +177,7 @@
     	<router-link v-else :to="{name: 'ExistingQuotes', params: { salesOrder: false } }">
         <b-button variant="outline-danger">Back to quotes</b-button>
         </router-link>
-        <b-btn variant="outline-primary" v-if="!selectedQuote.SalesOrder" @click="createPDF('Quotation')">Create Quote PDF</b-btn>
+        <b-btn variant="outline-primary" v-if="selectedQuote.SalesOrder == false" @click="createPDF('Quotation')">Create Quote PDF</b-btn>
         <b-btn variant="outline-primary" v-else @click="createPDF('Sales Order')">Create Sales Order PDF</b-btn>
       </div>
     </b-modal>
@@ -524,7 +525,6 @@ export default {
 												"Web: hillandsons.co.uk\n" +
 												"Stock: hillsstock.co.uk"
 			var quoteInfo =	pdfType + " Id: " + this.selectedQuote.quoteId + "\n" +
-			 								"Customer Name: " + this.selectedQuote.customerName + "\n" +
 											"Customer Ref: " + this.selectedQuote.customerRef + "\n" +
 											"Start Date: " + this.selectedQuote.startDate + "\n" +
 											"Expiry Date: " + this.selectedQuote.expiryDate				
