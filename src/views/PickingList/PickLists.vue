@@ -65,12 +65,11 @@
                 <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
               </router-link>
               <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
-
               <router-link v-if="row.item.state == 'Allocated' || row.item.state == 'Partially Picked' " :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
                 <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
               </router-link>
               <Delivery ref="delivery" v-bind:rowInfo='row.item'></Delivery>
-              <!-- <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="row.item.itemsToPick == row.item.quantityPicked" v-b-tooltip.hover title="Create Invoice" @click.stop=""></i> -->
+              <Invoice ref="invoice" v-bind:rowInfo='row.item'></Invoice>
               
           </template> 
         </b-table>
@@ -83,11 +82,13 @@ import moment from 'moment'
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
 import Datepicker from 'vuejs-datepicker';
 import Delivery from '@/views/PickingList/PDFs/Delivery.vue'
+import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
   export default {
     components: {
       QuoteNavbar,
       Datepicker,
       Delivery,
+      Invoice,
   	},
     name: 'PickLists',
     computed: {
