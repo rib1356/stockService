@@ -15,6 +15,7 @@
         <supplier-modal></supplier-modal>
         <hills-stock-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></hills-stock-modal>
         <subs-modal @batchesUsed="createArrayofBatches" @sendVal="checkRowVariant" v-bind:rowInfo='row.item'></subs-modal>
+        <b-button size="sm" @click="addSundries(row.item)" style="margin-left: 5px;">Sundries</b-button>
         </div>  
         <!-- <b-button size="sm">Supplier</b-button> -->
         <!-- <b-button size="sm">Hills</b-button> -->
@@ -123,6 +124,24 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
             });
             el.QuantityOutstanding = tempAmountNeeded;
         });
+      },
+      addSundries(row) //Add a duplicate of the row pressed to arrayOfBatches and set the quantityOutstanding = "the quantityNeeded"
+      {
+        console.log(row)
+        var thisObj = {
+          "plantForQuoteId": row.PlantForQuoteId,
+          "batchId": 0,
+          "plantName": row.PlantName,
+          "formSize": row.FormSize,
+          "amountNeeded": row.Quantity,
+          "location": "Nursery",
+          "isSubbed": false,
+          "subbedFor" : null,
+        }
+        row._rowVariant = null;
+        row.QuantityOutstanding = row.Quantity;
+        this.arrayOfBatches.push(thisObj);
+        this.checkRowVariant();
       }
     },
     created() {

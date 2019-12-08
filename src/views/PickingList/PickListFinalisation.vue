@@ -99,7 +99,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           }
           this.itemsToPick.push({
             "PlantForQuoteId": item.plantQuoteIdUsed,
-            "BatchId": item.batchId,
+            "BatchId": item.batchId, //Will be 0 if sundrie?
             "PlantName": item.plantName,
             "FormSize": item.formSize,
             "QuantityToPick": parseInt(item.amountNeeded),
