@@ -32,6 +32,9 @@ import PickLists from '@/views/PickingList/PickLists'
 import PickListDetail from '@/views/PickingList/PickListDetail'
 import PlantPicking from '@/views/PickingList/PlantPicking'
 
+import Test from '@/views/TestingPages/Test'
+
+
 //Bootstrap
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
@@ -153,6 +156,11 @@ const router = new Router({
       path: '/PlantPicking',
       name: 'PlantPicking',
       component: PlantPicking
+    },
+    {
+      path: '/Test',
+      name: 'Test',
+      component: Test
     },
     {
       path: '/CustomerTable',
