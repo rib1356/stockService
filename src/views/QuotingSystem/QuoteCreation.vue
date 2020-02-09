@@ -176,7 +176,7 @@
             </b-form-group>
             <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p>
           </div>
-            <b-button class="mt-3" variant="outline-primary" block @click.stop="validateEdits">Save Edits</b-button>
+            <b-button class="mt-3" id="btnSaveEdits" variant="outline-primary" block @click.stop="validateEdits">Save Edits</b-button>
             <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
         </b-modal>
       </template>     
@@ -471,9 +471,9 @@ export default {
 			this.formatPriceForPDF();
 			let pdfName = this.quoteId + "-" + this.customerInfo.customerName + "-" + this.quoteDate; 
 			var columns = [
+				{title: "Quantity", dataKey: "Quantity"},
 				{title: "Plant Name", dataKey: "PlantName"},
 				{title: "Form Size", dataKey: "FormSize"},
-				{title: "Quantity", dataKey: "Quantity"},
 				{title: "Comment", dataKey: "Comment"},
 				{title: "Price", dataKey: "Price"},
 			];
@@ -489,10 +489,8 @@ export default {
 												"Web: hillandsons.co.uk\n" +
 												"Stock: hillsstock.co.uk"
 			var quoteInfo =	"Quote Id: " + this.quoteId + "\n" +
-			 								"Customer Name: " + this.customerInfo.customerName + "\n" +
 											"Customer Ref: " + this.customerInfo.customerRef + "\n" +
-											"Start Date: " + this.quoteDate + "\n" +
-											"Expiry Date: " + this.expiryDate				
+											"Start Date: " + this.quoteDate + "\n" 
 			var deliveryInfo = "Customer Name: " + this.customerInfo.customerName + "\n" +
 												 "Customer Ref: " + this.customerInfo.customerRef + "\n" +
 												 "Customer Tel: " + this.customerInfo.customerTel + "\n" +
@@ -506,6 +504,8 @@ export default {
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
 			doc.text("Site Reference: " + this.siteRef, 400, 140);
+			doc.setFontSize(12);
+      doc.text("Expiry Date: " + this.expiryDate, 400, 155)
 			doc.setLineWidth(1);
 			doc.line(0,125,700,125) 
 			doc.setFontSize(10);
@@ -520,10 +520,21 @@ export default {
 			let quotePrice = (this.totalPrice/100).toFixed(2);
 			let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
 			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
+			let footerText = "These Prices Exclude Delivery Charges Unless Quoted";
 			doc.setFontSize(12);
-			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
-			doc.text("VAT:                  £" + quoteVAT, 380, finalY+35);
-			doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
+			doc.text(footerText,140, finalY+15);
+      doc.setLineWidth(1);
+      doc.line(140,finalY+17,435,finalY+17) 
+			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+40);
+			doc.text("VAT:                  £" + quoteVAT, 380, finalY+55);
+      doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+70);
+      
+      doc.setFontSize(10);
+      doc.text("Thank you for your Enquiry",120,finalY+40)
+      doc.setFontSize(8);
+      doc.text("We look forward to our next opportunity to price for you", 90, finalY+50);
+      doc.text("Vat No 258 1678 29 : Plant Passport No GB/12803 : Company No 4395902", 60, finalY+60);
+      doc.text("Directors D.Hill : M.Hill : J.Hill : S.Hill", 120, finalY+70);
 			doc.save(pdfName + '.pdf');
 
 			this.$router.push('ExistingQuotes');

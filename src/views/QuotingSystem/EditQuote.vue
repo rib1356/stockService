@@ -507,9 +507,9 @@ export default {
       this.formatTableForPDF();
 			let pdfName = this.selectedQuote.quoteId  + "-" + this.selectedQuote.customerName + "-" + this.selectedQuote.startDate;
 			var columns = [
+        {title: "Quantity", dataKey: "Quantity"},
 				{title: "Plant Name", dataKey: "PlantName"},
 				{title: "Form Size", dataKey: "FormSize"},
-				{title: "Quantity", dataKey: "Quantity"},
 				{title: "Comment", dataKey: "Comment"},
 				{title: "Price", dataKey: "Price"},
 			];
@@ -523,11 +523,13 @@ export default {
 												"Tel: 01642 711281\n" +
 												"Email: enquiries@hillandsons.co.uk\n" +
 												"Web: hillandsons.co.uk\n" +
-												"Stock: hillsstock.co.uk"
+                        "Stock: hillsstock.co.uk"
+      //string expiry = "Expiry Date: " + this.selectedQuote.expiryDate).toString();
+
 			var quoteInfo =	pdfType + " Id: " + this.selectedQuote.quoteId + "\n" +
 											"Customer Ref: " + this.selectedQuote.customerRef + "\n" +
-											"Start Date: " + this.selectedQuote.startDate + "\n" +
-											"Expiry Date: " + this.selectedQuote.expiryDate				
+											"Start Date: " + this.selectedQuote.startDate + "\n"
+															
 			var deliveryInfo = "Customer Name: " + this.selectedQuote.customerName + "\n" +
 												 "Customer Ref: " + this.selectedQuote.customerRef + "\n" +
 												 "Customer Tel: " + this.currentCustomer.customerTel + "\n" +
@@ -540,7 +542,9 @@ export default {
 			doc.setFontSize(10);
 			doc.text(companyInfo, 135, 35);
 			doc.text(quoteInfo, 443, 50);
-			doc.text("Site Reference: " + this.selectedQuote.siteRef, 400, 140);
+      doc.text("Site Reference: " + this.selectedQuote.siteRef, 400, 140);
+      doc.setFontSize(12);
+      doc.text("Expiry Date: " + this.selectedQuote.expiryDate, 400, 155)
 			doc.setLineWidth(1);
 			doc.line(0,125,700,125) 
 			doc.setFontSize(10);
@@ -554,14 +558,25 @@ export default {
       let finalY = doc.autoTable.previous.finalY;
 			let quotePrice = (this.totalPrice/100).toFixed(2);
 			let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
-			let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
-			doc.setFontSize(12);
-			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+20);
-			doc.text("VAT:                  £" + quoteVAT, 380, finalY+35);
-			doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+50);
+      let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
+      let footerText = "These Prices Exclude Delivery Charges Unless Quoted";
+      doc.setFontSize(12);
+      doc.text(footerText,140, finalY+15);
+      doc.setLineWidth(1);
+      doc.line(140,finalY+17,435,finalY+17) 
+			doc.text("Total Exc. VAT: £" + quotePrice, 380, finalY+40);
+			doc.text("VAT:                  £" + quoteVAT, 380, finalY+55);
+      doc.text("Total Inc. VAT:  £" + priceAfterVAT, 380, finalY+70);
+      
+      doc.setFontSize(10);
+      doc.text("Thank you for your Enquiry",120,finalY+40)
+      doc.setFontSize(8);
+      doc.text("We look forward to our next opportunity to price for you", 90, finalY+50);
+      doc.text("Vat No 258 1678 29 : Plant Passport No GB/12803 : Company No 4395902", 60, finalY+60);
+      doc.text("Directors D.Hill : M.Hill : J.Hill : S.Hill", 120, finalY+70);
 			doc.save(pdfName + '.pdf');
 
-			this.$router.push('ExistingQuotes');
+			//this.$router.push('ExistingQuotes');
     },
 	},
 	created() {
