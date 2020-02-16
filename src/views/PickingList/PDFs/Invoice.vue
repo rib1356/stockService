@@ -1,6 +1,6 @@
 <template>
     <div>
-        <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="rowInfo.quantityPicked == rowInfo.itemsToPick" v-b-tooltip.hover title="Create Invoice" @click.stop="getDeliveredPlants"></i>
+        <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="rowInfo.quantityPicked >= rowInfo.itemsToPick" v-b-tooltip.hover title="Create Invoice" @click.stop="getDeliveredPlants"></i>
     </div>
 </template>
 

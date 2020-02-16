@@ -40,9 +40,9 @@
         </b-collapse>
         <br>
         <h5>Key</h5>
-        <p style="background-color: #c3e6cb;">Exact Date</p>
-        <p style="background-color: #ffeeba;">Estimated Date</p>
-        <p style="background-color: #c3e6cb;">Entire Row = Picklist Delivered</p>
+        <p style="background-color: #c3e6cb;">All Picked / Delivered</p>
+        <p style="background-color: #ffeeba;">Items left to be picked</p>
+        <p style="background-color: #f5c6cb;">Nothing picked</p>
 
       </div>
       <div class="right-div">
@@ -56,21 +56,34 @@
                 :sort-direction="sortDirection"
                 class="table" 
                 outlined
+                
                 >
             <div slot="empty">
               <strong>Loading picklists...</strong>
             </div>
             <template slot="actions" slot-scope="row" class="actions">
-              <router-link :to="{name: 'PickListDetail', params: { pickListDetail: row.item } }">
-                <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
-              </router-link>
-              <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
-              <router-link v-if="row.item.state == 'Allocated' || row.item.state == 'Partially Picked' " :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
-                <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
-              </router-link>
-              <Delivery ref="delivery" v-bind:rowInfo='row.item'></Delivery>
-              <Invoice ref="invoice" v-bind:rowInfo='row.item'></Invoice>
-              
+              <div class="row">
+                <div class="col-md-3 col-lg-3">
+                  <router-link :to="{name: 'PickListDetail', params: { pickListDetail: row.item } }">
+                    <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
+                  </router-link>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                  <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-3 col-lg-3">
+                    
+                    <Delivery ref="delivery" v-bind:rowInfo='row.item'></Delivery>
+                </div>
+                <div class="col-md-6 col-lg-6">
+                   <Invoice ref="invoice" v-bind:rowInfo='row.item'></Invoice>
+                   <router-link v-if="row.item.quantityPicked < row.item.itemsToPick" :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
+                      <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
+                    </router-link>
+                </div>
+              </div>
           </template> 
         </b-table>
       </div>
@@ -113,14 +126,14 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
         { key: 'comment', label: 'Comment'},
         { key: 'itemsToPick', label: 'Quantity To Pick', sortable: true},
         { key: 'quantityPicked', label: 'Quantity Picked', sortable: true},
-        { key: 'actions', label: 'Actions', thClass: 'actions', class: 'actions', style: "width: 10%;"},
+        { key: 'actions', label: 'Actions', thClass: 'actions', class: 'actions', style: "width: 30%;"},
         ],
         showCollapse: true,
         filter: null,
         sortBy: "pickListId",
-        sortDesc: false,
+        sortDesc: true,
         sortSearch: false,
-        sortDirection: 'asc',
+        sortDirection: 'desc',
       }
     },
     methods: {
@@ -147,30 +160,53 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
           // var delivNeeded;
           var currentState;
           var dipatchDateVariant;
+          var allDispatchedVarient;
           var delivNeeded = element.DeliveryNeeded ? "Yes" : "No"; //DeliveryNeeded True=Yes False=No
-          if(element.IsPicked == true && element.IsAllocated == false && element.IsDelivered == false) {
+
+          if (element.PickListItemQty == element.TotalAmountPicked || element.PickListItemQty < element.TotalAmountPicked)
+          {
             currentState = "All Picked";
-          } else if(element.IsPicked == false && element.IsAllocated == false && element.IsDelivered == false) {
-            currentState = "Partially Picked"
-          } else if(element.IsAllocated == true && element.IsPicked == false && element.IsDelivered == false) {
-            currentState = "Allocated";
-          } else if(element.IsDelivered == true && element.IsPicked == false && element.IsAllocated == false) {
+            allDispatchedVarient = 'success'; 
+          } else if (element.TotalAmountPicked > 0 && element.TotalAmountPicked < element.PickListItemQty)
+          {
+            currentState = "Partially Picked";
+            allDispatchedVarient = 'warning'; 
+          } else if (element.PickListItemQty == element.TotalAmountPicked && element.IsDelivered == true)
+          {
             currentState = "Delivered";
+            allDispatchedVarient = 'success'; 
           } else {
-            currentState = "Unknown State";
+            currentState = "None Picked";
+            allDispatchedVarient = 'danger'; 
           }
 
+         
+
+          // if(element.IsPicked == true && element.IsAllocated == false && element.IsDelivered == false) {
+            
+          // } else if(element.IsPicked == false && element.IsAllocated == false && element.IsDelivered == false) {
+          //   currentState = "Partially Picked"
+
+          // } else if(element.IsAllocated == true && element.IsPicked == false && element.IsDelivered == false) {
+          //   currentState = "Allocated";
+          // } else if(element.IsDelivered == true && element.IsPicked == false && element.IsAllocated == false) {
+          //   currentState = "Delivered";
+          // } else {
+          //   currentState = "Unknown State";
+          // }
+
+          var datestuff = "";
           if(element.EstimatedDelivery == true) {
-            dipatchDateVariant = 'warning';
+            datestuff = 'Estimated: ';
           } else {
-            dipatchDateVariant = 'success';
+            datestuff = 'Exact: ';
           }
 
           if(element.Active == true) {
             this.picklists.push({
             "pickListId": element.PicklistId,
             "customerName": element.CustomerName,
-            "dispatchDate": this.convertDate(element.DispatchDate),
+            "dispatchDate": datestuff + this.convertDate(element.DispatchDate),
             "deliveryNeeded": delivNeeded,
             "deliveryAddress": element.DeliveryAddress,
             "state": currentState,
@@ -179,7 +215,8 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
             "quantityPicked": element.TotalAmountPicked,
             "quoteId": element.QuoteId,
             "estDeliv": element.EstimatedDelivery,
-            "_cellVariants": { dispatchDate: dipatchDateVariant},
+            //"_cellVariants": { dispatchDate: dipatchDateVariant},
+            "_rowVariant": allDispatchedVarient,
             });
           }
         });

@@ -136,6 +136,7 @@ import PickListInfo from '@/views/PickingList/PickListComponents/PickListInfo.vu
           Comment: this.comment,
           EstimatedDelivery: this.picklistInfo.estDeliv,
           PickListPlants: this.itemsToPick,
+          Active: true,
         }) 
         .then((response) => {
           alert("PickList saved");

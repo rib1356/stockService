@@ -181,7 +181,7 @@ export default {
       this.btnDisable = true;
     },
     customFormatter(date) { //Return the correct format so that the table dates can be filtered
-      return moment(new Date(date)).format('DD/M/YYYY');
+      return moment(new Date(date)).format('DD/MM/YYYY');
     },
     setFilter(date) {
       this.filter = this.customFormatter(date)

@@ -18,7 +18,7 @@
           <p v-if="showCollapse">Hide Items Left On Quote<i class="fas fa-minus plus"></i></p>
           <p v-else>Show Items Left On Quote<i class="fas fa-plus plus"></i></p>
         </b-button> 
-        <b-collapse v-model="showCollapse" class="input-pad" id="collapse">
+        <!-- <b-collapse v-model="showCollapse" class="input-pad" id="collapse">
           <p>Will finish this soon, these items havent been allocated so need to deal with that somehow</p>
           <ul>
             <li v-for="(data, index) in remainingPlants" :key='index'>
@@ -32,7 +32,7 @@
           </ul>
           <b-button variant="outline-success" @click="addToList" v-if="remainingPlants.length != 0">Add Plant</b-button>
           <p v-else>All plants have been allocated from quote: {{pickListDetail.quoteId}}</p>
-        </b-collapse>
+        </b-collapse> -->
         <div style="margin-top:5px;">
           <router-link :to="{name: 'PickLists'}">
             <b-button variant="outline-danger" class="myBtn">Back To Picklists</b-button>
