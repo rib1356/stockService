@@ -27,6 +27,7 @@ import EditQuote from '@/views/QuotingSystem/EditQuote'
 
 //Picking List Pages 
 import PlantAllocation from '@/views/PickingList/PlantAllocation'
+import PlantAllocationRevised from '@/views/PickingList/PlantAllocationRevised'
 import PickListFinalisation from '@/views/PickingList/PickListFinalisation'
 import PickLists from '@/views/PickingList/PickLists'
 import PickListDetail from '@/views/PickingList/PickListDetail'
@@ -133,9 +134,9 @@ const router = new Router({
       component: BatchPricing
     },
     {
-      path: '/PlantAllocation',
-      name: 'PlantAllocation',
-      component: PlantAllocation
+      path: '/PlantAllocationRevised',
+      name: 'PlantAllocationRevised',
+      component: PlantAllocationRevised
     },
     {
       path: '/PickListFinalisation',

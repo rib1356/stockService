@@ -201,7 +201,7 @@ export default {
     },
     savePickListInfo() {
       sessionStorage.setItem('pickListInfo', JSON.stringify(this.pickListInfo));
-      this.$router.push('PlantAllocation');
+      this.$router.push('PlantAllocationRevised');
     },
     getExistingQuotes() {
 			this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/all')

@@ -17,7 +17,7 @@ Vue.component('multiselect', Multiselect)
 import excel from 'vue-excel-export';
 Vue.use(excel);
 
-// import moment from 'moment'
+// import moment from 'moment'f
 // Vue.use(moment);
 
 // import jsPDF from 'jspdf'
