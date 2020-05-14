@@ -43,7 +43,7 @@
         <p v-else>Show Custom Add<i class="fas fa-plus plus"></i></p>
       </b-button>
 			<b-collapse v-model="showAddCollapse" id="collapse">
-				<p>You can add any custom plant here</p>
+				<p>Add a Custom Plant or Sundries</p>
         <b-form-input v-model="customPlantName"
 									placeholder="Enter a plant name"
                   name="customPlantName"

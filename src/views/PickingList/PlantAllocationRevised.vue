@@ -43,13 +43,13 @@
         <p id="currentPlantTag"></p>
         <div class="row modal-lg">
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn">Hills Stock</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="hillsStockClick">Hills Stock</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn">Subsitute</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="hillsSubsistueClick">Subsitute</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn">Sundries</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="sundriesClick">Sundries</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
             <b-button variant="outline-primary" class="myBtn">Supplier</b-button>
@@ -57,12 +57,24 @@
         </div>
         <hr>
         <div class="row">
-          <div class="col-xs-12 col-md-12 col-lg-12">
+          <div class="col-xs-12 col-md-12 col-lg-12" v-if="showSearchBar">
+            <b-input-group class="input-filter">
+              <b-form-input type="text" v-model="plantSearch" placeholder="Type to Search"/>
+                <b-input-group-append>
+                  <b-btn @click="searchForPlant">Search</b-btn>
+                </b-input-group-append>
+                <b-input-group-append>
+                  <b-btn @click="clearSearch">Clear</b-btn>
+                </b-input-group-append>
+            </b-input-group>
+          </div>
+          <div class="col-xs-12 col-md-12 col-lg-12" v-if="showSearchTable">
+            <p v-if="showSearchMessage">Searching for current selected plant from Hills Stock</p>
             <b-table
             show-empty
             stacked="md"
             :items="currentSearchedPlants"
-            :fields="fields"
+            :fields="searchedPlantFields"
             outlined
             >
           </b-table>
@@ -93,14 +105,18 @@ export default {
         { key: "PlantName", label: "Plant Name", sortable: true },
         { key: "FormSize", label: "Form Size" },
         { key: "Comment", label: "Comment" },
-        { key: "Price", label: "Item Price", sortable: true,contenteditable: true
-        },
+        { key: "Price", label: "Item Price", sortable: true,contenteditable: true},
         { key: "Quantity", label: "Qty Needed", sortable: true },
-        {
-          key: "QuantityOutstanding",
-          label: "Qty Left to pick",
-          sortable: true
-        },
+        { key: "QuantityOutstanding",label: "Qty Left to pick",sortable: true},
+        { key: "actions", label: "Actions" }
+      ],
+      searchedPlantFields: [
+        { key: "PlantName", label: "Plant Name", sortable: true },
+        { key: "FormSize", label: "Form Size" },
+        { key: "Location", label: "Location" },
+        { key: "BatchQuantity", label: "Saleable", sortable: true },
+        { key: "GrowingQuantity", label: "Growing", sortable: true },
+        { key: "AllocatedQuantity", label: "Allocated", sortable: true },
         { key: "actions", label: "Actions" }
       ],
       plantsOnQuoteToAddToPicklist: [],
@@ -108,6 +124,11 @@ export default {
       items: "",
       modalShow: false,
       currentSearchedPlants: [],
+      currentSelectedPlant: null,
+      plantSearch: "",
+      showSearchBar: false,
+      showSearchTable: false,
+      showSearchMessage: false,
     };
   },
   methods: {
@@ -143,9 +164,87 @@ export default {
     },
     openAddPlantModal(row) //Add a duplicate of the row pressed to arrayOfBatches and set the quantityOutstanding = "the quantityNeeded"
     {
+      this.currentSelectedPlant = row;
+      console.log(row)
       document.getElementById("currentPlantTag").innerHTML = "Current Plant to Pick: " + row.PlantName + " " + row.FormSize + " Quantity Needed: " + row.Quantity
                                                               // + " Quantity Left to Pick: " + row.QuantityOutstanding
+      this.showSearchTable = false;
+      this.showSearchBar = false;
+      this.showSearchMessage = false;
+      //empty the table here too
       this.modalShow = true;
+    },
+    searchForPlant()
+    {
+      if (this.currentSelectedPlant != null)
+      {
+        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/Batches/search?searchQuery=" +
+            this.plantSearch
+        )
+        .then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            this.currentSearchedPlants.push({
+              PlantName: response.data[i].Name,
+              FormSize: response.data[i].FormSize,
+              Location: response.data[i].Location,
+              BatchQuantity: response.data[i].Quantity,
+              GrowingQuantity: response.data[i].GrowingQuantity,
+              AllocatedQuantity: response.data[i].AllocatedQuantity,
+            });
+          }
+          this.showSearchMessage = false;
+        })
+        .catch(error => {
+          alert(error);
+        });
+      }
+    },
+    hillsStockClick()
+    {
+      this.showSearchBar = false;
+      this.showSearchTable = true;
+      this.showSearchMessage = true;
+      this.currentSearchedPlants = [];
+      if (this.currentSelectedPlant != null)
+      {
+        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/Batches/search?searchQuery=" +
+            this.currentSelectedPlant.PlantName
+        )
+        .then(response => {
+          for (var i = 0; i < response.data.length; i++) {
+            this.currentSearchedPlants.push({
+              PlantName: response.data[i].Name,
+              FormSize: response.data[i].FormSize,
+              Location: response.data[i].Location,
+              BatchQuantity: response.data[i].Quantity,
+              GrowingQuantity: response.data[i].GrowingQuantity,
+              AllocatedQuantity: response.data[i].AllocatedQuantity,
+            });
+          }
+          this.showSearchMessage = false;
+        })
+        .catch(error => {
+          alert(error);
+        });
+      }
+    },
+    hillsSubsistueClick()
+    {
+      this.showSearchBar = true;   
+      this.showSearchTable = true; 
+      this.currentSearchedPlants = [];
+    },
+    sundriesClick()
+    {
+      this.showSearchBar = false;  
+      this.showSearchTable = false;  
+      this.currentSearchedPlants = [];
+      alert("Warning only use this for sundres! This will automatically add the full quantity needed");
+    },
+    clearSearch()
+    {
+      this.currentSearchedPlants = [];
+      this.plantSearch = ""
     },
     cancel() {
       sessionStorage.removeItem("tempBatchSave");
@@ -192,9 +291,6 @@ export default {
   -webkit-overflow-scrolling: touch;
 }
 
-.modal-lg { /*Used to overwrite the size of the modal */
-    width: 100vh;
-}
 
 
 </style>
