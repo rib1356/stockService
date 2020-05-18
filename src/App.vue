@@ -22,4 +22,9 @@ export default {
 .modal__content {
     height: 45vh;
 }
+
+.action-btn
+  {
+    width: 75px;
+  }
 </style>

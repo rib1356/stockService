@@ -10,8 +10,8 @@
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-minus plus"></i></p>
-        <p v-else>Show Customer Information<i class="fas fa-plus plus"></i></p>
+        <p v-if="showCollapse">Hide Customer Information<i class="fas fa-minus plus custom-icon"></i></p>
+        <p v-else>Show Customer Information<i class="fas fa-plus plus custom-icon"></i></p>
       </b-button>
 			<b-collapse v-model="showCollapse" id="collapse">
 				<p>
@@ -39,8 +39,8 @@
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showAddCollapse">Hide Custom Add<i class="fas fa-minus plus"></i></p>
-        <p v-else>Show Custom Add<i class="fas fa-plus plus"></i></p>
+        <p v-if="showAddCollapse">Hide Custom Add<i class="fas fa-minus plus custom-icon"></i></p>
+        <p v-else>Show Custom Add<i class="fas fa-plus plus custom-icon"></i></p>
       </b-button>
 			<b-collapse v-model="showAddCollapse" id="collapse">
 				<p>Add a Custom Plant or Sundries</p>
@@ -148,8 +148,8 @@
         £{{(row.item.Price/100).toFixed(2)}}
       </template> 
 			<template slot="actions" slot-scope="row">
-				<i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
-				<i class="fas fa-trash-alt fa-lg" style="color:red" @click="remove(row.index)"></i>
+				<b-button type="button" class="btn btn-success action-btn" @click.stop="editItem(row.item, row.index)"><i class="far fa-edit fa-lg" style="color:black"></i></b-button>
+				<b-button type="button" class="btn btn-danger action-btn" @click="remove(row.index)"><i class="fas fa-trash-alt fa-lg" style="color:black"></i></b-button>
         <!-- Editing modal -->
         <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowName" @keyup.enter.native="validateEdits">
           <div>
@@ -629,7 +629,7 @@ export default {
 		min-height: 40px;
   }
 
-	i {
+	.custom-icon {
 		margin-top: 3px;	
 		cursor:pointer;
 		margin-left: 10px;

@@ -56,31 +56,30 @@
                 :sort-direction="sortDirection"
                 class="table" 
                 outlined
-                
+                style=""
                 >
             <div slot="empty">
               <strong>Loading picklists...</strong>
             </div>
             <template slot="actions" slot-scope="row" class="actions">
               <div class="row">
-                <div class="col-md-3 col-lg-3">
+                <div class="col-md-6 col-lg-6">
                   <router-link :to="{name: 'PickListDetail', params: { pickListDetail: row.item } }">
-                    <i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:green"></i>
+                    <b-button type="button" class="btn btn-success action-btn"><i class="far fa-edit fa-lg" v-b-tooltip.hover title="View/Edit Picklist" style="color:black"></i></b-button>
                   </router-link>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:red" @click.stop="deletePickList(row.item)"></i>
+                  <b-button type="button" class="btn btn-danger action-btn"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black" @click.stop="deletePickList(row.item)"></i></b-button>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-3 col-lg-3">
-                    
+              <div class="row" style="margin-top:5px;">
+                <div class="col-md-6 col-lg-6">
                     <Delivery ref="delivery" v-bind:rowInfo='row.item'></Delivery>
                 </div>
                 <div class="col-md-6 col-lg-6">
                    <Invoice ref="invoice" v-bind:rowInfo='row.item'></Invoice>
                    <router-link v-if="row.item.quantityPicked < row.item.itemsToPick" :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
-                      <i class="fas fa-tree fa-lg icon-tick"  v-b-tooltip.hover title="Pick Plants"></i>
+                      <b-button type="button" class="btn btn-info action-btn"><i class="fas fa-tree fa-lg icon-tick" style="color:black;"  v-b-tooltip.hover title="Pick Plants"></i></b-button>
                     </router-link>
                 </div>
               </div>

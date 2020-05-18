@@ -1,6 +1,6 @@
 <template>
     <div>
-        <i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-if="rowInfo.quantityPicked >= rowInfo.itemsToPick" v-b-tooltip.hover title="Create Invoice" @click.stop="getDeliveredPlants"></i>
+      <b-button type="button" class="btn btn-warning action-btn" v-if="rowInfo.quantityPicked >= rowInfo.itemsToPick" @click.stop="getDeliveredPlants"><i class="fas fa-file-invoice fa-lg icon-tick-delivery" v-b-tooltip.hover title="Create Invoice" ></i></b-button>
     </div>
 </template>
 
@@ -186,7 +186,7 @@ import moment from 'moment';
 
 <style scoped>
  .icon-tick-delivery {
-    color: rebeccapurple;
-    margin-left: 2px;
+    color: black;
+    /* margin-left: 2px; */
   }
 </style>

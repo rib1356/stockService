@@ -112,9 +112,9 @@
           £{{(row.item.Price/100).toFixed(2)}}
         </template>      
         <template slot="actions" slot-scope="row">
-          <i class="far fa-edit fa-lg" style="color:green" @click.stop="editItem(row.item, row.index)"></i>
-          <i class="fas fa-trash-alt fa-lg" style="color:red" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"></i>
-          <i class="fas fa-times fa-lg" style="color:black" v-else @click.stop="remove(row.index)"></i>
+          <b-button type="button" class="btn btn-success action-btn" @click.stop="editItem(row.item, row.index)"><i class="far fa-edit fa-lg" style="color:black"></i></b-button>
+          <b-button type="button" class="btn btn-danger action-btn" v-if="row.item.PlantForQuoteId > 0" @click.stop="deleteItem(row.item, row.index)"><i class="fas fa-trash-alt fa-lg" style="color:black"></i></b-button>
+          <b-button type="button" class="btn btn-danger action-btn" v-else @click.stop="remove(row.index)"><i class="fas fa-times fa-lg" style="color:black" v-b-tooltip.hover title="Remove Item"></i></b-button>
           <!-- <i class="fas fa-check fa-lg" style="color:blue" @click.stop="pickingList(row.item, row.index)" v-if="selectedQuote.SalesOrder"></i> -->
           <!-- Editing modal -->
           <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
@@ -630,6 +630,11 @@ export default {
 
   .navbar-custom {
     background-color: #0b720b
+  }
+
+  .action-btn
+  {
+    width: 75px;
   }
 
   @media only screen and (max-width : 768px) {

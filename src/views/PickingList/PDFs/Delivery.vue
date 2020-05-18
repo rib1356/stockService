@@ -1,6 +1,6 @@
 <template>
   <div>
-    <i class="fas fa-file-signature fa-lg icon-tick-delivery" v-if="rowInfo.quantityPicked > 0" v-b-tooltip.hover title="Create Delivery" @click.stop="getDeliveredPlants"></i>
+    <b-button type="button" class="btn btn-warning action-btn" v-if="rowInfo.quantityPicked > 0" @click.stop="getDeliveredPlants"><i class="fas fa-truck fa-lg icon-tick-delivery" v-b-tooltip.hover title="Create Delivery"></i></b-button>
   </div>
 </template>
 
@@ -112,7 +112,7 @@ import 'jspdf-autotable';
 
 <style scoped>
  .icon-tick-delivery {
-    color: rebeccapurple;
-    margin-left: 2px;
+    color: black;
+    /* margin-left: 2px; */
   }
 </style>
