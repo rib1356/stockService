@@ -3,46 +3,52 @@
     <quote-navbar class="navbar-custom" id="navbar" v-bind:pageName='pageName'></quote-navbar>
     <!-- Quote Informatmion -->
     <div class="left-div">
-      <b-button @click="showCollapse = !showCollapse"
+      <div class="row">
+        <div class="col-xs-2 col-md-2 col-lg-2">
+          <b-button @click="toggleQuoteSales" style="width;inherit">
+            <p v-if="!showSaleOrders">Show sales orders</p>        
+            <p v-else>Show quotes</p> </b-button>   
+        </div>
+        <div class="col-xs-10 col-md-10 col-lg-10">
+          <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
                 style="margin-bottom: 5px;"
                 block
                 variant="light"
                 aria-controls="collapse"
                 :aria-expanded="showCollapse ? 'true' : 'false'">
-        <p v-if="showCollapse">Hide Filters<i class="fas fa-minus plus"></i></p>
-        <p v-else>Show Filters<i class="fas fa-plus plus"></i></p>
-      </b-button>
-      <!-- Collapsible area to show the filters for the table -->
-      <b-collapse v-model="showCollapse" id="collapse">
-        <b-input-group class="input-filter">
-          <b-form-input v-model="filter" placeholder="Type to Search"/>
-            <b-input-group-append>
-              <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-            </b-input-group-append>
-        </b-input-group>
-        <b-input-group class="input-filter">
-          <b-form-select v-model="sortBy" :options="sortOptions">
-            <option slot="first" :value="null">Choose Sort Option</option>
-          </b-form-select>
-          <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
-            <option :value="false">Asc</option>
-            <option :value="true">Desc</option>
-          </b-form-select>
-        </b-input-group>
-        <datepicker placeholder="Select Date"
-                    v-model="selectedDate"
-                    :format="customFormatter"
-                    @selected="setFilter"
-                    @cleared="clearDate"
-                    monday-first
-                    clear-button
-                    bootstrap-styling
-                    ></datepicker>
-          <b-button @click="toggleQuoteSales" style="margin-top: 5px;">
-            <p v-if="!showSaleOrders">Show sales orders</p>        
-            <p v-else>Show quotes</p> </b-button>          
-      </b-collapse>   
+            <p v-if="showCollapse">Hide Filters<i class="fas fa-minus plus"></i></p>
+            <p v-else>Show Filters<i class="fas fa-plus plus"></i></p>
+          </b-button>
+          <!-- Collapsible area to show the filters for the table -->
+          <b-collapse v-model="showCollapse" id="collapse">
+            <b-input-group class="input-filter">
+              <b-form-input v-model="filter" placeholder="Type to Search"/>
+                <b-input-group-append>
+                  <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                </b-input-group-append>
+            </b-input-group>
+            <b-input-group class="input-filter">
+              <b-form-select v-model="sortBy" :options="sortOptions">
+                <option slot="first" :value="null">Choose Sort Option</option>
+              </b-form-select>
+              <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
+                <option :value="false">Asc</option>
+                <option :value="true">Desc</option>
+              </b-form-select>
+            </b-input-group>
+            <datepicker placeholder="Select Date"
+                        v-model="selectedDate"
+                        :format="customFormatter"
+                        @selected="setFilter"
+                        @cleared="clearDate"
+                        monday-first
+                        clear-button
+                        bootstrap-styling
+                        ></datepicker>
+            </b-collapse>  
+        </div>
+      </div>  
     </div>
     <!-- Quote Table -->
     <div class="right-div">
@@ -154,7 +160,7 @@ export default {
       saleOrders: [],
       originalQuotes: [],
       customers: [],
-      showCollapse: true,
+      showCollapse: false,
       filter: '',
       sortBy: "quoteId",
       sortDesc: true,
@@ -327,7 +333,22 @@ export default {
     overflow-y: hidden;
 	}
 
-	.left-div
+   .left-div {
+    padding: 5px;
+		position: relative;
+		width: 100%;
+	}
+
+	.right-div {
+    width: 100%;
+    padding: 5px;
+    position: relative;
+    overflow-x: none;
+    -webkit-overflow-scrolling: touch;
+	}
+
+
+	/* .left-div
 	{
     width: 20%;
 		height: 100%; 
@@ -342,7 +363,7 @@ export default {
 		overflow: auto;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
-	}
+	} */
 
   .navbar-custom {
 			background-color: #0b720b;

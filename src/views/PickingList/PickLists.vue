@@ -38,11 +38,11 @@
                       bootstrap-styling
                       ></datepicker>       
         </b-collapse>
-        <br>
-        <h5>Key</h5>
+        
+        <!-- <h5>Key</h5>
         <p style="background-color: #c3e6cb;">All Picked / Delivered</p>
         <p style="background-color: #ffeeba;">Items left to be picked</p>
-        <p style="background-color: #f5c6cb;">Nothing picked</p>
+        <p style="background-color: #f5c6cb;">Nothing picked</p> -->
 
       </div>
       <div class="right-div">
@@ -56,7 +56,7 @@
                 :sort-direction="sortDirection"
                 class="table" 
                 outlined
-                style=""
+                responsive
                 >
             <div slot="empty">
               <strong>Loading picklists...</strong>
@@ -127,7 +127,7 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
         { key: 'quantityPicked', label: 'Quantity Picked', sortable: true},
         { key: 'actions', label: 'Actions', thClass: 'actions', class: 'actions', style: "width: 30%;"},
         ],
-        showCollapse: true,
+        showCollapse: false,
         filter: null,
         sortBy: "pickListId",
         sortDesc: true,
@@ -261,12 +261,21 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
     margin-left: 2px;
   }
 
-  .icon-tick-delivery {
-    color: rebeccapurple;
-    margin-left: 2px;
-  }
+  .left-div {
+    padding: 5px;
+		position: relative;
+		width: 100%;
+	}
 
-	.left-div
+	.right-div {
+    width: 100%;
+    padding: 5px;
+    position: relative;
+    overflow-x: none;
+    -webkit-overflow-scrolling: touch;
+	}
+
+	/* .left-div
 	{
     width: 20%;
 		height: 100%; 
@@ -281,7 +290,7 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
 		overflow: auto;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
-	}
+	} */
 
   .plus{
     float: right;
