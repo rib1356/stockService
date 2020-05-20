@@ -127,7 +127,6 @@ import SubsModal from '@/views/PickingList/PickListComponents/SubsModal.vue'
       },
       addSundries(row) //Add a duplicate of the row pressed to arrayOfBatches and set the quantityOutstanding = "the quantityNeeded"
       {
-        console.log(row)
         var thisObj = {
           "plantForQuoteId": row.PlantForQuoteId,
           "batchId": 0,

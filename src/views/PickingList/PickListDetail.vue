@@ -75,8 +75,10 @@ import 'jspdf-autotable';
           { key: 'formSize', label: 'Form Size'},
           { key: 'location', label: 'Location'},
           { key: 'quantityToPick', label: 'Quantity To Pick', sortable: true},
-          { key: 'isSubbed', label: 'Is subbed'},
-          { key: 'subbedFor', label: 'Subbed For' },
+          { key: "isSubbed", label: "Is Subsituted", formatter: (value, key, item) => {
+                return value ? 'Yes' : 'No'
+          }},
+          { key: 'originalItem', label: 'Original Item' },
           { key: 'actions', label: 'Actions'}
           ],
           showCollapse: true,
@@ -103,7 +105,7 @@ import 'jspdf-autotable';
               "location": item.BatchLocation,
               "quantityToPick": item.QuantityToPick,
               "isSubbed": item.IsSubbed,
-              "subbedFor": item.SubbedFor,
+              "originalItem": item.OriginalItem,
             });
             this.plantsForPDF.push({
               "batchId": item.BatchId,

@@ -68,7 +68,7 @@ import moment from 'moment';
           this.plantsToDeliver.push({
             "plantName": item.PlantName + " " + item.FormSize,
             "quantity": item.QuantityToPick,
-            "comment": item.SubbedFor,
+            "comment": item.OriginalItem,
             "pickedPlants": item.QuantityPicked,
             "outstandingPlants": item.QuantityToPick - item.QuantityPicked
           });

@@ -224,6 +224,7 @@ export default {
         .then(response => {
           for (var i = 0; i < response.data.length; i++) {
             this.currentSearchedPlants.push({
+              BatchId: response.data[i].Id,
               PlantName: response.data[i].Name,
               FormSize: response.data[i].FormSize,
               Location: response.data[i].Location,
@@ -260,6 +261,7 @@ export default {
                 rowVariant = 'success'
             }
             this.currentSearchedPlants.push({
+              BatchId: response.data[i].Id,
               PlantName: response.data[i].Name,
               FormSize: response.data[i].FormSize,
               Location: response.data[i].Location,
@@ -281,7 +283,7 @@ export default {
     {
        //NEED TO ADD INTO THE OBJECT THAT IT HAS BEEN SUBBED AND THE NAME THAT IT WAS SUBBED FOR ---------------> DO WE WANT TO ADD THE BATCHID HERE SO WE KNOW WHAT IT IS? <----
        this.currentSelectedPlant.QuantityOutstanding += parseInt(row.AmountToAddToPicklist); //Set the current set plant when the modal opens so we can edit the qty left to pick here
-
+        console.log(row)
        row.PlantForQuoteId = this.currentSelectedPlant.PlantForQuoteId;
        var issubbed = false;
        var originalItem = "N/A";
@@ -292,6 +294,7 @@ export default {
        }
        //This is the list of object we send through API
        this.plantsOnPicklist.push({ 
+         BatchId: row.BatchId,
          PlantForQuoteId: row.PlantForQuoteId,
          PlantName: row.PlantName.trim(),
          FormSize: row.FormSize,

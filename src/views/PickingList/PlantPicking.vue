@@ -64,8 +64,10 @@ import 'jspdf-autotable';
           { key: 'formSize', label: 'Form Size'},
           { key: 'location', label: 'Location'},
           { key: 'quantityToPick', label: 'Quantity To Pick', sortable: true},
-          { key: 'isSubbed', label: 'Is subbed'},
-          { key: 'subbedFor', label: 'Subbed For' },
+          { key: "isSubbed", label: "Is Subsituted", formatter: (value, key, item) => {
+              return value ? 'Yes' : 'No'
+          }},
+          { key: 'originalItem', label: 'Original Item' },
           { key: 'actions', label: 'Picked'}
           ],
           showCollapse: true,
@@ -94,7 +96,7 @@ import 'jspdf-autotable';
               "quantityToPick": item.QuantityToPick,
               "quantityPicked": item.QuantityPicked,
               "isSubbed": item.IsSubbed,
-              "subbedFor": item.SubbedFor,
+              "originalItem": item.OriginalItem,
             });
           });
         },
