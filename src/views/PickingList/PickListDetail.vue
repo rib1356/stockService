@@ -48,6 +48,16 @@
               :filter="filter"
               outlined       
               >
+              <template slot="actions" slot-scope="row" class="actions">
+                <div class="row">
+                  <div class="col-md-6 col-lg-6">
+                    <b-button type="button" class="btn btn-success action-btn"><i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:black"></i></b-button>
+                  </div>
+                  <div class="col-md-6 col-lg-6">
+                    <b-button type="button" class="btn btn-danger action-btn"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black" @click.stop="deletePickList(row.item)"></i></b-button>
+                  </div>
+                </div>
+              </template> 
         </b-table>
       </div>
     </div>

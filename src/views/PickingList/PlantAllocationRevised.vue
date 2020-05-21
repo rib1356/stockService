@@ -1,8 +1,10 @@
 <template>
   <div>
     <div class="left-div">
-      <h4>THIS IS GOING TO CHANGE</h4>
       <pick-list-info v-bind:pickListInformation="pickListInformation"></pick-list-info>
+      <b-input-group class="input-filter">
+        <b-form-input type="text" v-model="picklistComment" placeholder="Add a comment to picklist"/>
+      </b-input-group>
       <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: true } }">
         <b-button variant="outline-danger" class="myBtn">Cancel Allocation</b-button>
       </router-link>
@@ -60,7 +62,7 @@
             <b-button variant="outline-primary" class="myBtn" @click="hillsSubsistueClick">Subsitute</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn" @click="sundriesClick">Sundries</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="sundriesClick">Add Sundries</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
             <b-button variant="outline-primary" class="myBtn">Supplier</b-button>
@@ -90,13 +92,23 @@
             >
             <template slot="actions" slot-scope="row">
               <b-input-group class="input-filter">
-              <b-form-input type="text" v-model="row.item.AmountToAddToPicklist" placeholder="Amount to add"/>
-                <b-input-group-append>
-                  <b-btn variant="success" @click="AddItemsFromModalToPicklist(row.item)">Add</b-btn>
-                </b-input-group-append>
-            </b-input-group>
+                <b-form-input type="text" v-model="row.item.AmountToAddToPicklist" placeholder="Amount to add"/>
+                  <b-input-group-append>
+                    <b-btn variant="success" @click="AddItemsFromModalToPicklist(row.item)">Add</b-btn>
+                  </b-input-group-append>
+              </b-input-group>
             </template>
           </b-table>
+          </div>
+          <div class="col-xs-12 col-md-12 col-lg-12" v-if="showSundriesDiv">
+            <p>Warning - This should only be used for adding sundries or a "custom plant" it will have no link to a batch</p>
+            <b-input-group class="input-filter">
+                <b-form-input type="text" v-model="sundriesAmountToAdd" placeholder="Amount to add"/>
+                  <b-input-group-append>
+                    <b-btn variant="success" @click="AddSundriesFromModalToPicklist()">Add</b-btn>
+                  </b-input-group-append>
+              </b-input-group>
+              <br>
           </div>
         </div>
         <div class="row">
@@ -169,10 +181,13 @@ export default {
       showSearchTable: false,
       showSearchMessage: false,
       currentAmountToPick: 0,
+      picklistComment: null,
+      showSundriesDiv: false,
+      sundriesAmountToAdd: null,
     };
   },
   methods: {
-    getPlants() {
+    getPlants() { 
       // console.log(this.pickListInformation.salesOrderInfo.quoteId);
       this.axios
         .get(
@@ -210,6 +225,7 @@ export default {
       this.showSearchTable = false;
       this.showSearchBar = false;
       this.showSearchMessage = false;
+      this.showSundriesDiv = false;
       this.plantSearch = "";
       //empty the table here too
       this.modalShow = true;
@@ -246,6 +262,7 @@ export default {
       this.showSearchBar = false;
       this.showSearchTable = true;
       this.showSearchMessage = true;
+      this.showSundriesDiv = false;
       this.currentSearchedPlants = [];
       if (this.currentSelectedPlant != null)
       {
@@ -281,12 +298,10 @@ export default {
     },
     AddItemsFromModalToPicklist(row)
     {
-       //NEED TO ADD INTO THE OBJECT THAT IT HAS BEEN SUBBED AND THE NAME THAT IT WAS SUBBED FOR ---------------> DO WE WANT TO ADD THE BATCHID HERE SO WE KNOW WHAT IT IS? <----
        this.currentSelectedPlant.QuantityOutstanding += parseInt(row.AmountToAddToPicklist); //Set the current set plant when the modal opens so we can edit the qty left to pick here
-        console.log(row)
        row.PlantForQuoteId = this.currentSelectedPlant.PlantForQuoteId;
        var issubbed = false;
-       var originalItem = "N/A";
+       var originalItem = null; //Might want to change this to null when communicating to api?
        if (this.showSearchBar == true || row._rowVariant == null) //If show search bar is true it means that the user is on the "subsitute tab" || row selected was not the same as one on salesOrder
        { 
           issubbed = true;
@@ -306,6 +321,25 @@ export default {
        });
        row.AmountToAddToPicklist = null; //Reset value
     },
+    AddSundriesFromModalToPicklist()
+    {
+      if (this.sundriesAmountToAdd != null)
+      {
+        this.currentSelectedPlant.QuantityOutstanding += parseInt(this.sundriesAmountToAdd);
+        this.plantsOnPicklist.push({ 
+          BatchId: 0, //This is 0 so that we can tell what is a custom plant in the db
+          PlantForQuoteId: this.currentSelectedPlant.PlantForQuoteId,
+          PlantName: this.currentSelectedPlant.PlantName.trim(),
+          FormSize: this.currentSelectedPlant.FormSize,
+          Location: "No Location",
+          QuantityToPick: this.sundriesAmountToAdd,
+          IsSubbed: false,
+          OriginalItem: null,
+          DispatchLocation: null,
+        });
+      }
+      this.sundriesAmountToAdd = null;
+    },
     completePicklst() //Get all the stuff and save picklist
     {
         var address;
@@ -322,7 +356,7 @@ export default {
           IsPicked: false,
           IsAllocated: true,
           IsDelivered: false,
-          Comment: this.comment,
+          Comment: this.picklistComment,
           EstimatedDelivery: this.pickListInformation.estDeliv,
           PickListPlants: this.plantsOnPicklist,
           Active: true,
@@ -340,12 +374,14 @@ export default {
     {
       this.showSearchBar = true;   
       this.showSearchTable = true; 
+      this.showSundriesDiv = false;
       this.currentSearchedPlants = [];
     },
     sundriesClick()
     {
       this.showSearchBar = false;  
       this.showSearchTable = false;  
+      this.showSundriesDiv = true;
       this.currentSearchedPlants = [];
       //alert("Warning only use this for sundres! This will automatically add the full quantity needed");
     },
