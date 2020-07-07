@@ -52,7 +52,7 @@
       </div>
     </div>
     <!-- MODAL -->
-    <b-modal v-model="modalShow" size="xl" no-close-on-backdrop hide-footer title="Select A button to pick items for picklist">
+    <b-modal v-model="modalShow" size="xl" class="modal-xl" no-close-on-backdrop hide-footer title="Select A button to pick items for picklist">
         <p v-if="modalShow">Current Plant to Pick: {{currentSelectedPlant.PlantName}} Form Size: {{currentSelectedPlant.FormSize}} Quantity Needed: {{currentSelectedPlant.Quantity - currentSelectedPlant.QuantityOutstanding}}</p>
         <div class="row">
           <div class="col-xs-3 col-md-3 col-lg-3">
@@ -523,6 +523,11 @@ export default {
 		width:80%;
 		overflow:hidden;
 	}
+
+  .modal-xl {
+    max-width: 1200px;
+    min-width: 1200px;
+  }
 
 	@media only screen and (max-width : 768px) {
 
