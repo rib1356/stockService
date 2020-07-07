@@ -15,7 +15,7 @@
     <div class="right-div">
       <div class="row" style="height: 50vh;">
         <div class="col-xs-12 col-md-12 col-lg-12">
-          <h4>Items to add to picklist</h4>
+          <h4>Items to add to picklist</h4><h6>If Quantity on Picklist is greater than 0. An item already exists on another picklist</h6>
           <b-table
             show-empty
             stacked="md"
@@ -191,11 +191,11 @@ export default {
       // console.log(this.pickListInformation.salesOrderInfo.quoteId);
       this.axios
         .get(
-          "https://ahillsquoteservice.azurewebsites.net/api/quote/detail?id=" +
+          "https://ahillsquoteservice.azurewebsites.net/api/picklist/plantsAlreadyOnPicklist?id=" +
             this.pickListInformation.salesOrderInfo.quoteId
         )
         .then(response => {
-          this.addQuotePlantsToArray(response.data.QuoteDetails); //Pass in just the plants on the quote to be displayed on table
+          this.addQuotePlantsToArray(response.data); //Pass in just the plants on the quote to be displayed on table
         })
         .catch(error => {
           alert(error);
@@ -210,7 +210,7 @@ export default {
             FormSize: response[i].FormSize,
             Comment: response[i].Comment,
             Quantity: response[i].Quantity,
-            QuantityOutstanding: 0, //To change eventually and calculate how many more is needed based on value already picked
+            QuantityOutstanding: response[i].QuantityPicked, //To change eventually and calculate how many more is needed based on value already picked
             Price: response[i].Price,
             IsSubbed: false,
             SubbedForPlant: null,

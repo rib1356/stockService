@@ -147,6 +147,8 @@ export default {
         { key: 'expiryDate', label: 'Expiry Date'},
         { key: 'siteRef', label: 'Site Reference'},
         { key: 'totalPrice', label: 'Quote Price (exVAT)' , sortable: true},
+        { key: 'totalQuoteQuantity', label: 'Total Quantity' , sortable: true},
+        { key: 'totalPicklistQuantity', label: 'Total Picklist Quantity' , sortable: true},
         { key: 'actions', label: 'Actions' }
       ],
       pickListInfo: {
@@ -238,6 +240,8 @@ export default {
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
             "totalPrice": this.getPrice(response[i].TotalPrice),
+            "totalQuoteQuantity": response[i].TotalQuoteQuantity,
+            "totalPicklistQuantity": 0,
             "SalesOrder": response[i].SalesOrder,
           });
           this.originalQuotes = this.quotes;
@@ -252,6 +256,8 @@ export default {
             "expiryDate": this.convertDate(response[i].ExpiryDate),
             "siteRef": response[i].SiteRef,
             "totalPrice": this.getPrice(response[i].TotalPrice),
+            "totalQuoteQuantity": response[i].TotalQuoteQuantity,
+            "totalPicklistQuantity": response[i].TotalPicklistQuantity,
             "SalesOrder": response[i].SalesOrder,
           });
         }

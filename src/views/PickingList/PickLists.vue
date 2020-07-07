@@ -69,7 +69,7 @@
                   </router-link>
                 </div>
                 <div class="col-md-6 col-lg-6">
-                  <b-button type="button" class="btn btn-danger action-btn"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black" @click.stop="deletePickList(row.item)"></i></b-button>
+                  <b-button type="button" class="btn btn-danger action-btn" @click.stop="deletePickList(row.item)"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black"></i></b-button>
                 </div>
               </div>
               <div class="row" style="margin-top:5px;">
@@ -117,6 +117,7 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
         picklists: [],
         fields: [
         { key: 'pickListId', label: 'PickList Id', sortable: true},
+        { key: 'salesOrderId', label: 'Sales Order Id', sortable: true},
         { key: 'customerName', label: 'Customer Name', sortable: true},
         { key: 'dispatchDate', label: 'Dispatch Date'},
         { key: 'deliveryNeeded', label: 'Delivery Needed', sortable: true},
@@ -204,6 +205,7 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
           if(element.Active == true) {
             this.picklists.push({
             "pickListId": element.PicklistId,
+            "salesOrderId" : element.QuoteId,
             "customerName": element.CustomerName,
             "dispatchDate": datestuff + this.convertDate(element.DispatchDate),
             "deliveryNeeded": delivNeeded,

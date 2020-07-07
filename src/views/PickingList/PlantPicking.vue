@@ -76,6 +76,7 @@ import 'jspdf-autotable';
       },
       methods: {
         getPickListDetail() {
+          console.log(this.pickListDetail.pickListId)
           this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/picklist/detail?id=' + this.pickListDetail.pickListId)
           .then((response) => {
             this.changeData(response.data.PickListPlants);

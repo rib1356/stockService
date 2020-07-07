@@ -54,7 +54,7 @@
                     <b-button type="button" class="btn btn-success action-btn"><i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:black"></i></b-button>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <b-button type="button" class="btn btn-danger action-btn"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black" @click.stop="deletePickList(row.item)"></i></b-button>
+                    <b-button type="button" class="btn btn-danger action-btn" @click.stop="deletePickList(row.item)"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black"></i></b-button>
                   </div>
                 </div>
               </template> 
@@ -160,6 +160,13 @@ import 'jspdf-autotable';
             element.quantityEntered = null;
             }
           });
+        },
+        deletePickList(row)
+        {
+            if(confirm("WARNING: If this is the last item on the picklist it will delete the entire picklist \nAre you sure you want to delete, this will add the Quantity to pick back onto the sales order"))
+            {
+
+            }
         },
         createPDF() {
           let pdfName = 'Picklist' + this.pickListDetail.quoteId;
