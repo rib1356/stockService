@@ -89,16 +89,19 @@ import 'jspdf-autotable';
         },
         changeData(items) {
           items.forEach(item => {
-            this.pickListDetailItems.push({
-              "plantForPicklistId": item.PlantForPicklistId,
-              "plantName": item.PlantName,
-              "formSize": item.FormSize,
-              "location": item.BatchLocation,
-              "quantityToPick": item.QuantityToPick,
-              "quantityPicked": item.QuantityPicked,
-              "isSubbed": item.IsSubbed,
-              "originalItem": item.OriginalItem,
-            });
+            if (item.Active == true)
+            {
+              this.pickListDetailItems.push({
+                "plantForPicklistId": item.PlantForPicklistId,
+                "plantName": item.PlantName,
+                "formSize": item.FormSize,
+                "location": item.BatchLocation,
+                "quantityToPick": item.QuantityToPick,
+                "quantityPicked": item.QuantityPicked,
+                "isSubbed": item.IsSubbed,
+                "originalItem": item.OriginalItem,
+              });
+            }
           });
         },
         pickAllPlants() {

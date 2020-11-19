@@ -179,9 +179,7 @@ import Invoice from '@/views/PickingList/PDFs/Invoice.vue'
             currentState = "None Picked";
             allDispatchedVarient = 'danger'; 
           }
-
-         
-
+          
           // if(element.IsPicked == true && element.IsAllocated == false && element.IsDelivered == false) {
             
           // } else if(element.IsPicked == false && element.IsAllocated == false && element.IsDelivered == false) {

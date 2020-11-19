@@ -34,7 +34,7 @@
       <div class="row" style="height: 49vh;">
         <div class="col-xs-12 col-md-12 col-lg-12">
           <div>
-            <h4>Items currently on picklist</h4>
+            <h4>Items on this picklist</h4>
             <b-table
               show-empty
               stacked="md"
@@ -56,10 +56,10 @@
         <p v-if="modalShow">Current Plant to Pick: {{currentSelectedPlant.PlantName}} Form Size: {{currentSelectedPlant.FormSize}} Quantity Needed: {{currentSelectedPlant.Quantity - currentSelectedPlant.QuantityOutstanding}}</p>
         <div class="row">
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn" @click="hillsStockClick">Hills Stock</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="hillsStockClick">Hills Stock / Pannebakker</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
-            <b-button variant="outline-primary" class="myBtn" @click="hillsSubsistueClick">Subsitute</b-button>
+            <b-button variant="outline-primary" class="myBtn" @click="hillsSubsistueClick">Search For Subsitute</b-button>
           </div>
           <div class="col-xs-3 col-md-3 col-lg-3">
             <b-button variant="outline-primary" class="myBtn" @click="sundriesClick">Add Sundries</b-button>
@@ -234,7 +234,7 @@ export default {
     {
       if (this.currentSelectedPlant != null)
       {
-        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/Batches/search?searchQuery=" +
+        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/search?searchQuery=" +
             this.plantSearch
         )
         .then(response => {
@@ -266,7 +266,8 @@ export default {
       this.currentSearchedPlants = [];
       if (this.currentSelectedPlant != null)
       {
-        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/Batches/search?searchQuery=" +
+        console.log(this.currentSelectedPlant.PlantName)
+        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/search?searchQuery=" +
             this.currentSelectedPlant.PlantName
         )
         .then(response => {

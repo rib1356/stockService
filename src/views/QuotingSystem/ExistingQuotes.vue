@@ -147,8 +147,8 @@ export default {
         { key: 'expiryDate', label: 'Expiry Date'},
         { key: 'siteRef', label: 'Site Reference'},
         { key: 'totalPrice', label: 'Quote Price (exVAT)' , sortable: true},
-        { key: 'totalQuoteQuantity', label: 'Total Quantity' , sortable: true},
-        { key: 'totalPicklistQuantity', label: 'Total Picklist Quantity' , sortable: true},
+        { key: 'totalQuoteQuantity', label: 'Quantity' , sortable: true},
+        { key: 'totalPicklistQuantity', label: 'Total Quantity On Picklists' , sortable: true},
         { key: 'actions', label: 'Actions' }
       ],
       pickListInfo: {

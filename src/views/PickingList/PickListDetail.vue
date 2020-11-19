@@ -2,13 +2,96 @@
     <div>
       <quote-navbar class="navbar-custom" v-bind:pageName='pageName'></quote-navbar>
       <div class="left-div">
-        <b-input-group class="input-filter" >
-            <b-form-input v-model="filter" placeholder="Type to Search"/>
-              <b-input-group-append>
-                <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
-              </b-input-group-append>
+        <p>Search Pick List</p>
+        <b-input-group class="input-filter" style="margin-top:10px;">
+              <b-form-input v-model="filter" placeholder="Type to Search"/>
+                <b-input-group-append>
+                  <b-btn :disabled="!filter" @click="filter = ''">Clear</b-btn>
+                </b-input-group-append>
           </b-input-group>
-        <b-button @click="showCollapse = !showCollapse"
+        <b-button @click="showEditCollapse = !showEditCollapse"
+                :class="showEditCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showEditCollapse ? 'true' : 'false'">
+                Edit PickList Details
+                <i class="fas fa-plus plus"></i>
+        </b-button>
+        <b-collapse v-model="showEditCollapse" id="collapse">
+          <div class="editDate">
+            <p>Edit Picklist Date</p>
+            <b-input-group class="input-filter" style="margin-top:10px;">
+                <h5 style="margin-top:5px; margin-left: 15px;">{{deliveryTypeName}}</h5>
+                <b-btn @click="changeDeliveryType" style="margin-left: 15px;">Change Delivery Type</b-btn>
+            </b-input-group>
+            <b-form-group horizontal label="Current Date:">
+              <p>{{oldDispatchDate}}</p>
+            </b-form-group> 
+            <b-form-group horizontal label="New Date:">
+            <datepicker id="modalDatepicker"
+                      placeholder="Select Date"
+                      :format="customFormatter"
+                      
+                      @selected="setSelectedDate"
+                      monday-first
+                      clear-button
+                      bootstrap-styling
+                      ></datepicker>
+          </b-form-group>     
+            <b-button variant="outline-success" type="button" class="btn btn-block" @click="saveDateChanges">Save Date changes</b-button>
+          </div>
+        </b-collapse>
+        <b-button @click="showAddCollapse = !showAddCollapse"
+                :class="showAddCollapse ? 'collapsed' : null"
+                style="margin-bottom: 5px;"
+                block
+                variant="light"
+                aria-controls="collapse"
+                :aria-expanded="showAddCollapse ? 'true' : 'false'">
+        Add Plants To Picklist
+        <i class="fas fa-plus plus"></i>
+        </b-button>
+        <b-collapse v-model="showAddCollapse" id="collapse">
+          <multiselect v-model="selectedBatch" 
+                       :options="batches"  
+                       placeholder="Select a batch" 
+                       label="plantName"
+                       :loading="isLoading"
+                       :custom-label="customLabel"
+                       :show-labels="false"
+                       :allow-empty="false"
+                       style="margin-bottom: 5px;">
+            <template slot="option" slot-scope="props">
+              <div>
+				        <span>{{props.option.plantName }} {{props.option.formSize }}</span>
+				        <br>
+				        <span> Quantity: <strong>{{props.option.quantity}}</strong>
+                       Price: <strong>£{{(props.option.price/100).toFixed(2)}}</strong>
+                       Location: <strong>{{props.option.location}} </strong>
+                </span>
+			        </div>
+            </template>
+          </multiselect>
+          <b-form-input v-model="batchQuantity"
+                        placeholder="Enter a quantity to pick"
+                        type="number"
+                        pattern="[0-9]*"
+                        v-validate="'required|numeric|min_value:1'"
+                        name="batchQuantity"
+                        inputmode="numeric"
+                        @keyup.enter.native="validateBatch"></b-form-input>	
+                        <p class="text-danger" v-if="errors.has('batchQuantity')">{{ errors.first('batchQuantity') }}</p>
+          <b-form-input v-model="comment"
+                        placeholder="Enter a plant comment"
+                        type="text"
+                        style="margin-top: 5px;"
+                        @keyup.enter.native="validateBatch">
+        </b-form-input>
+        <b-button @click="validateBatch" variant="outline-primary" style="margin-top: 5px;">Add plant to picklist</b-button>	
+      </b-collapse>
+        <!-- <b-button @click="showCollapse = !showCollapse"
                 :class="showCollapse ? 'collapsed' : null"
                 style="margin-bottom: 0;"
                 block
@@ -17,7 +100,7 @@
                 :aria-expanded="showCollapse ? 'true' : 'false'">
           <p v-if="showCollapse">Hide Items Left On Quote<i class="fas fa-minus plus"></i></p>
           <p v-else>Show Items Left On Quote<i class="fas fa-plus plus"></i></p>
-        </b-button> 
+        </b-button>  -->
         <!-- <b-collapse v-model="showCollapse" class="input-pad" id="collapse">
           <p>Will finish this soon, these items havent been allocated so need to deal with that somehow</p>
           <ul>
@@ -35,9 +118,9 @@
         </b-collapse> -->
         <div style="margin-top:5px;">
           <router-link :to="{name: 'PickLists'}">
-            <b-button variant="outline-danger" class="myBtn">Back To Picklists</b-button>
+            <b-button variant="outline-danger" class="btn">Back To Picklists</b-button>
           </router-link>
-          <b-button variant="outline-primary" class="myBtn" @click="createPDF">Create Picklist PDF</b-button>
+          <b-button variant="outline-primary" class="btn" @click="createPDF">Create Picklist PDF</b-button>
         </div>
       </div>
       <div class="right-div">
@@ -51,12 +134,30 @@
               <template slot="actions" slot-scope="row" class="actions">
                 <div class="row">
                   <div class="col-md-6 col-lg-6">
-                    <b-button type="button" class="btn btn-success action-btn"><i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:black"></i></b-button>
+                    <b-button type="button" class="btn btn-success action-btn" @click.stop="editItem(row.item, row.index)"><i class="far fa-edit fa-lg" v-b-tooltip.hover title="Edit Item" style="color:black"></i></b-button>
                   </div>
                   <div class="col-md-6 col-lg-6">
-                    <b-button type="button" class="btn btn-danger action-btn" @click.stop="deletePickList(row.item)"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black"></i></b-button>
+                    <b-button type="button" class="btn btn-danger action-btn" @click.stop="deleteItemFromPickList(row.item)"><i class="fas fa-trash-alt fa-lg" v-b-tooltip.hover title="Delete PickList" style="color:black"></i></b-button>
                   </div>
                 </div>
+                 <b-modal :ref='"editModal"+row.index' no-close-on-backdrop hide-footer :title="rowTitle">
+                  <div>
+                    <p>Edit the quantity to pick for this plant</p>
+                    <b-form-group horizontal label="Quantity:" >
+                      <b-form-input v-model="editRowQuantityToPick"
+                                    placeholder="Enter a quantity"
+                                    type="number"
+                                    pattern="[0-9]*"
+                                    name="editRowQuantityToPick"
+                                    inputmode="numeric"
+                                    v-validate="'required|numeric|min_value:1'"  />
+                    </b-form-group>
+                    <p class="text-danger" v-if="errors.has('editRowQuantityToPick')">{{ errors.first('editRowQuantityToPick') }}</p>
+                    <!-- <p class="text-danger" v-if="errors.has('rowPrice')">{{ errors.first('rowPrice') }}</p> -->
+                  </div>
+                    <b-button class="mt-3" variant="outline-primary" block @click.stop="validateBeforeSubmit">Save Edits</b-button>
+                    <b-button class="mt-3" variant="outline-danger" block @click="hideModal(row.index)">Close Me</b-button>
+                </b-modal>
               </template> 
         </b-table>
       </div>
@@ -64,12 +165,15 @@
 </template>
 
 <script>
+import moment from 'moment'
 import QuoteNavbar from '@/components/QuoteNavbar.vue'
+import Datepicker from 'vuejs-datepicker';
 import jsPDF from 'jspdf'
 import 'jspdf-autotable';
   export default {
     components: {
-		  QuoteNavbar,
+      QuoteNavbar,
+      Datepicker,
   	},
       data() {
         return{
@@ -89,10 +193,25 @@ import 'jspdf-autotable';
                 return value ? 'Yes' : 'No'
           }},
           { key: 'originalItem', label: 'Original Item' },
-          { key: 'actions', label: 'Actions'}
+          { key: 'actions', label: 'Actions'},
+          { key: 'plantForPicklistId', thClass: 'd-none', tdClass: 'd-none',}
           ],
           showCollapse: true,
           remainingPlants: [],
+          deliveryTypeName: null,
+          oldDispatchDate: '',
+          newDispatchDate: null,
+          showEditCollapse: false,
+          showAddCollapse: false,
+          batches: [],
+          selectedBatch: null,
+          isLoading: true,
+          batchQuantity: null,
+          comment: null,
+          rowTitle: '',
+          editRowQuantityToPick: null,
+          originalRowQuantityToPick: null,
+          plantForPicklistId: null,
         }
       },
       methods: {
@@ -102,6 +221,13 @@ import 'jspdf-autotable';
             this.changeData(response.data.PickListPlants);
             this.customerRef = response.data.CustomerRef;
             this.customerTel = response.data.CustomerTel;
+            if (response.data.EstimatedDelivery == true)
+            {
+               this.deliveryTypeName = 'Estimated';
+            } else {
+              this.deliveryTypeName = 'Exact';
+            }
+            this.oldDispatchDate = this.customFormatter(response.data.DispatchDate);
           })
           .catch((error) => {
               alert("Error getting current picklists: " + error);
@@ -109,21 +235,53 @@ import 'jspdf-autotable';
         },
         changeData(items) {
           items.forEach(item => {
-            this.pickListDetailItems.push({
-              "plantName": item.PlantName,
-              "formSize": item.FormSize,
-              "location": item.BatchLocation,
-              "quantityToPick": item.QuantityToPick,
-              "isSubbed": item.IsSubbed,
-              "originalItem": item.OriginalItem,
-            });
-            this.plantsForPDF.push({
-              "batchId": item.BatchId,
-              "plantName": item.PlantName,
-              "formSize": item.FormSize,
-              "amountNeeded": item.QuantityToPick,
-              "location": item.BatchLocation,
-            });
+            if(item.Active === true)
+            {
+              this.pickListDetailItems.push({
+                "plantName": item.PlantName,
+                "formSize": item.FormSize,
+                "location": item.BatchLocation,
+                "quantityToPick": item.QuantityToPick,
+                "isSubbed": item.IsSubbed,
+                "originalItem": item.OriginalItem,
+                "plantForPicklistId": item.PlantForPicklistId,
+              });
+              this.plantsForPDF.push({
+                "batchId": item.BatchId,
+                "plantName": item.PlantName,
+                "formSize": item.FormSize,
+                "amountNeeded": item.QuantityToPick,
+                "location": item.BatchLocation,
+              });
+            }
+          });
+        },
+        customFormatter(date) { //Return the correct format so that the table dates can be filtered
+          return moment(new Date(date)).format('DD/MM/YYYY');
+        },
+        setSelectedDate(date) {
+          this.newDispatchDate = this.customFormatter(date);
+          console.log(this.newDispatchDate);
+        },
+        saveDateChanges()
+        {
+          var estDeliveryBool = true;
+          if (this.deliveryTypeName == 'Exact')
+          {
+            estDeliveryBool = false;
+          }
+          this.axios.put("http://ahillsquoteservice.azurewebsites.net/api/picklist/updateDate", 
+            {
+              PickListId: this.pickListDetail.pickListId,
+              EstimatedDelivery: estDeliveryBool,
+              DispatchDate: this.newDispatchDate,
+            })
+            .then((response) => {
+              console.log(response);
+              alert("Date changes saved")
+            })
+          .catch((error) => {
+            alert(error);
           });
         },
         getRemainingPlants() {
@@ -161,12 +319,134 @@ import 'jspdf-autotable';
             }
           });
         },
-        deletePickList(row)
+        getBatches() {
+          this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+          .then((response) => {
+            this.changeBatchData(response.data);
+            this.isLoading = false;
+          }).catch((error) => {
+            alert("Sorry there was an error")
+            console.log(error)
+          });
+        },
+        changeBatchData (response) {
+          for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
+            if(response[i].Active === true) {        //Only get the batches that are active to not show deleted batches  
+              this.batches.push({                 //This is then pushed into an array and used to populate the data table
+                "batchId": response[i].Id,
+                "Sku": response[i].Sku,
+                "plantName": response[i].Name,
+                "location": response[i].Location,
+                "quantity": response[i].Quantity,
+                "formSize": response[i].FormSize,
+                "price": response[i].WholesalePrice,
+                "active": response[i].Active,
+                "growingQuantity": response[i].GrowingQuantity,
+                "allocatedQuantity": response[i].AllocatedQuantity,
+                "dateStamp": response[i].DateStamp,
+              });
+            }     
+          }
+        },
+        customLabel ({ plantName, formSize, quantity }) { //Returns a custom label to be used on the dropdown
+          return `${plantName} | ${formSize} | Qty: (${quantity})`
+        },
+        validateBatch(e) { //Check that all validation passes before saving
+          this.$validator.validateAll();
+          if (!this.errors.any() && this.selectedBatch != null && this.batchQuantity != null) { 
+              this.addNewItemToPicklist(); //If there are no validation errors and a batch has been selected add a plant to the list
+          }
+        },
+        addNewItemToPicklist()
+        {
+            if(confirm("This will also add this plant onto the original sales order. Make sure to check pricing of item in quote"))
+            {
+              this.axios.put("https://ahillsquoteservice.azurewebsites.net/api/picklist/addItem", 
+                {
+                  PickListId: this.pickListDetail.pickListId,
+                  PlantName: this.selectedBatch.plantName,
+                  Comment: this.comment,
+                  FormSize: this.selectedBatch.formSize,
+                  QuantityToPick: this.batchQuantity,
+                  BatchId: this.selectedBatch.batchId,
+                })
+                .then((response) => {
+                  console.log(response);
+                  this.pickListDetailItems = [],
+                  this.getPickListDetail();
+                })
+              .catch((error) => {
+                alert(error);
+              });
+            }
+        },
+        deleteItemFromPickList(row)
         {
             if(confirm("WARNING: If this is the last item on the picklist it will delete the entire picklist \nAre you sure you want to delete, this will add the Quantity to pick back onto the sales order"))
             {
-
+                this.axios.put("http://ahillsquoteservice.azurewebsites.net/api/picklist/deletePicklistRow?PlantForPicklistId=" + row.plantForPicklistId, 
+                {
+                })
+                .then((response) => {
+                  console.log(response);
+                  this.pickListDetailItems = [];
+                  this.getPickListDetail();
+                })
+              .catch((error) => {
+                alert(error);
+              });
             }
+        },
+        editItem(row, rowId) {
+            this.$refs['editModal'+rowId].show(); //Open editing modal
+            this.rowTitle = row.plantName + " " + row.formSize;
+            this.originalRowQuantityToPick = row.quantityToPick;
+            this.plantForPicklistId = row.plantForPicklistId;
+            if (row.plantForPicklistId == null)
+            {
+              confirm("plant for picklistid is null which means this will not be able to be edited");
+            }
+        },
+        validateBeforeSubmit(e) { //Check that all validation passes before saving
+          this.$validator.validate('editRowQuantityToPick', this.editRowQuantityToPick); //Validate the inputs on the modal
+          if (!this.errors.any() && this.editRowQuantityToPick != null && this.editRowQuantityToPick > 0) { 
+              this.saveRowEdit(); //If there are no validation errors and a batch has been selected add a plant to the list
+          }
+        },
+        saveRowEdit()
+        {
+            if (confirm("If the quantity is greater than the original picklist, accepting this will add update this picklist and add the additional quantity to the sales order."))
+            {
+              console.log("updating picklist row");
+              this.axios.put("http://ahillsquoteservice.azurewebsites.net/api/picklist/editPicklistRow", 
+                {
+                  PlantForPicklistId: this.plantForPicklistId,
+                  NewQuantityToPick: this.editRowQuantityToPick,
+                })
+                .then((response) => {
+                  console.log(response);
+                  this.hideModal();
+                  this.pickListDetailItems = [];
+                  this.getPickListDetail();
+                })
+              .catch((error) => {
+                alert(error);
+              });
+            }
+        },
+        hideModal(rowId) {
+          this.$refs['editModal'+rowId].hide();
+        },
+        changeDeliveryType()
+        {
+          //Grim but w/e
+          if (this.deliveryTypeName == 'Estimated')
+          {
+              this.deliveryTypeName = 'Exact'; 
+          } else if (this.deliveryTypeName == 'Exact') 
+          {
+              this.deliveryTypeName = 'Estimated';
+          }
         },
         createPDF() {
           let pdfName = 'Picklist' + this.pickListDetail.quoteId;
@@ -264,6 +544,7 @@ import 'jspdf-autotable';
         this.pickListDetail = this.$route.params.pickListDetail;
         this.getPickListDetail();
         this.getRemainingPlants();
+        this.getBatches();
       },
     }
 </script>
