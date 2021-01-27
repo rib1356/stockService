@@ -105,14 +105,21 @@ export default {
       sessionStorage.removeItem('customers');
       location.reload();
     },
-    retrieveData (dbBatch) {
-      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+    retrieveData () {
+      // this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/Batches') //Call the database to retrieve the current batches
+      //   .then((response) => {
+      //     console.log(response);
+      //     this.excelBatch(response.data); //Call this each time so the correct batch data can be export
+      //     if(dbBatch) { //Only call this if the batch data needs to be saved into browser storage
+      //       this.changeData(response.data);
+      //     }
+      // }).catch((error) => {
+      //     console.log(error);
+      // });
+
+      this.axios.get('https://ahillsbatchservice.azurewebsites.net/api/getBatchCount') //Call the database to retrieve the current batches
         .then((response) => {
-          console.log(response);
-          this.excelBatch(response.data); //Call this each time so the correct batch data can be export
-          if(dbBatch) { //Only call this if the batch data needs to be saved into browser storage
-            this.changeData(response.data);
-          }
+          this.batches = response.data;
       }).catch((error) => {
           console.log(error);
       });
@@ -141,7 +148,7 @@ export default {
       //Save the data into session storage
       sessionStorage.setItem('batchList', JSON.stringify(this.batchData));
       sessionStorage.setItem('batchInMemory', true);
-      this.batches = this.batchData.length;
+      //this.batches = this.batchData.length;
     },
     excelBatch(response) {
       for(var i = 0; i < response.length; i++){ //Loop through the requested data and create an array of objects
@@ -198,17 +205,17 @@ export default {
 		},
   },  
   mounted() {
-    var bool;
-    if(sessionStorage.getItem('batchList') == null) {
-      console.log("getting data from db");
-      bool = true;
-      // this.retrieveData(pleb);
-    } else {
-      console.log("getting length from session");
-      setTimeout(this.getNoBatches, 1500);
-      bool = false;
-    }
-    this.retrieveData(bool);
+    // var bool;
+    // if(sessionStorage.getItem('batchList') == null) {
+    //   console.log("getting data from db");
+    //   bool = true;
+    //   // this.retrieveData(pleb);
+    // } else {
+    //   console.log("getting length from session");
+    //   setTimeout(this.getNoBatches, 1500);
+    //   bool = false;
+    // }
+    this.retrieveData();
     setTimeout(this.getCustomers,1500);
     setTimeout(this.getQuotes,1500);
     sessionStorage.setItem('timesLoaded', 0);

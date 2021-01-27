@@ -206,44 +206,48 @@
 					</div>
 					<br>
 					<div class="row">
-						<div class="col-xs-5 col-md-5 col-lg-5">
+						<div class="col-xs-4 col-md-4 col-lg-4">
 							<multiselect 
+							  v-model="selectedPlantNameFilter"
 								:options="plantNameFilters"  
 								placeholder="Select a plantname" 
 								:loading="isLoading"
 								:show-labels="false"
 								:allow-empty="false"
-								open-direction="bottom"
-               
-								>
+								open-direction="bottom">
 								</multiselect>
 						</div>
-						<div class="col-xs-3 col-md-3 col-lg-2">
+						<div class="col-xs-2 col-md-2 col-lg-2">
 							<multiselect 
+								v-model="selectedFormSizeFilter"
 								:options="formSizeFilters"  
 								placeholder="Select a formsize" 
 								:loading="isLoading"
 								:show-labels="false"
 								:allow-empty="false"
-								open-direction="bottom"
-               
-								>
+								open-direction="bottom">
 								</multiselect>
 						</div>
 						<div class="col-xs-2 col-md-2 col-lg-2">
 							<multiselect 
+								v-model="selectedLocationFilter"
 								:options="locationFilters"  
 								placeholder="Select a location" 
 								:loading="isLoading"
 								:show-labels="false"
 								:allow-empty="false"
-								open-direction="bottom"
-								>
+								open-direction="bottom">
 								</multiselect>
 						</div>
+						<div class="col-xs-1 col-md-1 col-lg-1">
+							<b-btn variant="success" block @click="filterCurrentSearchedPlants()">Filter</b-btn>
+						</div>
 						<div class="col-xs-2 col-md-2 col-lg-2">
-							<b-btn variant="success" block >Filter</b-btn>
-					</div>
+							<b-btn variant="success" block @click="removePBFromCurrentSearchedPlants()">Remove PB</b-btn>
+						</div>
+						<div class="col-xs-1 col-md-1 col-lg-1">
+							<b-btn variant="danger" block @click="clearFilterCurrentSearchedPlants()">Clear</b-btn>
+						</div>
 					</div>
 					
 					<br>
@@ -438,6 +442,7 @@ export default {
       customPrice: 0,
 			showPlantPickerModal: false,
 			currentSearchedPlants: [],
+			originalSearchedPlants: [],
 			plantSearch: '',
 			showSearchTable: true,
 			showAddingPlantSection: false, //Nice names lmao
@@ -445,6 +450,9 @@ export default {
 			plantNameFilters: [],
 			formSizeFilters: [],
 			locationFilters: [],
+			selectedPlantNameFilter: null,
+			selectedFormSizeFilter: null,
+			selectedLocationFilter: null,
 		}		
 	},
   methods: {
@@ -633,11 +641,19 @@ export default {
 			this.showPlantPickerModal = true;
 			this.showAddCollapse = false;
 			this.currentSearchedPlants = [];
-      this.plantSearch = ""
+			this.originalSearchedPlants = [];
+			this.plantSearch = "";
+			this.formSizeFilters = [];
+			this.plantNameFilters = [];
+			this.locationFilters = [];
+			this.selectedPlantNameFilter = null;
+			this.selectedFormSizeFilter = null;
+			this.selectedLocationFilter = null;
 		},
 		searchAgain()
 		{
 			this.currentSearchedPlants = [];
+			this.originalSearchedPlants = [];
 			this.plantSearch = ""
 			this.selectedRowFromSearch = null;
 			this.showAddingPlantSection = false;
@@ -645,7 +661,13 @@ export default {
 			this.currentGPM = '';
 			this.quantity = null
 			this.comment = null
-      this.calculatedPrice = '';
+			this.calculatedPrice = '';
+			this.selectedPlantNameFilter = null;
+			this.selectedFormSizeFilter = null;
+			this.selectedLocationFilter = null;
+			this.formSizeFilters = [];
+			this.plantNameFilters = [];
+			this.locationFilters = [];
 		},
 		backToLastSearch()
 		{
@@ -659,15 +681,56 @@ export default {
 		},
 		clearSearch()
     {
-      this.currentSearchedPlants = [];
+			this.currentSearchedPlants = [];
+			this.originalSearchedPlants = [];
 			this.plantSearch = ""
 			this.selectedRowFromSearch = null;
+			this.selectedPlantNameFilter = null;
+			this.selectedFormSizeFilter = null;
+			this.selectedLocationFilter = null;
+			this.formSizeFilters = [];
+			this.plantNameFilters = [];
+			this.locationFilters = [];
 		},
 		showModalOtherScreen(row)
 		{
 			this.showAddingPlantSection = true;
 			this.showSearchTable = false;
 			this.selectedRowFromSearch = row;
+		},
+		filterCurrentSearchedPlants()
+		{
+			if (this.selectedPlantNameFilter != null)
+			{
+				let selectedPlants = this.currentSearchedPlants.filter(x => //Loop through batches to find which match the one selected for picking
+					(x.PlantName === this.selectedPlantNameFilter));
+				this.currentSearchedPlants = selectedPlants;
+			}
+			if (this.selectedFormSizeFilter != null)
+			{
+				let selectedPlants = this.currentSearchedPlants.filter(x => //Loop through batches to find which match the one selected for picking
+					(x.FormSize === this.selectedFormSizeFilter));
+				this.currentSearchedPlants = selectedPlants;
+			}
+			if (this.selectedLocationFilter != null)
+			{
+				let selectedPlants = this.currentSearchedPlants.filter(x => //Loop through batches to find which match the one selected for picking
+				(x.Location === this.selectedLocationFilter));
+				this.currentSearchedPlants = selectedPlants;
+			}
+		},
+		clearFilterCurrentSearchedPlants()
+		{
+			this.selectedPlantNameFilter = null;
+			this.selectedFormSizeFilter = null;
+			this.selectedLocationFilter = null;
+			this.currentSearchedPlants = this.originalSearchedPlants;
+		},
+		removePBFromCurrentSearchedPlants()
+		{
+			let selectedPlants = this.currentSearchedPlants.filter(x => //Loop through batches to find which match the one selected for picking
+				(x.Location != "PB"));
+				this.currentSearchedPlants = selectedPlants;
 		},
 		searchForPlant()
     {
@@ -694,7 +757,7 @@ export default {
 						tempFSF.push(response.data[i].FormSize);
 						tempLF.push(response.data[i].Location);
 					}
-					
+					this.originalSearchedPlants = this.currentSearchedPlants;
 					this.plantNameFilters = this.removeDuplicates(tempPNF);
 					this.formSizeFilters = this.removeDuplicates(tempFSF);
 					this.locationFilters = this.removeDuplicates(tempLF);
