@@ -13,9 +13,13 @@
       <!-- </router-link> -->
     </div>
     <div class="right-div">
-      <div class="row" style="height: 50vh;">
+       <div class="row">
         <div class="col-xs-12 col-md-12 col-lg-12">
           <h4>Items to add to picklist</h4><h6>If Quantity on Picklist is greater than 0. An item already exists on another picklist</h6>
+        </div>
+      </div>
+      <div class="row" style="height: 50vh; overflow:auto">
+        <div class="col-xs-12 col-md-12 col-lg-12">
           <b-table
             show-empty
             stacked="md"
@@ -31,10 +35,14 @@
           </b-table>
         </div>
       </div>
-      <div class="row" style="height: 49vh;">
+      <div class="row">
+        <div class="col-xs-12 col-md-12 col-lg-12">
+          <h4>Items on this picklist</h4>
+        </div>
+      </div>
+      <div class="row" style="height: 50vh; overflow:auto">
         <div class="col-xs-12 col-md-12 col-lg-12">
           <div>
-            <h4>Items on this picklist</h4>
             <b-table
               show-empty
               stacked="md"
@@ -92,7 +100,7 @@
             >
             <template slot="actions" slot-scope="row">
               <b-input-group class="input-filter">
-                <b-form-input type="text" v-model="row.item.AmountToAddToPicklist" placeholder="Amount to add"/>
+                <b-form-input type="number" v-model="row.item.AmountToAddToPicklist" placeholder="Amount to add"/>
                   <b-input-group-append>
                     <b-btn variant="success" @click="AddItemsFromModalToPicklist(row.item)">Add</b-btn>
                   </b-input-group-append>
@@ -156,6 +164,7 @@ export default {
         { key: "BatchQuantity", label: "Saleable", sortable: true },
         { key: "GrowingQuantity", label: "Growing", sortable: true },
         { key: "AllocatedQuantity", label: "Allocated", sortable: true },
+        { key: "WholesalePrice", label: "Wholesale Price", sortable:true},
         { key: "actions", label: "Actions" }
       ],
       pickListFields: [
@@ -247,6 +256,7 @@ export default {
               BatchQuantity: response.data[i].Quantity,
               GrowingQuantity: response.data[i].GrowingQuantity,
               AllocatedQuantity: response.data[i].AllocatedQuantity,
+              WholesalePrice: "£"+(response.data[i].WholesalePrice/100).toFixed(2),
               AmountToAddToPicklist: null,
             });
           }
@@ -286,6 +296,7 @@ export default {
               BatchQuantity: response.data[i].Quantity,
               GrowingQuantity: response.data[i].GrowingQuantity,
               AllocatedQuantity: response.data[i].AllocatedQuantity,
+              WholesalePrice: "£"+(response.data[i].WholesalePrice/100).toFixed(2),
               AmountToAddToPicklist: null,
               _rowVariant: rowVariant,
             });
@@ -299,6 +310,7 @@ export default {
     },
     AddItemsFromModalToPicklist(row)
     {
+      
        this.currentSelectedPlant.QuantityOutstanding += parseInt(row.AmountToAddToPicklist); //Set the current set plant when the modal opens so we can edit the qty left to pick here
        row.PlantForQuoteId = this.currentSelectedPlant.PlantForQuoteId;
        var issubbed = false;
@@ -320,7 +332,8 @@ export default {
          OriginalItem: originalItem,
          DispatchLocation: null,
        });
-       row.AmountToAddToPicklist = null; //Reset value
+       row.AmountToAddToPicklist = 0; //Reset value
+      
     },
     AddSundriesFromModalToPicklist()
     {

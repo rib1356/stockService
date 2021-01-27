@@ -26,14 +26,15 @@ import moment from 'moment';
     },
     methods: {
       getDeliveredPlants() {
-        if(this.check1 == false && this.check2 == false)
+        if(!this.check1 && !this.check2)
         {
+          console.log("num")
           this.pickList();
-          this.quote();
-        } else if(this.check1 && this.check2) {
+          //this.quote();
+        } else {
           this.check1 = false;
           this.check2 = false;
-          this.getPlantPrices();
+          //this.getPlantPrices();
           //this.createInvoicePDF();
         }
         
@@ -50,6 +51,17 @@ import moment from 'moment';
         .catch((error) => {
             alert("Error getting current picklists: " + error);
         });
+
+        this.axios.get('https://ahillsquoteservice.azurewebsites.net/api/quote/detail?id=' + this.rowInfo.quoteId)
+        .then((response) => {
+          this.totalPrice = (parseFloat(response.data.TotalPrice) / 100);
+          this.siteRef = response.data.SiteRef;
+          this.changeQuoteData(response.data.QuoteDetails);
+         })
+        .catch((error) => {
+            alert("Error getting current picklists: " + error);
+        });
+        this.getPlantPrices();
       },
       quote() {
         //Get the plants on the quote to get the prices/total price
@@ -73,6 +85,7 @@ import moment from 'moment';
             "outstandingPlants": item.QuantityToPick - item.QuantityPicked
           });
         });
+        console.log(this.plantsToDeliver);
         this.check1 = true;
         this.getDeliveredPlants()
       },

@@ -83,7 +83,7 @@
 		  <hr>
 			</b-collapse>
     </div>
-		<label class="typo__label">Choose a plant to add to a quote</label>
+		<!-- <label class="typo__label">Choose a plant to add to a quote</label>
 		<multiselect v-model="selectedBatch" 
 								:options="batches"  
 								placeholder="Select a batch" 
@@ -115,14 +115,14 @@
 									@keyup.enter.native="validateBeforeSubmit"
 									@input="calculatePrice"></b-form-input>	
 									<p class="text-danger" v-if="errors.has('quantity')">{{ errors.first('quantity') }}</p>
-		<!-- <strong>Item Price £{{selectedBatch.batchPrice/100}}</strong>							 -->
+		
 		<strong v-if="!retail">Calculated Price £{{calculatedPrice}}</strong>
 		<strong v-else>Retail Price £{{calculatedPrice}}</strong>
 		<br>							
-		<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
+	
 		<strong v-if="!retail">Current discount: {{(currentGPM)}}%</strong>
 		<br>
-		<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
+		
 		<b-form-input v-model="comment"
 									placeholder="Enter a plant comment"
 									type="text"
@@ -130,8 +130,14 @@
 									@keyup.enter.native="validateBeforeSubmit"></b-form-input>	
     <p v-if="showAddCollapse" style="color: red;"><b>Plants will be added from the Custom Add dropdown!</b></p>														
 		<p v-else>Please add plants to the quote to save</p>			
+		
+		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>
+		<br>
+		<br> -->
+		<b-button @click="openPlantPickerModal" variant="success" style="margin-top: 5px;">Search for plants to add to quote</b-button>		
+<!-- <strong>Next Calculated Price £{{nextCalculatedPrice}}</strong>							 -->
+	<!-- <strong>Qtn needed until next band {{untilNextBand}}</strong> -->
 		<b-button @click="saveQuote" v-if="totalPrice != 0" variant="outline-success" style="margin-top: 5px;">Save Quote</b-button>	
-		<b-button @click="validateBeforeSubmit" variant="outline-primary" style="margin-top: 5px;">Add plant</b-button>		
 	</div>
 		<div class="right-div" id="right">
 			<strong>Quote Price: £{{computedTotalPrice}}</strong>
@@ -182,6 +188,172 @@
       </template>     
     </b-table>	
 	</div>
+	<!-- MODAL -->
+    <b-modal v-model="showPlantPickerModal" size="xl" class="modal-xl" no-close-on-backdrop hide-footer title="Search and add a plant to a quote">
+			<div v-if="showSearchTable">
+					<div class="row">
+						<div class="col-xs-12 col-md-12 col-lg-12">
+							<b-input-group class="input-filter">
+								<b-form-input type="text" v-model="plantSearch" placeholder="Type to Search"/>
+									<b-input-group-append>
+										<b-btn variant="success" @click="searchForPlant">Search</b-btn>
+									</b-input-group-append>
+									<b-input-group-append>
+										<b-btn variant="danger" @click="clearSearch">Clear</b-btn>
+									</b-input-group-append>
+							</b-input-group>
+						</div>
+					</div>
+					<br>
+					<div class="row">
+						<div class="col-xs-5 col-md-5 col-lg-5">
+							<multiselect 
+								:options="plantNameFilters"  
+								placeholder="Select a plantname" 
+								:loading="isLoading"
+								:show-labels="false"
+								:allow-empty="false"
+								open-direction="bottom"
+               
+								>
+								</multiselect>
+						</div>
+						<div class="col-xs-3 col-md-3 col-lg-2">
+							<multiselect 
+								:options="formSizeFilters"  
+								placeholder="Select a formsize" 
+								:loading="isLoading"
+								:show-labels="false"
+								:allow-empty="false"
+								open-direction="bottom"
+               
+								>
+								</multiselect>
+						</div>
+						<div class="col-xs-2 col-md-2 col-lg-2">
+							<multiselect 
+								:options="locationFilters"  
+								placeholder="Select a location" 
+								:loading="isLoading"
+								:show-labels="false"
+								:allow-empty="false"
+								open-direction="bottom"
+								>
+								</multiselect>
+						</div>
+						<div class="col-xs-2 col-md-2 col-lg-2">
+							<b-btn variant="success" block >Filter</b-btn>
+					</div>
+					</div>
+					
+					<br>
+					<div class="row">
+						<div class="col-xs-12 col-md-12 col-lg-12">
+							<b-table
+							show-empty
+							stacked="md"
+							:items="currentSearchedPlants"
+							:fields="searchedPlantFields"
+							outlined
+							>
+							<template slot="actions" slot-scope="row">
+								<!-- <b-input-group class="input-filter"> -->
+									<!-- <b-form-input type="number" v-model="row.item.AmountToAddToPicklist" placeholder="Amount to add"/> -->
+										<!-- <b-input-group-append> -->
+											<b-btn variant="success" @click="showModalOtherScreen(row.item)">Add</b-btn>
+										<!-- </b-input-group-append> -->
+								<!-- </b-input-group> -->
+							</template>
+						</b-table>
+						</div>
+					</div>
+					<div class="row">
+						<!-- Going to be for filtering shit -->
+					</div>
+			</div>
+			<div v-if="showAddingPlantSection">
+				<div class="row">
+					<div class="col-xs-12 col-md-12 pull-left">
+							<p>Plant Name: {{selectedRowFromSearch.PlantName}}</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-4 col-md-4">
+							<p>Available Quantity: {{selectedRowFromSearch.BatchQuantity}}</p>
+					</div>
+					<div class="col-xs-4 col-md-4">
+							<p>Growing Quantity: {{selectedRowFromSearch.GrowingQuantity}}</p>
+					</div>
+						<div class="col-xs-4 col-md-4">
+							<p>Allocated Quantity: {{selectedRowFromSearch.AllocatedQuantity}}</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+							<p>Location: {{selectedRowFromSearch.Location}}</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+							<p>FormSize: {{selectedRowFromSearch.FormSize}}</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+							<p>Wholesale Price: £{{(selectedRowFromSearch.WholesalePrice/100).toFixed(2)}}</p>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="col-xs-6 col-md-6">
+							<b-form-input v-model="quantity"
+									placeholder="Enter a quantity"
+									type="number"
+                  pattern="[0-9]*"
+									v-validate="'required|numeric|min_value:1'"
+									name="quantity"
+									inputmode="numeric"
+									@input="calculatePriceNew">
+							</b-form-input>	
+					</div>
+					<div class="col-xs-6 col-md-6">
+						<strong v-if="!retail">Calculated Price £{{calculatedPrice}}</strong>
+						<strong v-else>Retail Price £{{calculatedPrice}}</strong>
+						<strong v-if="!retail">Current discount: {{(currentGPM)}}%</strong>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-12 col-md-12">
+						<b-form-input v-model="comment"
+										placeholder="Enter a plant comment"
+										type="text"
+										style="margin-top: 10px;"
+										@keyup.enter.native="validateBeforeSubmit">
+						</b-form-input>	
+					</div>
+				</div>
+				<br>
+				
+			</div>
+        <div class="row" v-if="showAddingPlantSection">
+          <div class="col-xs-3 col-md-3 col-lg-3">
+            <b-button variant="danger" block @click="searchAgain()">Search Again</b-button>
+            <!-- <b-button variant="outline-danger" block >Close Modal</b-button> -->
+          </div>
+					<div class="col-xs-3 col-md-3 col-lg-3">
+            <b-button variant="warning" block @click="backToLastSearch()">Last Search</b-button>
+            <!-- <b-button variant="outline-danger" block >Close Modal</b-button> -->
+          </div>
+					<div class="col-xs-3 col-md-3 col-lg-3">
+            <b-button variant="success" block @click="addToList(true)">Add And Re-search</b-button>
+            <!-- <b-button variant="outline-danger" block >Close Modal</b-button> -->
+          </div>
+					<div class="col-xs-3 col-md-3 col-lg-3">
+            <b-button variant="info" block @click="addToList(false)">Add And Keep Search</b-button>
+            <!-- <b-button variant="outline-danger" block >Close Modal</b-button> -->
+          </div>
+        </div>
+      </b-modal>
 	<!-- PDF Modal -- this will popup once the quote has been saved to the database -->
 	<b-modal ref="createPDFModal" size="sm" title="Create a quote PDF?" centered hide-footer hide-header-close no-close-on-backdrop>
 		<div class="modal__footer">
@@ -217,6 +389,16 @@ export default {
         { key: 'Price', label: 'Item Price', sortable: true, contenteditable: true},
         { key: 'actions', label: 'Actions' }
 			],
+			searchedPlantFields: [
+        { key: "PlantName", label: "Plant Name", sortable: true },
+        { key: "FormSize", label: "Form Size" },
+        { key: "Location", label: "Location" },
+        { key: "BatchQuantity", label: "Saleable", sortable: true },
+        { key: "GrowingQuantity", label: "Growing", sortable: true },
+        { key: "AllocatedQuantity", label: "Allocated", sortable: true },
+        { key: "WholesalePrice", label: "Wholesale Price", sortable:true},
+        { key: "actions", label: "Actions" }
+      ],
 			isLoading: true,
 			isLoading2: false,
 			quoteDate: null,
@@ -254,6 +436,15 @@ export default {
       customComment: null,
       customQuantity: 0,
       customPrice: 0,
+			showPlantPickerModal: false,
+			currentSearchedPlants: [],
+			plantSearch: '',
+			showSearchTable: true,
+			showAddingPlantSection: false, //Nice names lmao
+			selectedRowFromSearch: null,
+			plantNameFilters: [],
+			formSizeFilters: [],
+			locationFilters: [],
 		}		
 	},
   methods: {
@@ -362,7 +553,7 @@ export default {
 				this.totalPrice += plantPrice; //Add it to the total cost of the quote
 			});
 		},
-		addToList() {
+		addToList(searchAgain) {
       if(this.showAddCollapse == true) {
         this.plants.push({
           PlantName: this.customPlantName,
@@ -372,33 +563,35 @@ export default {
           Price: this.customPrice,
           Active: true,
         });
-        this.showAddCollapse = false;
+				this.showAddCollapse = false;
+				 this.customPlantName = "";
+				this.customFormSize = "";
+				this.customComment = null;
+				this.customQuantity = null;
+				this.customPrice = null;
       }
       else {
         this.plants.push({
-          PlantName: this.selectedBatch.plantName,
-          FormSize: this.selectedBatch.formSize,
+          PlantName: this.selectedRowFromSearch.PlantName,
+          FormSize: this.selectedRowFromSearch.FormSize,
           Quantity: this.quantity,
           Comment: this.comment,
           Price: Math.trunc((this.calculatedPrice)*100), //Remove any trailing decimals so that it can be saved as an integer
           Active: true,
-          _rowVariant: this.checkIfBatchHasPrice(this.selectedBatch.batchPrice), //Pass to method
+          _rowVariant: this.checkIfBatchHasPrice(this.selectedRowFromSearch.WholesalePrice), //Pass to method
 			  });
       }
 			
 			this.getTotalPrice(); //Once a plant is added recalculate the current quote price
 			//Reset input and validation
-			this.selectedBatch = null
-			this.quantity = null
-			this.comment = null
-      this.calculatedPrice = '';
-
-      this.customPlantName = "";
-      this.customFormSize = "";
-      this.customComment = null;
-      this.customQuantity = null;
-      this.customPrice = null;
 			this.$validator.reset();
+			if (searchAgain)
+			{
+				this.searchAgain();
+			} else {
+				this.backToLastSearch();
+			}
+			
 		},
 		editItem(row, rowId) {
     	this.$refs['editModal'+rowId].show(); //Open editing modal
@@ -434,6 +627,112 @@ export default {
 			} else {
 				return '' //Else it has a price so dont highlight the row
 			}
+		},
+		openPlantPickerModal()
+		{
+			this.showPlantPickerModal = true;
+			this.showAddCollapse = false;
+			this.currentSearchedPlants = [];
+      this.plantSearch = ""
+		},
+		searchAgain()
+		{
+			this.currentSearchedPlants = [];
+			this.plantSearch = ""
+			this.selectedRowFromSearch = null;
+			this.showAddingPlantSection = false;
+			this.showSearchTable = true;
+			this.currentGPM = '';
+			this.quantity = null
+			this.comment = null
+      this.calculatedPrice = '';
+		},
+		backToLastSearch()
+		{
+			this.selectedRowFromSearch = null;
+			this.showAddingPlantSection = false;
+			this.showSearchTable = true;
+			this.currentGPM = '';
+			this.quantity = null
+			this.comment = null
+      this.calculatedPrice = '';
+		},
+		clearSearch()
+    {
+      this.currentSearchedPlants = [];
+			this.plantSearch = ""
+			this.selectedRowFromSearch = null;
+		},
+		showModalOtherScreen(row)
+		{
+			this.showAddingPlantSection = true;
+			this.showSearchTable = false;
+			this.selectedRowFromSearch = row;
+		},
+		searchForPlant()
+    {
+        this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/search?searchQuery=" +
+            this.plantSearch
+        )
+        .then(response => {
+					var tempPNF = [];
+					var tempFSF = [];
+					var tempLF = [];
+          for (var i = 0; i < response.data.length; i++) {
+            this.currentSearchedPlants.push({
+              BatchId: response.data[i].Id,
+              PlantName: response.data[i].Name,
+              FormSize: response.data[i].FormSize,
+              Location: response.data[i].Location,
+              BatchQuantity: response.data[i].Quantity,
+              GrowingQuantity: response.data[i].GrowingQuantity,
+              AllocatedQuantity: response.data[i].AllocatedQuantity,
+              WholesalePrice: response.data[i].WholesalePrice,
+						});
+						
+						tempPNF.push(response.data[i].Name);
+						tempFSF.push(response.data[i].FormSize);
+						tempLF.push(response.data[i].Location);
+					}
+					
+					this.plantNameFilters = this.removeDuplicates(tempPNF);
+					this.formSizeFilters = this.removeDuplicates(tempFSF);
+					this.locationFilters = this.removeDuplicates(tempLF);
+				})
+        .catch(error => {
+          alert(error);
+				});
+				
+		},
+		removeDuplicates(array) {
+			console.log(array);
+				return array.filter((a, b) => array.indexOf(a) === b)
+		},
+			calculatePriceNew() {
+				//--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				//Going to try deal with this fucking god afwul function that works of the price by communicating to firebase? Need to just put these into the database.
+				//Then you can just called them on page load and save them into session storage because fuck using this 
+				//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				if(this.retail) { //If a retail user has been selected use this price for the items on the quote
+					this.calculatedPrice = ((this.selectedRowFromSearch.WholesalePrice/100)*1.5).toFixed(2);
+				} else {
+					var ref = firebase.database().ref("GPM/").orderByKey();
+					let itemTotal = (this.selectedRowFromSearch.WholesalePrice/100)*this.quantity; //get the line total to work out what gpm to use
+					ref.on("value", (snapshot) => {
+						snapshot.forEach((child) => { //Loop through each of the different bands held within firebase
+								var obj = child.val();
+								if(itemTotal >= obj.rowMin && itemTotal <= obj.rowMax) { //If the itemTotal falls between these values a GPM value is used
+									this.currentGPM = ((1-obj.gpm)*100).toFixed(2);
+									//Apply the calculation to work out the price and add it onto the quote
+									this.calculatedPrice = ((this.selectedRowFromSearch.WholesalePrice/100)*obj.gpm).toFixed(2)
+								}
+							});
+					}, 
+					function (error) {
+						console.log("Error: " + error.code);
+					});
+				}
+			
 		},
 		getBatchList() {
 			if(sessionStorage.getItem('batchList') != null) {
@@ -643,6 +942,11 @@ export default {
 	.navbar-custom {
 			background-color: #15c015;
 	}
+
+	 .modal-xl {
+    max-width: 1200px;
+    min-width: 1200px;
+  }
 
 	@media only screen and (max-width : 768px) {
 

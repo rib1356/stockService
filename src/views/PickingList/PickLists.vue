@@ -78,7 +78,9 @@
                 </div>
                 <div class="col-md-6 col-lg-6">
                    <Invoice ref="invoice" v-bind:rowInfo='row.item'></Invoice>
-                   <router-link v-if="row.item.quantityPicked < row.item.itemsToPick" :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
+                </div>
+                <div class="col-md-12 col-lg-12" v-if="row.item.quantityPicked < row.item.itemsToPick">
+                    <router-link :to="{name: 'PlantPicking', params: { pickListDetail: row.item } }">
                       <b-button type="button" class="btn btn-info action-btn"><i class="fas fa-tree fa-lg icon-tick" style="color:black;"  v-b-tooltip.hover title="Pick Plants"></i></b-button>
                     </router-link>
                 </div>
