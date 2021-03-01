@@ -5,7 +5,7 @@
       <router-link :to="{name: 'StockTable'}">
         <b-button class="myBtn" variant="primary">Stock Table</b-button>
 			</router-link>
-      <router-link :to="{name: 'CustomerInformation'}">
+      <router-link :to="{name: 'RevisedCustomerSelection'}">
         <b-button class="myBtn q-btn" variant="success">Create New Quote</b-button>
       </router-link> 
       <router-link :to="{name: 'ExistingQuotes', params: { salesOrder: false } }"> <!-- PASS IN PARAMS TO DECIDE WHAT TO SHOW -->

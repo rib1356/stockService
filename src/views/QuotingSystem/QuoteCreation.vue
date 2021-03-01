@@ -15,13 +15,13 @@
       </b-button>
 			<b-collapse v-model="showCollapse" id="collapse">
 				<p>
-					Customer Name: <strong>{{customerInfo.customerName}}</strong> <br>
-					Customer Reference: <strong>{{customerInfo.customerRef}}</strong> <br>
-					Customer Telephone: <strong>{{customerInfo.customerTel}}</strong> <br>
+					Customer Name: <strong>{{customerInfo.CustomerName}}</strong> <br>
+					Customer Reference: <strong>{{customerInfo.CustomerReference}}</strong> <br>
+					Customer Telephone: <strong>{{customerInfo.CustomerTel}}</strong> <br>
 				</p>
 				<p>	
-					Customer Address: <strong>{{customerInfo.customerAddress}}</strong> <br>
-					Customer Email: <strong>{{customerInfo.customerEmail}}</strong> <br>
+					Customer Address: <strong>{{customerInfo.CustomerAddress}}</strong> <br>
+					Customer Email: <strong>{{customerInfo.CustomerEmail}}</strong> <br>
 				</p>
 				<p>
 					Site reference: <strong>{{siteRef}}</strong> <br>
@@ -31,6 +31,9 @@
 		  <hr>
 			</b-collapse>
 		</div>
+		<b-form-input v-model="siteRef"
+									type="text"
+									placeholder="Enter a site reference"></b-form-input>
     <div id="custom-add">
       <b-button @click="showAddCollapse = !showAddCollapse"
                 :class="showCollapse ? 'collapsed' : null"
@@ -487,7 +490,7 @@ export default {
 				// 		this.untilNextBand = 0
 				// 	}
 				// }
-				if(this.retail) { //If a retail user has been selected use this price for the items on the quote
+				if(this.customerInfo.CustomerIsWholesale && this.customerInfo.SageCustomer == false) { //If a retail user has been selected use this price for the items on the quote
 					this.calculatedPrice = ((this.selectedBatch.batchPrice/100)*1.5).toFixed(2);
 				} else {
 					var ref = firebase.database().ref("GPM/").orderByKey();
@@ -510,13 +513,13 @@ export default {
 		},
 		saveQuote() {
 			this.axios.post('https://ahillsquoteservice.azurewebsites.net/api/quote', {
-        CustomerRef: this.customerInfo.customerRef,
+        		CustomerRef: this.customerInfo.CustomerReference,
 				TotalPrice: this.totalPrice,
 				Date: this.quoteDate,
 				ExpiryDate: this.expiryDate,
 				SiteRef: this.siteRef,
 				SalesOrder: 0,
-				Retail: this.retail,
+				Retail: this.customerInfo.CustomerIsWholesale,
 				Active: true,
 				QuoteDetails: this.plants,
 				VAT: 0,
@@ -733,7 +736,7 @@ export default {
 				this.currentSearchedPlants = selectedPlants;
 		},
 		searchForPlant()
-    {
+    	{
         this.axios.get("https://ahillsbatchservice.azurewebsites.net/api/search?searchQuery=" +
             this.plantSearch
         )
@@ -776,7 +779,7 @@ export default {
 				//Going to try deal with this fucking god afwul function that works of the price by communicating to firebase? Need to just put these into the database.
 				//Then you can just called them on page load and save them into session storage because fuck using this 
 				//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-				if(this.retail) { //If a retail user has been selected use this price for the items on the quote
+				if(this.customerInfo.CustomerIsWholesale && this.customerInfo.SageCustomer == false) { //If a retail user has been selected use this price for the items on the quote
 					this.calculatedPrice = ((this.selectedRowFromSearch.WholesalePrice/100)*1.5).toFixed(2);
 				} else {
 					var ref = firebase.database().ref("GPM/").orderByKey();
@@ -831,7 +834,7 @@ export default {
     },
 		createPDF () {
 			this.formatPriceForPDF();
-			let pdfName = this.quoteId + "-" + this.customerInfo.customerName + "-" + this.quoteDate; 
+			let pdfName = this.quoteId + "-" + this.customerInfo.CustomerName + "-" + this.quoteDate; 
 			var columns = [
 				{title: "Quantity", dataKey: "Quantity"},
 				{title: "Plant Name", dataKey: "PlantName"},
@@ -851,13 +854,13 @@ export default {
 												"Web: hillandsons.co.uk\n" +
 												"Stock: hillsstock.co.uk"
 			var quoteInfo =	"Quote Id: " + this.quoteId + "\n" +
-											"Customer Ref: " + this.customerInfo.customerRef + "\n" +
+											"Customer Ref: " + this.customerInfo.CustomerReference + "\n" +
 											"Start Date: " + this.quoteDate + "\n" 
-			var deliveryInfo = "Customer Name: " + this.customerInfo.customerName + "\n" +
-												 "Customer Ref: " + this.customerInfo.customerRef + "\n" +
-												 "Customer Tel: " + this.customerInfo.customerTel + "\n" +
-												 "Customer Email: " + this.customerInfo.customerEmail + "\n" +
-												 "Customer Address: "+ this.customerInfo.customerAddress + "\n"
+			var deliveryInfo = "Customer Name: " + this.customerInfo.CustomerName + "\n" +
+												 "Customer Ref: " + this.customerInfo.CustomerReference + "\n" +
+												 "Customer Tel: " + this.customerInfo.CustomerTel + "\n" +
+												 "Customer Email: " + this.customerInfo.CustomerEmail + "\n" +
+												 "Customer Address: "+ this.customerInfo.CustomerAddress + "\n"
 			var doc = new jsPDF('p', 'pt');
 			doc.addImage(companyLogo.src, 'PNG', 30, 30, 100, 75);
 			doc.setFontSize(20);
@@ -908,6 +911,11 @@ export default {
 		getPrice (price) { //Does the same as computed method but passed in a value
       return (price/100).toFixed(2);
 		},
+		getSelectedCustomerFromStorage()
+		{
+			this.customerInfo = JSON.parse(localStorage.getItem('selectedCustomer'));
+			 
+		}
 	},
 	computed: {
     computedTotalPrice () { ///Whenever total value is shown this will format to look monitary
@@ -924,22 +932,23 @@ export default {
 		window.onbeforeunload = function() {
 			return 'This wont save the quote?';
 		};
+		this.getSelectedCustomerFromStorage();
 		// window.onpopstate = function() {
 		// 	confirm("Warning changes havent been saved. Go back to customer selection?");
 			
 		// }
-		if(this.$route.params.custFromList) { //If singleCustomer is null then a customer from dropdown has been passed through
-			this.customerInfo = this.$route.params.selectedCustomer;
-		} else {
-			this.customerInfo = this.$route.params.singleCustomer;
-			// if(this.$route.params.retail) { //When manually entered customer is used, choose the referenced based on if trade or retail is chosen
-			// 	this.customerInfo.customerRef = this.$route.params.retCustomer;
-			// } else {
-			// 	this.customerInfo.customerRef = this.$route.params.trdCustomer;
-			// }
-		}
-		this.siteRef = this.$route.params.siteRef;
-		this.retail = this.$route.params.retail;
+		// if(this.$route.params.custFromList) { //If singleCustomer is null then a customer from dropdown has been passed through
+		// 	this.customerInfo = this.$route.params.selectedCustomer;
+		// } else {
+		// 	this.customerInfo = this.$route.params.singleCustomer;
+		// 	// if(this.$route.params.retail) { //When manually entered customer is used, choose the referenced based on if trade or retail is chosen
+		// 	// 	this.customerInfo.customerRef = this.$route.params.retCustomer;
+		// 	// } else {
+		// 	// 	this.customerInfo.customerRef = this.$route.params.trdCustomer;
+		// 	// }
+		// }
+		// this.siteRef = this.$route.params.siteRef;
+		// this.retail = this.$route.params.retail;
 	},
 }
 </script>

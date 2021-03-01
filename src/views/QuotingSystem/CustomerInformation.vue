@@ -35,6 +35,13 @@
 			</div>
 	</div>
 	<div class="right-div">
+		<ul id="example-1">
+			<li v-for="customer in customers" :key="customer.CustomerName">
+				{{ customer.customerName }} <b-button variant="outline-primary" style="margin-top: 5px;" @click="test(customer)"> select</b-button>
+			</li>
+			</ul>
+
+
 			<p>Site Reference: <strong>{{siteRef}}</strong></p>
 		<b-container>
 		<b-row class="my-1">
@@ -123,6 +130,10 @@ export default {
 		}		
   },
   methods: {
+		test(customer)
+		{
+			console.log(customer);
+		},
 		checkboxChange() {
 			if(this.trade) {
 				this.disabled = 1;

@@ -24,6 +24,7 @@ import QuoteCreation from '@/views/QuotingSystem/QuoteCreation'
 import CustomerInformation from '@/views/QuotingSystem/CustomerInformation'
 import ExistingQuotes from '@/views/QuotingSystem/ExistingQuotes'
 import EditQuote from '@/views/QuotingSystem/EditQuote'
+import RevisedCustomerSelection from '@/views/QuotingSystem/RevisedCustomerSelection'
 
 //Picking List Pages 
 import PlantAllocation from '@/views/PickingList/PlantAllocation'
@@ -178,6 +179,11 @@ const router = new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/RevisedCustomerSelection',
+      name: 'RevisedCustomerSelection',
+      component: RevisedCustomerSelection
     },
   ]
 })

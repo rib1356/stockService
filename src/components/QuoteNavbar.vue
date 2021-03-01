@@ -44,7 +44,7 @@
 				this.$router.push({name: 'ExistingQuotes', params: { salesOrder: true} });
 			},
 			newQuote() {
-				this.$router.push('CustomerInformation');
+				this.$router.push('RevisedCustomerSelection');
       },
       pickLists() {
         this.$router.push('PickLists');
