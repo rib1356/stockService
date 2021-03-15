@@ -64,19 +64,34 @@
     </div>
     <!-- Main Table Element -->
     <div class="table-div">
+      <b-pagination
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+      aria-controls="my-table"
+      first-number
+      last-number
+      centre
+      first-text="First"
+      prev-text="Prev"
+      next-text="Next"
+      last-text="Last"
+      ></b-pagination>
     <b-table show-empty
-             stacked="md"
-             :items="plantData"
-             :fields="fields"
-             :filter="filter"
-             :sort-by.sync="sortBy"
-             :sort-desc.sync="sortDesc"
-             :sort-direction="sortDirection"
-             class="p-2"  
-             :busy="isBusy"
-             outlined
-             
-             >
+            id="my-table"
+            stacked="md"
+            :items="plantData"
+            :fields="fields"
+            :filter="filter"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            :sort-direction="sortDirection"
+            class="p-2"  
+            :busy="isBusy"
+            outlined
+            :per-page="perPage"
+            :current-page="currentPage"
+            >
       <div slot="empty">
         <strong>Loading batches...</strong>
       </div>       
@@ -144,7 +159,9 @@ export default {
       imgError: false,
       imageLoaded: false,
       customers: [],
-      err: ''
+      err: '',
+      perPage: 50,
+      currentPage: 1,
     }
   },
   computed: {
@@ -154,6 +171,9 @@ export default {
         .filter(f => f.sortable)
         .map(f => { return { text: f.label, value: f.key } })
     },
+    rows() {
+        return this.plantData.length
+    }
   },
   methods: {
     info(item, button) {

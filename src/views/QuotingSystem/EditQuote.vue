@@ -557,7 +557,7 @@ export default {
                                                 });
       let finalY = doc.autoTable.previous.finalY;
 			let quotePrice = (this.totalPrice/100).toFixed(2);
-			let quoteVAT = (quotePrice/100*this.VAT).toFixed(2);
+			let quoteVAT = (quotePrice/100*20).toFixed(2);
       let priceAfterVAT = (parseFloat(quotePrice)+parseFloat(quoteVAT)).toFixed(2);
       let footerText = "These Prices Exclude Delivery Charges Unless Quoted";
       doc.setFontSize(12);
